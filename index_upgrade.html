@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lege pallets AWC</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+<style>
+body{font-family:Arial;background:#f3f4f6;margin:0;padding:10px;}
+.container{max-width:700px;margin:auto;background:#fff;padding:20px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,0.1);}
+h2{text-align:center;margin-bottom:20px;}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+input,select,textarea{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:1px solid #ddd;
+font-size:16px;
+}
+
+button{
+width:100%;
+padding:14px;
+margin-top:10px;
+border:none;
+border-radius:12px;
+font-weight:bold;
+font-size:16px;
+}
+
+.primary{background:black;color:white;}
+.secondary{background:#e5e7eb;}
+
+.section{margin-top:20px;}
+.title{font-weight:bold;margin-bottom:5px;}
+
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h2>Lege pallets AWC</h2>
+
+<div class="section">
+<div class="title">Locatie</div>
+<select id="loc">
+<option>Conakryweg</option>
+<option>Slego</option>
+</select>
+</div>
+
+<div class="section">
+<div class="title">Datum</div>
+<input type="date" id="date">
+</div>
+
+<div class="section grid">
+<input type="number" id="euro" placeholder="Europallets">
+<input type="number" id="blok" placeholder="Blokpallets">
+<input type="number" id="m2" placeholder="2m pallets">
+<input type="number" id="dpb" placeholder="DPB pallets">
+</div>
+
+<div class="section">
+<input type="text" id="name" placeholder="Naam">
+</div>
+
+<button class="primary" onclick="save()">Opslaan</button>
+<button class="secondary" onclick="downloadExcel()">Download Excel</button>
+<button class="secondary" onclick="sendMail()">Mail versturen</button>
+
+</div>
+
+<script>
+
+date.value = new Date().toISOString().split('T')[0];
+
+function save(){
+let data = JSON.parse(localStorage.getItem("awc")||"[]");
+
+data.push({
+date:date.value,
+loc:loc.value,
+euro:euro.value,
+blok:blok.value,
+m2:m2.value,
+dpb:dpb.value,
+name:name.value
+});
+
+localStorage.setItem("awc", JSON.stringify(data));
+alert("Opgeslagen!");
+}
+
+function downloadExcel(){
+let data = JSON.parse(localStorage.getItem("awc")||"[]");
+let csv="Datum;Loc;Euro;Blok;2m;DPB;Naam\n";
+
+data.forEach(r=>{
+csv+=`${r.date};${r.loc};${r.euro};${r.blok};${r.m2};${r.dpb};${r.name}\n`;
+});
+
+let blob=new Blob([csv]);
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="pallets.csv";
+a.click();
+}
+
+function sendMail(){
+let body=`Pallet telling
+
+Locatie: ${loc.value}
+Datum: ${date.value}
+Euro: ${euro.value}
+Blok: ${blok.value}
+2m: ${m2.value}
+DPB: ${dpb.value}
+Naam: ${name.value}`;
+
+window.location.href="mailto:warehouseh@amsterdamwarehouse.com?subject=Pallet telling&body="+encodeURIComponent(body);
+}
+
+</script>
+
+</body>
+</html>
