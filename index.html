@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lege pallets AWC</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+<style>
+body{font-family:Arial;background:#eef2f5;padding:10px;}
+.container{max-width:600px;margin:auto;background:#fff;padding:20px;border-radius:12px;}
+input,select{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:1px solid #ccc;}
+button{width:100%;padding:12px;margin-top:10px;background:black;color:white;border:none;border-radius:8px;}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h2>Lege pallets AWC</h2>
+
+<select id="loc">
+<option>Conakryweg</option>
+<option>Slego</option>
+</select>
+
+<input type="date" id="date">
+
+<input type="number" placeholder="Europallets">
+<input type="number" placeholder="Blokpallets">
+<input type="number" placeholder="2m pallets">
+<input type="number" placeholder="DPB pallets">
+
+<button onclick="alert('Opgeslagen')">Opslaan</button>
+
+</div>
+
+<script>
+date.value = new Date().toISOString().split('T')[0];
+</script>
+
+</body>
+</html>
