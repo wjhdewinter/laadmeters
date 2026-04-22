@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Warehouse Master v4.4</title>
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --border: #334155; --accent: #3b82f6; --wa: #22c55e; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: sans-serif; }
+        body { margin: 0; padding: 0; height: 100vh; background: var(--bg); color: var(--text); display: flex; flex-direction: column; overflow: hidden; }
+        .header { background: var(--card); padding: 12px; border-bottom: 2px solid var(--border); }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .stat-box { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
+        .stat-val { display: block; font-size: 1.2rem; font-weight: 900; color: var(--wa); }
+        .trailer-scroll { width: 100%; overflow-x: auto; background: #000; padding: 20px 0; margin: 10px 0; border-radius: 6px; border: 1px solid var(--border); }
+        #trailer-canvas { height: 120px; width: 2000px; background: #000; position: relative; border-right: 20px solid #444; margin-left: 20px; }
+        .v-pallet { position: absolute; border: 1px solid rgba(255,255,255,0.8); font-size: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; border-radius: 2px; }
+        .scroll-area { flex: 1; overflow-y: auto; padding: 15px; }
+        .p-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        input[type="number"] { width: 85px; height: 50px; background: #000; color: #fff; border: 2px solid var(--accent); border-radius: 10px; text-align: center; font-size: 1.8rem; font-weight: 900; }
+        footer { padding: 15px; background: var(--card); }
+        .btn-wa { width: 100%; padding: 20px; background: var(--wa); color: white; border: none; border-radius: 14px; font-weight: 900; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <input type="text" id="zending" style="width:100%; padding:12px; background:#000; color:#fff; border:1px solid var(--border); border-radius:8px;" placeholder="Ritnummer / Referentie...">
+    <div class="stats-grid">
+        <div class="stat-box"><span style="font-size:0.6rem; color:#94a3b8;">METERS</span><span id="lm-out" class="stat-val">0,00</span></div>
+        <div class="stat-box"><span style="font-size:0.6rem; color:#94a3b8;">PALLETS</span><span id="pal-out" class="stat-val">0</span></div>
+        <div class="stat-box"><span style="font-size:0.6rem; color:#94a3b8;">VULLING</span><span id="perc-out" class="stat-val">0%</span></div>
+    </div>
+    <div class="trailer-scroll"><div id="trailer-canvas"></div></div>
+</div>
+
+<div class="scroll-area">
+    <div class="p-card"><div><b>Euro (80x120)</b><br><small style="color:#94a3b8">Draait naar 120x80</small></div><input type="number" id="q-euro" value="0" oninput="calculate()"></div>
+    <div class="p-card"><div><b>Blok (120x100)</b><br><small style="color:#94a3b8">Draait naar 100x120</small></div><input type="number" id="q-blok" value="0" oninput="calculate()"></div>
+    <div class="p-card"><div><b>Middel (80x140)</b><br><small style="color:#94a3b8">80 breed</small></div><input type="number" id="q-mid" value="0" oninput="calculate()"></div>
+    <div class="p-card"><div><b>Lang (80x200)</b><br><small style="color:#94a3b8">80 breed</small></div><input type="number" id="q-lang" value="0" oninput="calculate()"></div>
+</div>
+
+<footer><button class="btn-wa" onclick="sendWA()">🚀 VERSTUUR INTELLIGENT PLAN</button></footer>
+
+<script>
+    function calculate() {
+        const canvas = document.getElementById('trailer-canvas');
+        canvas.innerHTML = '';
+        let curX = 0, curY = 0, maxLRow = 0;
+        const T_WIDTH = 240, SCALE = 0.5;
+
+        let pool = [];
+        const add = (id, q, w, l, c, em) => { for(let i=0; i<q; i++) pool.push({id, w, l, c, em}); };
+        add('E', parseInt(document.getElementById('q-euro').value)||0, 80, 120, '#3b82f6', '🟦');
+        add('B', parseInt(document.getElementById('q-blok').value)||0, 120, 100, '#f59e0b', '🟧');
+        add('M', parseInt(document.getElementById('q-mid').value)||0, 80, 140, '#10b981', '🟩');
+        add('L', parseInt(document.getElementById('q-lang').value)||0, 80, 200, '#ef4444', '🟥');
+
+        document.getElementById('pal-out').innerText = pool.length;
+        window.visualMap = []; let currentRow = [];
+
+        while(pool.length > 0) {
+            let foundIdx = -1;
+            let rotated = false;
+            
+            for(let i=0; i<pool.length; i++) {
+                let p = pool[i];
+                // Check of hij 'normaal' past
+                if(curY + p.w <= T_WIDTH) { foundIdx = i; rotated = false; break; }
+                // Check of hij 'gedraaid' past (voor Euro: 120 breed)
+                if(curY + p.l <= T_WIDTH) { foundIdx = i; rotated = true; break; }
+            }
+
+            if(foundIdx !== -1) {
+                let p = pool.splice(foundIdx, 1)[0];
+                let finalW = rotated ? p.l : p.w;
+                let finalL = rotated ? p.w : p.l;
+                
+                const d = document.createElement('div');
+                d.className = 'v-pallet';
+                d.style.left = (curX*SCALE)+"px"; d.style.top = (curY*SCALE)+"px";
+                d.style.width = (finalL*SCALE)+"px"; d.style.height = (finalW*SCALE)+"px";
+                d.style.backgroundColor = p.c; d.innerText = p.id + (rotated ? "↺" : "");
+                canvas.appendChild(d);
+
+                currentRow.push(p.em);
+                curY += finalW;
+                if(finalL > maxLRow) maxLRow = finalL;
+            } else {
+                window.visualMap.push(currentRow.join(''));
+                currentRow = []; curX += maxLRow; curY = 0; maxLRow = 0;
+            }
+        }
+        if(currentRow.length > 0) window.visualMap.push(currentRow.join(''));
+
+        const totalLM = (curX + maxLRow) / 100;
+        document.getElementById('lm-out').innerText = totalLM.toFixed(2).replace('.', ',');
+        document.getElementById('perc-out').innerText = Math.round((totalLM / 13.6) * 100) + "%";
+    }
+
+    function sendWA() {
+        const z = document.getElementById('zending').value || "-";
+        let msg = `*🚛 SMART LAADPLAN*\nRit: ${z}\nMeters: ${document.getElementById('lm-out').innerText}m\n\n*INDELING:*\n`;
+        window.visualMap.forEach((r, i) => msg += `Rij ${i+1}: [${r}]\n`);
+        msg += `\n🟦E | 🟧B | 🟩M | 🟥L`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+    }
+    window.onload = calculate;
+</script>
+</body>
+</html>
