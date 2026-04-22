@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Warehouse Master v2.6</title>
+    <style>
+        :root {
+            --bg: #0f172a; --card: #1e293b; --text: #f8fafc;
+            --border: #334155; --accent: #3b82f6; --danger: #ef4444; --wa: #22c55e;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: sans-serif; }
+        body { margin: 0; padding: 0; height: 100vh; background: var(--bg); color: var(--text); display: flex; flex-direction: column; overflow: hidden; }
+
+        /* Bovenbalk */
+        .header { background: var(--card); padding: 10px; border-bottom: 2px solid var(--border); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .lang-switch { background: #000; border: 1px solid var(--border); color: #fff; padding: 5px; border-radius: 6px; font-weight: bold; }
+        
+        .zending-input { 
+            width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; 
+            border: 2px solid var(--border); background: #000; color: #fff; 
+            font-size: 1rem; font-weight: bold; outline: none;
+        }
+
+        /* Statsblokken zoals in foto 1 */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .stat-box { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
+        .stat-val { display: block; font-size: 1.1rem; font-weight: 900; }
+        .stat-lbl { font-size: 0.6rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; }
+
+        /* Trailer visueel */
+        .trailer-scroll { width: 100%; overflow-x: auto; background: #000; padding: 15px 0; border: 1px solid #444; border-radius: 4px; }
+        #trailer-canvas { height: 110px; width: 680px; background: #111; position: relative; border-right: 12px solid #334155; margin: 0 15px; }
+        .v-pallet { position: absolute; border: 1px solid rgba(255,255,255,0.8); font-size: 9px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+
+        /* De kaarten met invulvelden */
+        .scroll-area { flex: 1; overflow-y: auto; padding: 10px; }
+        .p-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .p-info b { display: block; font-size: 1rem; color: #fff; }
+        .p-info span { font-size: 0.75rem; color: #94a3b8; }
+        
+        .input-group { display: flex; gap: 8px; }
+        input[type="number"] { 
+            width: 65px; height: 45px; background: #000; color: #fff; 
+            border: 2px solid var(--border); border-radius: 8px; 
+            text-align: center; font-size: 1.1rem; font-weight: bold; 
+        }
+
+        /* Footer knoppen */
+        footer { padding: 15px; background: var(--card); border-top: 2px solid var(--border); }
+        .footer-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .btn-reset { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); font-weight: bold; border-radius: 8px; padding: 10px 20px; }
+        .btn-wa { width: 100%; padding: 18px; background: var(--wa); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 0 #15803d; }
+        
+        .check-container { display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        input[type="checkbox"] { width: 25px; height: 25px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-top">
+        <div style="font-weight: 900; font-size: 0.9rem;">WAREHOUSE MASTER</div>
+        <select class="lang-switch" id="lang" onchange="renderApp()">
+            <option value="nl">🇳🇱 NL</option>
+            <option value="en">🇬🇧 EN</option>
+        </select>
+    </div>
+    <input type="text" id="zending" class="zending-input" placeholder="Zending / Ritnummer...">
+    <div class="stats-grid">
+        <div class="stat-box" style="border-color: var(--wa);"><span class="stat-lbl" id="lbl-lm">Meters</span><span id="lm-out" class="stat-val" style="color: var(--wa);">0,00</span></div>
+        <div class="stat-box" style="border-color: var(--accent);"><span class="stat-lbl" id="lbl-kg">Gewicht</span><span id="kg-out" class="stat-val" style="color: var(--accent);">0</span></div>
+        <div class="stat-box"><span class="stat-lbl" id="lbl-perc">Vulling</span><span id="perc-out" class="stat-val">0%</span></div>
+    </div>
+    <div class="trailer-scroll"><div id="trailer-canvas"></div></div>
+</div>
+
+<div class="scroll-area" id="main-list">
+    </div>
+
+<footer>
+    <div class="footer-top">
+        <label class="check-container">
+            <input type="checkbox" id="stack" onchange="calc()"> <span id="lbl-stack">STAPELBAAR</span>
+        </label>
+        <button class="btn-reset" id="lbl-reset" onclick="resetAll()">RESET</button>
+    </div>
+    <button class="btn-wa" id="lbl-wa" onclick="sendWA()">WHATSAPP VERSTUREN</button>
+</footer>
+
+<script>
+    const ui = {
+        nl: { lm: "Meters", kg: "Gewicht", perc: "Vulling", stack: "STAPELBAAR", reset: "RESET", wa: "WHATSAPP VERSTUREN", ph: "Zending / Ritnummer...", p1: "Aant", p2: "Kg", pallets: [
+            { n: "Europallet", s: "80 (br) x 120 (l)", l: "EURO", w: 80, len: 120, c: "#3b82f6" },
+            { n: "Blokpallet", s: "120 (br) x 100 (l)", l: "BLOK", w: 120, len: 100, c: "#f59e0b" },
+            { n: "Middel", s: "80 (br) x 140 (l)", l: "MID", w: 80, len: 140, c: "#10b981" },
+            { n: "Lang", s: "80 (br) x 200 (l)", l: "LANG", w: 80, len: 200, c: "#ef4444" }
+        ]},
+        en: { lm: "Meters", kg: "Weight", perc: "Fill", stack: "STACKABLE", reset: "RESET", wa: "SEND WHATSAPP", ph: "Shipment / Trip No...", p1: "Qty", p2: "Kg", pallets: [
+            { n: "Euro Pallet", s: "80 (w) x 120 (l)", l: "EURO", w: 80, len: 120, c: "#3b82f6" },
+            { n: "Block Pallet", s: "120 (w) x 100 (l)", l: "BLOCK", w: 120, len: 100, c: "#f59e0b" },
+            { n: "Medium", s: "80 (w) x 140 (l)", l: "MID", w: 80, len: 140, c: "#10b981" },
+            { n: "Long", s: "80 (w) x 200 (l)", l: "LONG", w: 80, len: 200, c: "#ef4444" }
+        ]}
+    };
+
+    function renderApp() {
+        const lang = document.getElementById('lang').value;
+        const t = ui[lang];
+        
+        document.getElementById('lbl-lm').innerText = t.lm;
+        document.getElementById('lbl-kg').innerText = t.kg;
+        document.getElementById('lbl-perc').innerText = t.perc;
+        document.getElementById('lbl-stack').innerText = t.stack;
+        document.getElementById('lbl-reset').innerText = t.reset;
+        document.getElementById('lbl-wa').innerText = t.wa;
+        document.getElementById('zending').placeholder = t.ph;
+
+        const list = document.getElementById('main-list');
+        list.innerHTML = t.pallets.map(p => `
+            <div class="p-card" data-name="${p.l}" data-w="${p.w}" data-len="${p.len}" data-color="${p.c}">
+                <div class="p-info"><b>${p.n}</b><span>${p.s}</span></div>
+                <div class="input-group">
+                    <input type="number" class="qty" placeholder="${t.p1}" oninput="calc()">
+                    <input type="number" class="kg" placeholder="${t.p2}" oninput="calc()">
+                </div>
+            </div>`).join('');
+        calc();
+    }
+
+    function calc() {
+        const canvas = document.getElementById('trailer-canvas');
+        canvas.innerHTML = '';
+        let totalKG = 0, curX = 0, curY = 0, maxLInRow = 0;
+        const SCALE = 0.5, TRAILER_W = 240;
+
+        document.querySelectorAll('.p-card').forEach(card => {
+            const q = parseInt(card.querySelector('.qty').value) || 0;
+            const k = parseFloat(card.querySelector('.kg').value) || 0;
+            totalKG += (q * k);
+            
+            const w = parseInt(card.dataset.w), l = parseInt(card.dataset.len), c = card.dataset.color, name = card.dataset.name;
+
+            for(let i=0; i<q; i++) {
+                if (curY + w > TRAILER_W) { curY = 0; curX += maxLInRow; maxLInRow = 0; }
+                
+                let div = document.createElement('div');
+                div.className = 'v-pallet';
+                div.style.left = (curX * SCALE) + "px"; div.style.top = (curY * SCALE) + "px";
+                div.style.width = (l * SCALE) + "px"; div.style.height = (w * SCALE) + "px";
+                div.style.backgroundColor = c; div.innerText = name;
+                canvas.appendChild(div);
+
+                curY += w;
+                if(l > maxLInRow) maxLInRow = l;
+            }
+        });
+
+        let lm = (curX + maxLInRow) / 100;
+        if(document.getElementById('stack').checked) lm /= 2;
+
+        document.getElementById('lm-out').innerText = lm.toFixed(2).replace('.', ',');
+        document.getElementById('kg-out').innerText = Math.round(totalKG);
+        document.getElementById('perc-out').innerText = Math.round((lm / 13.6) * 100) + "%";
+    }
+
+    function resetAll() {
+        document.getElementById('zending').value = '';
+        document.querySelectorAll('input[type="number"]').forEach(i => i.value = '');
+        document.getElementById('stack').checked = false;
+        calc();
+    }
+
+    function sendWA() {
+        const l = document.getElementById('lang').value;
+        const z = document.getElementById('zending').value || "-";
+        const msg = `*LAADPLAN*\nZending: ${z}\nLM: ${document.getElementById('lm-out').innerText}\nKG: ${document.getElementById('kg-out').innerText}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+    }
+
+    window.onload = renderApp;
+</script>
+</body>
+</html>
