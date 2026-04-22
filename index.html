@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Laadmeter Pro</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --accent: #22c55e; /* Groen voor resultaat */
+            --border: #334155;
+            --reset: #ef4444;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            margin: 0; padding: 0; height: 100vh; width: 100vw;
+            background-color: var(--bg); font-family: -apple-system, sans-serif;
+            color: var(--text); overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        header {
+            padding: 20px 15px 15px; text-align: center; font-weight: bold; 
+            font-size: 1.3rem; background: var(--card); border-bottom: 1px solid var(--border);
+        }
+
+        .scroll-area {
+            flex: 1; overflow-y: auto; padding: 15px;
+            padding-bottom: 100px; /* Ruimte voor de footer */
+        }
+
+        .pallet-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px; margin-bottom: 10px;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .info { display: flex; flex-direction: column; }
+        .name { font-weight: bold; font-size: 1.05rem; margin-bottom: 2px; }
+        .dims { font-size: 0.85rem; color: #94a3b8; }
+
+        input[type="number"] {
+            width: 80px; height: 50px; border: 2px solid var(--border);
+            border-radius: 10px; text-align: center; font-size: 1.3rem;
+            background: #000; color: white; font-weight: bold;
+        }
+
+        footer {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--card); padding: 15px;
+            border-top: 2px solid var(--border);
+            display: flex; flex-direction: column; gap: 10px;
+            box-shadow: 0 -10px 20px rgba(0,0,0,0.3);
+        }
+
+        .controls {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .result-box {
+            background: var(--accent); color: white;
+            padding: 18px; border-radius: 12px; text-align: center;
+        }
+
+        .total-text { font-size: 2.5rem; font-weight: 900; line-height: 1; }
+        .label-small { font-size: 0.8rem; text-transform: uppercase; opacity: 0.9; margin-bottom: 4px; display: block; }
+
+        .btn-reset {
+            background: var(--reset); color: white; border: none;
+            padding: 10px 15px; border-radius: 8px; font-weight: bold;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--accent); }
+        .stack-label { display: flex; align-items: center; gap: 8px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<header>Laadmeter Calculator</header>
+
+<div class="scroll-area">
+    <div class="pallet-row">
+        <div class="info"><span class="name">Mini Pallet</span><span class="dims">80 x 60 cm</span></div>
+        <input type="number" data-factor="0.20" value="0" min="0" oninput="calc()" pattern="\d*">
+    </div>
+    <div class="pallet-row">
+        <div class="info"><span class="name">Europallet</span><span class="dims">80 x 120 cm</span></div>
+        <input type="number" data-factor="0.40" value="0" min="0" oninput="calc()" pattern="\d*">
+    </div>
+    <div class="pallet-row">
+        <div class="info"><span class="name">Blokpallet</span><span class="dims">100 x 100 cm</span></div>
+        <input type="number" data-factor="0.42" value="0" min="0" oninput="calc()" pattern="\d*">
+    </div>
+    <div class="pallet-row">
+        <div class="info"><span class="name">Industrie / LPR</span><span class="dims">100 x 120 cm</span></div>
+        <input type="number" data-factor="0.50" value="0" min="0" oninput="calc()" pattern="\d*">
+    </div>
+    <div class="pallet-row">
+        <div class="info"><span class="name">Middel Pallet</span><span class="dims">140 x 80 cm</span></div>
+        <input type="number" data-factor="0.47" value="0" min="0" oninput="calc()" pattern="\d*">
+    </div>
+    <div class="pallet-row">
+        <div class="info"><span class="name">Lange Pallet</span><span class="dims">200 x 80 cm</span></div>
+        <input type="number" data-factor="0.67" value="0" min="0" oninput="calc()" pattern="\d*">
+    </div>
+</div>
+
+<footer>
+    <div class="controls">
+        <label class="stack-label">
+            <input type="checkbox" id="stack" onchange="calc()"> STAPELEN (x2)
+        </label>
+        <button class="btn-reset" onclick="resetAll()">RESET</button>
+    </div>
+    <div class="result-box">
+        <span class="label-small">Totaal benodigde ruimte</span>
+        <span id="total" class="total-text">0,00 m¹</span>
+    </div>
+</footer>
+
+<script>
+    function calc() {
+        const inputs = document.querySelectorAll('input[type="number"]');
+        const isStackable = document.getElementById('stack').checked;
+        let total = 0;
+
+        inputs.forEach(i => {
+            const count = parseFloat(i.value) || 0;
+            const factor = parseFloat(i.dataset.factor);
+            total += (count * factor);
+        });
+
+        if (isStackable) total = total / 2;
+        
+        // Update display met komma en m1
+        document.getElementById('total').innerText = total.toFixed(2).replace('.', ',') + " m¹";
+    }
+
+    function resetAll() {
+        document.querySelectorAll('input[type="number"]').forEach(i => i.value = 0);
+        document.getElementById('stack').checked = false;
+        calc();
+    }
+</script>
+
+</body>
+</html>
