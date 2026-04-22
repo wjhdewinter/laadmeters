@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Trailer Planner V6</title>
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --border: #475569; --accent: #3b82f6; --wa: #25d366; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--bg); font-family: sans-serif; color: var(--text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        .header { background: var(--card); padding: 10px; border-bottom: 2px solid var(--border); }
+        .trailer-scroll { width: 100%; overflow-x: auto; background: #000; padding: 15px 0; border-top: 2px solid #94a3b8; border-bottom: 2px solid #94a3b8; margin: 10px 0; }
+        #trailer-canvas { height: 120px; width: 680px; background: #111; position: relative; border-right: 8px solid #334155; margin: 0 15px; }
+        .v-pallet { position: absolute; border: 1px solid rgba(255,255,255,0.7); font-size: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 5px; }
+        .stat-box { background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; text-align: center; border: 1px solid var(--border); }
+        .stat-val { display: block; font-size: 1.1rem; font-weight: 900; color: #fff; }
+        .stat-lbl { font-size: 0.65rem; text-transform: uppercase; color: #94a3b8; }
+
+        .scroll-area { flex: 1; overflow-y: auto; padding: 10px; }
+        .p-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .p-info b { display: block; font-size: 0.9rem; }
+        .p-info span { font-size: 0.7rem; color: #94a3b8; }
+        input { width: 65px; height: 40px; background: #000; color: #fff; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 1rem; font-weight: bold; }
+        
+        footer { padding: 15px; background: var(--card); border-top: 2px solid var(--border); }
+        .btn-wa { width: 100%; padding: 15px; background: var(--wa); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="stats-grid">
+        <div class="stat-box"><span class="stat-lbl">Meters</span><span id="lm-out" class="stat-val">0,00</span></div>
+        <div class="stat-box"><span class="stat-lbl">Gewicht</span><span id="kg-out" class="stat-val">0</span></div>
+        <div class="stat-box"><span class="stat-lbl">Vulling</span><span id="perc-out" class="stat-val">0%</span></div>
+    </div>
+    <div class="trailer-scroll">
+        <div id="trailer-canvas"></div>
+    </div>
+</div>
+
+<div class="scroll-area">
+    <div class="p-card" data-name="Euro" data-w="80" data-l="120" data-color="#3b82f6">
+        <div class="p-info"><b>Europallet</b><span>80 (breed) x 120 (lang)</span></div>
+        <div style="display:flex; gap:5px;"><input type="number" class="qty" placeholder="Aant" oninput="calc()"><input type="number" class="kg" placeholder="Kg" oninput="calc()"></div>
+    </div>
+    <div class="p-card" data-name="Blok" data-w="100" data-l="120" data-color="#f59e0b">
+        <div class="p-info"><b>Blokpallet</b><span>100 (breed) x 120 (lang)</span></div>
+        <div style="display:flex; gap:5px;"><input type="number" class="qty" placeholder="Aant" oninput="calc()"><input type="number" class="kg" placeholder="Kg" oninput="calc()"></div>
+    </div>
+    <div class="p-card" data-name="Mid" data-w="80" data-l="140" data-color="#10b981">
+        <div class="p-info"><b>Middel (140x80)</b><span>80 (breed) x 140 (lang)</span></div>
+        <div style="display:flex; gap:5px;"><input type="number" class="qty" placeholder="Aant" oninput="calc()"><input type="number" class="kg" placeholder="Kg" oninput="calc()"></div>
+    </div>
+    <div class="p-card" data-name="Lang" data-w="80" data-l="200" data-color="#ef4444">
+        <div class="p-info"><b>Lang (200x80)</b><span>80 (breed) x 200 (lang)</span></div>
+        <div style="display:flex; gap:5px;"><input type="number" class="qty" placeholder="Aant" oninput="calc()"><input type="number" class="kg" placeholder="Kg" oninput="calc()"></div>
+    </div>
+</div>
+
+<footer>
+    <div style="margin-bottom:10px;"><label><input type="checkbox" id="stack" onchange="calc()"> <b>STAPELBAAR</b></label></div>
+    <button class="btn-wa" onclick="sendWA()">STUUR WHATSAPP</button>
+</footer>
+
+<script>
+    function calc() {
+        const canvas = document.getElementById('trailer-canvas');
+        canvas.innerHTML = '';
+        let totalKG = 0, currentX = 0, currentY = 0, rowMaxX = 0;
+        const SCALE = 0.5; 
+        const T_WIDTH = 240;
+
+        document.querySelectorAll('.p-card').forEach(card => {
+            let qty = parseInt(card.querySelector('.qty').value) || 0;
+            totalKG += (qty * (parseFloat(card.querySelector('.kg').value) || 0));
+            
+            const w = parseInt(card.dataset.w); // breedte (bijv 80)
+            const l = parseInt(card.dataset.l); // lengte (bijv 120)
+            const color = card.dataset.color;
+            const name = card.dataset.name;
+
+            for(let i=0; i<qty; i++) {
+                let useW = w;
+                let useL = l;
+
+                // Intelligentie: check of hij gedraaid (breedte) beter past dan rechtop (lengte)
+                // Maar we houden vast aan de 240cm limiet.
+                if (currentY + l <= T_WIDTH && (currentY + w > T_WIDTH)) {
+                    [useW, useL] = [l, w];
+                }
+
+                if (currentY + useW > T_WIDTH) {
+                    currentY = 0;
+                    currentX += rowMaxX;
+                    rowMaxX = 0;
+                }
+
+                let div = document.createElement('div');
+                div.className = 'v-pallet';
+                div.style.left = (currentX * SCALE) + "px";
+                div.style.top = (currentY * SCALE) + "px";
+                div.style.width = (useL * SCALE) + "px";
+                div.style.height = (useW * SCALE) + "px";
+                div.style.backgroundColor = color;
+                div.innerText = name[0];
+                canvas.appendChild(div);
+
+                currentY += useW;
+                if(useL > rowMaxX) rowMaxX = useL;
+            }
+        });
+
+        let finalLM = (currentX + rowMaxX) / 100;
+        if(document.getElementById('stack').checked) finalLM /= 2;
+
+        document.getElementById('lm-out').innerText = finalLM.toFixed(2).replace('.', ',');
+        document.getElementById('kg-out').innerText = Math.round(totalKG);
+        document.getElementById('perc-out').innerText = Math.round((finalLM / 13.6) * 100) + "%";
+    }
+
+    function sendWA() {
+        let msg = `*TRAILER PLAN*%0A%0ALM: ${document.getElementById('lm-out').innerText}%0AKG: ${document.getElementById('kg-out').innerText}`;
+        window.open(`https://wa.me/?text=${msg}`);
+    }
+</script>
+</body>
+</html>
