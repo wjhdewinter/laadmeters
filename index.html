@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Warehouse Master v7.0</title>
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #3b82f6; --wa: #22c55e; }
+        * { box-sizing: border-box; font-family: sans-serif; }
+        body { margin: 0; background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .header { background: var(--card); padding: 10px; border-bottom: 2px solid #334155; }
+        .stats { display: flex; justify-content: space-around; margin-bottom: 10px; }
+        .stat-v { font-size: 1.4rem; font-weight: 900; color: var(--wa); display: block; }
+        .trailer-box { background: #000; padding: 15px 0; overflow-x: auto; border-radius: 8px; border: 1px solid #334155; }
+        #canvas { height: 120px; width: 2800px; position: relative; margin-left: 20px; border-right: 20px solid #444; }
+        .v-p { position: absolute; border: 1px solid rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: white; border-radius: 2px; text-align: center; }
+        .input-grid { flex: 1; overflow-y: auto; padding: 10px; }
+        .p-card { background: var(--card); padding: 12px; border-radius: 12px; margin-bottom: 8px; border: 1px solid #334155; }
+        .control-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap: 10px; }
+        .num-box { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        input { width: 100%; height: 50px; background: #000; color: #fff; border: 2px solid var(--accent); border-radius: 8px; text-align: center; font-size: 1.5rem; font-weight: 900; }
+        label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
+        footer { padding: 12px; background: var(--card); }
+        button { width: 100%; padding: 18px; background: var(--wa); color: white; border: none; border-radius: 12px; font-weight: 900; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="stats">
+        <div style="text-align:center"><span id="m-out" class="stat-v">0,00</span><span style="font-size:0.6rem">METERS</span></div>
+        <div style="text-align:center"><span id="p-out" class="stat-v">0</span><span style="font-size:0.6rem">PALLETS</span></div>
+    </div>
+    <div class="trailer-box"><div id="canvas"></div></div>
+</div>
+
+<div class="input-grid">
+    <div class="p-card">
+        <b>Euro (80x120)</b>
+        <div class="control-row">
+            <div class="num-box"><label>Lang (80)</label><input type="number" id="e_l" value="0" oninput="calc()"></div>
+            <div class="num-box"><label>Breed (120)</label><input type="number" id="e_b" value="0" oninput="calc()"></div>
+        </div>
+    </div>
+    <div class="p-card">
+        <b>Blok (120x100)</b>
+        <div class="control-row">
+            <div class="num-box"><label>Lang (100)</label><input type="number" id="b_l" value="0" oninput="calc()"></div>
+            <div class="num-box"><label>Breed (120)</label><input type="number" id="b_b" value="0" oninput="calc()"></div>
+        </div>
+    </div>
+    <div class="p-card">
+        <b>Middel (80x140)</b>
+        <div class="control-row">
+            <div class="num-box"><label>Lang (140)</label><input type="number" id="m_l" value="0" oninput="calc()"></div>
+            <div class="num-box"><label>Breed (80)</label><input type="number" id="m_b" value="0" oninput="calc()"></div>
+        </div>
+    </div>
+</div>
+
+<footer><button onclick="send()">🚀 VERSTUUR JOUW INDELING</button></footer>
+
+<script>
+    function calc() {
+        const can = document.getElementById('canvas'); can.innerHTML = '';
+        let x = 0, y = 0, maxL = 0, totalP = 0, pool = [];
+        const TW = 240, S = 0.5;
+
+        // Haal alles op per stand
+        const getData = (id, w, l, c, em) => {
+            let q = parseInt(document.getElementById(id).value) || 0;
+            totalP += q;
+            for(let i=0; i<q; i++) pool.push({w, l, c, em});
+        };
+
+        // Euro: Lang (80 breed), Breed (120 breed)
+        getData('e_l', 80, 120, '#3b82f6', '🟦');
+        getData('e_b', 120, 80, '#3b82f6', '🟦');
+        // Blok: Lang (100 breed), Breed (120 breed)
+        getData('b_l', 100, 120, '#f59e0b', '🟧');
+        getData('b_b', 120, 100, '#f59e0b', '🟧');
+        // Middel: Lang (140 breed), Breed (80 breed)
+        getData('m_l', 140, 80, '#10b981', '🟩');
+        getData('m_b', 80, 140, '#10b981', '🟩');
+
+        document.getElementById('p-out').innerText = totalP;
+        window.plan = []; let curR = [];
+
+        pool.forEach(p => {
+            if (y + p.w > TW) {
+                window.plan.push(curR.join('')); curR = [];
+                x += maxL; y = 0; maxL = 0;
+            }
+            const d = document.createElement('div');
+            d.className = 'v-p'; d.style.left = (x*S)+'px'; d.style.top = (y*S)+'px';
+            d.style.width = (p.l*S)+'px'; d.style.height = (p.w*S)+'px';
+            d.style.backgroundColor = p.c; d.innerText = (p.w > p.l) ? 'B' : 'L';
+            can.appendChild(d);
+            curR.push(p.em); y += p.w; if(p.l > maxL) maxL = p.l;
+        });
+
+        if(curR.length > 0) window.plan.push(curR.join(''));
+        document.getElementById('m-out').innerText = ((x + maxL)/100).toFixed(2).replace('.', ',');
+    }
+
+    function send() {
+        let t = `*🚛 JOUW LAADPLAN*\nMeters: ${document.getElementById('m-out').innerText}m\n\n`;
+        window.plan.forEach((r, i) => t += `Rij ${i+1}: [${r}]\n`);
+        window.open(`https://wa.me/?text=${encodeURIComponent(t)}`);
+    }
+    window.onload = calc;
+</script>
+</body>
+</html>
