@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>Warehouse Master v9.0 PRO</title>
+<title>Warehouse Master v9.1 PRO</title>
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--text:#f8fafc;--accent:#3b82f6;--wa:#22c55e;--muted:#94a3b8}
 *{box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -18,11 +18,11 @@ body{margin:0;background:var(--bg);color:var(--text);min-height:100vh}
 .input-grid{padding:10px 10px 90px}.p-card{background:var(--card);padding:12px;border-radius:12px;margin-bottom:8px;border:1px solid #334155;display:flex;align-items:center;gap:12px}.p-title{flex:1}.p-title b{display:block}.p-title small{color:var(--muted)}
 .p-card{display:block}.type-head{display:flex;align-items:center;gap:10px;margin-bottom:9px}.type-head .p-title{flex:1}.add-order{width:auto;padding:8px 11px;border-radius:8px;font-size:.72rem;background:#2563eb}.order-lines{display:flex;flex-direction:column;gap:7px}.order-line{display:grid;grid-template-columns:1fr 84px 38px;gap:7px;align-items:end}.order-line label{display:block;font-size:.58rem;color:#94a3b8;text-transform:uppercase;margin-bottom:3px}.order-line .order-input{width:100%;height:46px;background:#0f172a;color:#fff;border:1px solid #64748b;border-radius:9px;padding:0 9px;font-size:.9rem;font-weight:700}.order-line input.qty{width:100%;height:46px;background:#000;color:#fff;border:2px solid var(--accent);border-radius:9px;text-align:center;font-size:1.25rem;font-weight:900}.remove-line{height:46px;padding:0;border-radius:9px;background:#7f1d1d;font-size:1.15rem}.order-line:only-child .remove-line{visibility:hidden}.v-p .pallet-label{line-height:1.05;pointer-events:none}.v-p .ord{display:block;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding:0 2px}.v-p .dims{display:block;font-size:7px;opacity:.9;margin-top:2px}
 .info{font-size:.76rem;line-height:1.35;color:#cbd5e1;background:#111827;border:1px solid #334155;border-radius:10px;padding:9px;margin-bottom:10px}
-footer{position:fixed;bottom:0;left:0;right:0;padding:10px;background:var(--card);z-index:30;display:grid;grid-template-columns:1fr 1fr;gap:8px}button{width:100%;padding:15px;background:var(--wa);color:white;border:0;border-radius:12px;font-weight:900;font-size:1rem}.secondary{background:#334155}.accent{background:var(--accent)}.pdfbtn{background:#0b3b2e;border:1px solid #22c55e}
+footer{position:fixed;bottom:0;left:0;right:0;padding:10px;background:var(--card);z-index:30;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}button{width:100%;padding:15px;background:var(--wa);color:white;border:0;border-radius:12px;font-weight:900;font-size:1rem}.secondary{background:#334155}.accent{background:var(--accent)}.pdfbtn{background:#0b3b2e;border:1px solid #22c55e}
 #modeLabel{font-size:.7rem;color:#cbd5e1;text-align:center;margin-top:5px}
 #orderLegend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 5px 0}.order-chip{display:flex;align-items:center;gap:6px;background:#0f172a;border:1px solid #475569;border-radius:999px;padding:5px 9px;font-size:.68rem;font-weight:800}.order-dot{width:12px;height:12px;border-radius:3px;border:3px solid #fff;background:#111}.warning{display:none;margin:7px 5px 0;padding:8px 10px;border-radius:8px;background:#3f2d08;border:1px solid #f59e0b;color:#fde68a;font-size:.7rem;font-weight:700}
 
-/* v9.0 PRO UI */
+/* v9.1 PRO UI */
 :root{--awc:#00a651;--awc-dark:#08783f;--panel:#111827}
 body{background:#07111f}
 .header{padding:0 0 8px;background:#0b1627;border-bottom:1px solid #26364b}
@@ -47,7 +47,7 @@ footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
 </style>
 </head>
 <body>
-<div class="header"><div class="pro-brand"><div class="pro-brand-main"><img src="icon.png" alt="AWC"><div><b>Amsterdam Warehouse Company</b><small>Warehouse Master · Laadplan</small></div></div><span class="version-badge">v9.0 PRO</span></div>
+<div class="header"><div class="pro-brand"><div class="pro-brand-main"><img src="icon.png" alt="AWC"><div><b>Amsterdam Warehouse Company</b><small>Warehouse Master · Laadplan</small></div></div><span class="version-badge">v9.1 PRO</span></div>
   <div class="stats">
     <div style="text-align:center"><span id="m-out" class="stat-v">0,00</span><span style="font-size:.6rem">LAADMETER</span></div>
     <div style="text-align:center"><span id="p-out" class="stat-v">0</span><span style="font-size:.6rem">PALLETS</span></div>
@@ -77,7 +77,7 @@ footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
   <div class="p-card" data-type="m"><div class="type-head"><div class="p-title"><b>Middel</b><small>80 × 140 cm</small></div><button class="add-order" onclick="addOrderLine('m')">＋ ORDER</button></div><div class="order-lines" id="mLines"></div></div>
   <div class="p-card" data-type="l"><div class="type-head"><div class="p-title"><b>Lang</b><small>80 × 200 cm</small></div><button class="add-order" onclick="addOrderLine('l')">＋ ORDER</button></div><div class="order-lines" id="lLines"></div></div>
 </div>
-<footer><button onclick="send()">WHATSAPP VISUEEL</button><button class="pdfbtn" onclick="printPlan()">PDF / PRINT</button></footer>
+<footer><button onclick="send()">WHATSAPP VISUEEL</button><button class="pdfbtn" onclick="downloadPdf()">DOWNLOAD PDF</button><button class="secondary" onclick="printPlan()">PDF / PRINT</button></footer>
 <script>
 function setUIMode(edit){
  document.body.classList.toggle('editing',!!edit);
@@ -258,6 +258,32 @@ async function send(){
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
  alert('De visuele laadplan-afbeelding is opgeslagen. Deel deze afbeelding vervolgens via WhatsApp.');
 }
+
+async function downloadPdf(){
+ if(!items.length){alert('Voer eerst pallets in.');return}
+ const canvas=makePlanImage();
+ const dataUrl=canvas.toDataURL('image/jpeg',0.94);
+ const b64=dataUrl.split(',')[1];
+ const raw=atob(b64); const img=new Uint8Array(raw.length); for(let i=0;i<raw.length;i++)img[i]=raw.charCodeAt(i);
+ const pageW=842,pageH=595,margin=22;
+ const scale=Math.min((pageW-margin*2)/canvas.width,(pageH-margin*2)/canvas.height);
+ const w=canvas.width*scale,h=canvas.height*scale,x=(pageW-w)/2,y=(pageH-h)/2;
+ const enc=new TextEncoder(); const parts=[]; const offsets=[0]; let pos=0;
+ const push=t=>{const a=typeof t==='string'?enc.encode(t):t;parts.push(a);pos+=a.length};
+ push('%PDF-1.4\n%AWC\n');
+ const obj=(n,body)=>{offsets[n]=pos;push(`${n} 0 obj\n${body}\nendobj\n`)};
+ obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
+ obj(2,'<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+ obj(3,`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`);
+ offsets[4]=pos;push(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${canvas.width} /Height ${canvas.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${img.length} >>\nstream\n`);push(img);push('\nendstream\nendobj\n');
+ const stream=`q\n${w.toFixed(2)} 0 0 ${h.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)} cm\n/Im0 Do\nQ\n`;
+ obj(5,`<< /Length ${enc.encode(stream).length} >>\nstream\n${stream}endstream`);
+ const xref=pos;push('xref\n0 6\n0000000000 65535 f \n');for(let n=1;n<=5;n++)push(String(offsets[n]).padStart(10,'0')+' 00000 n \n');
+ push(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+ const blob=new Blob(parts,{type:'application/pdf'});const url=URL.createObjectURL(blob);const a=document.createElement('a');
+ const order=(document.getElementById('orderNo').value.trim()||'laadplan').replace(/[^a-z0-9_-]+/gi,'-');a.href=url;a.download=`AWC-laadplan-${order}.pdf`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+
 function printPlan(){
  if(!items.length){alert('Voer eerst pallets in.');return}
  const c=makePlanImage();
@@ -286,7 +312,7 @@ function printPlan(){
  .foot{display:flex;justify-content:space-between;gap:6mm;margin-top:3mm;font-size:8.5pt;color:#475569}.note{font-weight:bold;color:#0f172a}.approval{display:grid;grid-template-columns:1fr 1.4fr;gap:5mm;margin-top:4mm}.approval .box{min-height:23mm}.signature{height:13mm;border-bottom:1px solid #64748b;margin-top:2mm}.small{font-size:7pt;color:#64748b;margin-top:1mm}
  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.sheet{break-inside:avoid}}
  
-/* v9.0 PRO UI */
+/* v9.1 PRO UI */
 :root{--awc:#00a651;--awc-dark:#08783f;--panel:#111827}
 body{background:#07111f}
 .header{padding:0 0 8px;background:#0b1627;border-bottom:1px solid #26364b}
@@ -311,7 +337,7 @@ footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
 </style></head><body><div class="sheet"><div class="top"><div class="mark">AWC</div><div><h1>AMSTERDAM WAREHOUSE COMPANY</h1><div class="sub">LAADPLAN - BIJLAGE CMR</div></div></div>
  <div class="meta"><div class="box"><div class="lab">ORDER / VRACHTNUMMER</div><div class="val">${escapeHtml(order)}</div></div><div class="box"><div class="lab">REFERENTIE / KLANT</div><div class="val">${escapeHtml(ref)}</div></div><div class="box"><div class="lab">DATUM</div><div class="val">${date}</div></div><div class="box"><div class="lab">LAADMETER</div><div class="val">${load} m</div></div><div class="box"><div class="lab">PALLETS</div><div class="val">${items.length}</div></div><div class="box"><div class="lab">VRIJ</div><div class="val">${free} m</div></div></div>
  <div class="transport"><div class="box"><div class="lab">CHAUFFEUR</div><div class="val">${escapeHtml(driver)}</div></div><div class="box"><div class="lab">KENTEKEN TREKKER</div><div class="val">${escapeHtml(tractor)}</div></div><div class="box"><div class="lab">KENTEKEN TRAILER</div><div class="val">${escapeHtml(trailer)}</div></div><div class="box"><div class="lab">TRANSPORTEUR</div><div class="val">${escapeHtml(carrier)}</div></div></div>
- <div class="box" style="margin-bottom:3mm"><div class="lab">ORDEROVERZICHT</div><div class="val" style="font-size:9pt">${orderStats().map(([o,n])=>`${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)}: ${n} pallet${n===1?'':'s'}`).join(' &nbsp; • &nbsp; ')}</div></div><div class="visual"><img src="${img}" alt="Visueel laadplan"></div><div class="approval"><div class="box"><div class="lab">LAADPLAN AKKOORD</div><div class="val">☐ Ja &nbsp;&nbsp; ☐ Afwijking</div><div class="small">Eventuele afwijkingen van het laadplan vermelden op de CMR.</div></div><div class="box"><div class="lab">HANDTEKENING CHAUFFEUR</div><div class="signature"></div><div class="small">Naam / handtekening</div></div></div><div class="foot"><div class="note">Bovenaanzicht - trailer 13,60 x 2,40 m</div><div>Gegenereerd met Warehouse Master v8.9</div></div></div>
+ <div class="box" style="margin-bottom:3mm"><div class="lab">ORDEROVERZICHT</div><div class="val" style="font-size:9pt">${orderStats().map(([o,n])=>`${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)}: ${n} pallet${n===1?'':'s'}`).join(' &nbsp; • &nbsp; ')}</div></div><div class="visual"><img src="${img}" alt="Visueel laadplan"></div><div class="approval"><div class="box"><div class="lab">LAADPLAN AKKOORD</div><div class="val">☐ Ja &nbsp;&nbsp; ☐ Afwijking</div><div class="small">Eventuele afwijkingen van het laadplan vermelden op de CMR.</div></div><div class="box"><div class="lab">HANDTEKENING CHAUFFEUR</div><div class="signature"></div><div class="small">Naam / handtekening</div></div></div><div class="foot"><div class="note">Bovenaanzicht - trailer 13,60 x 2,40 m</div><div>Gegenereerd met Warehouse Master v9.1</div></div></div>
  <script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
  w.document.close();
 }
