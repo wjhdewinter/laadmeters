@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>Warehouse Master v8.8</title>
+<title>Warehouse Master v9.0 PRO</title>
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--text:#f8fafc;--accent:#3b82f6;--wa:#22c55e;--muted:#94a3b8}
 *{box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -21,18 +21,47 @@ body{margin:0;background:var(--bg);color:var(--text);min-height:100vh}
 footer{position:fixed;bottom:0;left:0;right:0;padding:10px;background:var(--card);z-index:30;display:grid;grid-template-columns:1fr 1fr;gap:8px}button{width:100%;padding:15px;background:var(--wa);color:white;border:0;border-radius:12px;font-weight:900;font-size:1rem}.secondary{background:#334155}.accent{background:var(--accent)}.pdfbtn{background:#0b3b2e;border:1px solid #22c55e}
 #modeLabel{font-size:.7rem;color:#cbd5e1;text-align:center;margin-top:5px}
 #orderLegend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 5px 0}.order-chip{display:flex;align-items:center;gap:6px;background:#0f172a;border:1px solid #475569;border-radius:999px;padding:5px 9px;font-size:.68rem;font-weight:800}.order-dot{width:12px;height:12px;border-radius:3px;border:3px solid #fff;background:#111}.warning{display:none;margin:7px 5px 0;padding:8px 10px;border-radius:8px;background:#3f2d08;border:1px solid #f59e0b;color:#fde68a;font-size:.7rem;font-weight:700}
+
+/* v9.0 PRO UI */
+:root{--awc:#00a651;--awc-dark:#08783f;--panel:#111827}
+body{background:#07111f}
+.header{padding:0 0 8px;background:#0b1627;border-bottom:1px solid #26364b}
+.pro-brand{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff;color:#0f172a;border-bottom:4px solid var(--awc)}
+.pro-brand-main{display:flex;align-items:center;gap:10px}.pro-brand img{width:42px;height:42px;object-fit:contain;border-radius:8px}.pro-brand b{display:block;font-size:1rem}.pro-brand small{color:#64748b}.version-badge{font-size:.64rem;font-weight:900;background:#e8f7ef;color:#08783f;padding:6px 8px;border-radius:999px}
+.stats{margin:8px 8px 7px;background:#111d2e;border:1px solid #26364b;border-radius:12px;padding:8px}.stat-v{font-size:1.2rem;color:#35d07f}
+#viewModeBar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 8px 8px}.modebtn{padding:10px;border-radius:9px;font-size:.76rem;background:#243247}.modebtn.active{background:var(--awc)}
+#editPanel{display:none}.editing #editPanel{display:block}
+.trailer-shell{margin:0 8px}.direction-row{display:flex;justify-content:space-between;font-size:.62rem;color:#94a3b8;margin:0 2px 4px;font-weight:800;letter-spacing:.03em}
+.meter-ruler{position:relative;height:20px;margin:0 0 2px;background:#0b1320;border:1px solid #26364b;border-radius:7px;overflow:hidden}
+.meter-ruler span{position:absolute;top:3px;transform:translateX(-50%);font-size:.56rem;color:#cbd5e1}.meter-ruler span:first-child{transform:none}.meter-ruler span:last-child{transform:translateX(-100%)}
+.trailer-scroll{margin:0;max-height:390px;border:2px solid #506070;border-radius:10px;padding:6px;background:#020617}
+#canvas{height:180px;background-color:#0a0f18;border-left:12px solid #334155;border-right:18px double #94a3b8}
+.v-p{font-size:9px;border-width:1px}.v-p .ord{font-size:9px;text-shadow:0 1px 2px #000}.v-p.order-start{box-shadow:-4px 0 0 rgba(255,255,255,.75),inset 0 0 0 1px rgba(0,0,0,.3)}
+#orderLegend{margin:8px 8px 0}.warning{margin:7px 8px 0}
+.input-grid{padding:8px 10px 100px}.input-grid>.info{display:none}.editing .input-grid>.info{display:block}
+.p-card{display:none}.editing .p-card{display:block}
+#modeLabel{display:none}
+footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
+.editing .trailer-scroll{max-height:300px}
+@media(min-width:700px){.header,.input-grid,footer{max-width:900px;margin-left:auto;margin-right:auto}.pro-brand{border-radius:0}.trailer-scroll{max-height:480px}}
 </style>
 </head>
 <body>
-<div class="header">
+<div class="header"><div class="pro-brand"><div class="pro-brand-main"><img src="icon.png" alt="AWC"><div><b>Amsterdam Warehouse Company</b><small>Warehouse Master · Laadplan</small></div></div><span class="version-badge">v9.0 PRO</span></div>
   <div class="stats">
     <div style="text-align:center"><span id="m-out" class="stat-v">0,00</span><span style="font-size:.6rem">LAADMETER</span></div>
     <div style="text-align:center"><span id="p-out" class="stat-v">0</span><span style="font-size:.6rem">PALLETS</span></div>
     <div style="text-align:center"><span id="free-out" class="stat-v">13,60</span><span style="font-size:.6rem">VRIJ</span></div>
   </div>
+<div id="viewModeBar"><button id="viewBtn" class="modebtn active" onclick="setUIMode(false)">BEKIJK LAADPLAN</button><button id="editBtn" class="modebtn" onclick="setUIMode(true)">BEWERKEN</button></div><div id="editPanel">
   <div class="meta-grid"><div><label>ORDER / VRACHTNUMMER</label><input id="orderNo" type="text" placeholder="bijv. 123456" oninput="autoPlan()"></div><div><label>REFERENTIE / KLANT</label><input id="reference" type="text" placeholder="optioneel"></div></div>
   <div class="transport-grid"><div><label>CHAUFFEUR</label><input id="driver" type="text" placeholder="naam chauffeur"></div><div><label>KENTEKEN TREKKER</label><input id="tractorPlate" type="text" placeholder="bijv. 12-ABC-3"></div><div><label>KENTEKEN TRAILER</label><input id="trailerPlate" type="text" placeholder="optioneel"></div><div><label>TRANSPORTEUR</label><input id="carrier" type="text" placeholder="optioneel"></div></div>
-  <div class="trailer-scroll" id="trailerScroll"><div id="canvas"></div></div>
+</div>
+  <div class="trailer-shell">
+    <div class="direction-row"><span>← CABINE</span><span>DEUREN →</span></div>
+    <div class="meter-ruler"><span style="left:0.0000%">0m</span><span style="left:14.7059%">2m</span><span style="left:29.4118%">4m</span><span style="left:44.1176%">6m</span><span style="left:58.8235%">8m</span><span style="left:73.5294%">10m</span><span style="left:88.2353%">12m</span><span style="left:100.0000%">13,6m</span></div>
+    <div class="trailer-scroll" id="trailerScroll"><div id="canvas"></div></div>
+  </div>
   <div class="toolbar">
     <button class="accent" onclick="autoPlan()">✨ AUTO</button>
     <button class="secondary" onclick="rotateSelected()">↻ DRAAI</button>
@@ -42,14 +71,20 @@ footer{position:fixed;bottom:0;left:0;right:0;padding:10px;background:var(--card
   <div id="modeLabel">Automatisch: optimale indeling zoeken • laadvlak is horizontaal én verticaal scrollbaar</div><div id="orderWarning" class="warning"></div><div id="orderLegend"></div>
 </div>
 <div class="input-grid">
-  <div class="info">Je kunt nu <b>meerdere orders van hetzelfde pallettype</b> invoeren. Gebruik <b>+ ORDER</b> om bijvoorbeeld 8 Euro voor order 45120 én 5 Euro voor order 45135 toe te voegen. De optimizer behandelt alle pallets als één lading, terwijl ordernummer en orderkleur op iedere pallet behouden blijven in de app, WhatsApp-visual en PDF.<br><br>Laat een ordernummer leeg om het algemene order/vrachtnummer bovenaan te gebruiken. Het laadvlak blijft <b>scrollbaar, zoombaar en handmatig bewerkbaar</b>.</div>
+  <div class="info">Je kunt nu <b>meerdere orders van hetzelfde pallettype</b> invoeren. Gebruik <b>+ ORDER</b> om bijvoorbeeld 8 Euro voor order 45120 én 5 Euro voor order 45135 toe te voegen. De optimizer houdt ieder order als één aaneengesloten laadblok. Pallets van verschillende orders worden niet door elkaar geplaatst. Binnen ieder order worden pallettypes en draairichtingen wel zo efficiënt mogelijk gecombineerd.<br><br>Laat een ordernummer leeg om het algemene order/vrachtnummer bovenaan te gebruiken. Het laadvlak blijft <b>scrollbaar, zoombaar en handmatig bewerkbaar</b>.</div>
   <div class="p-card" data-type="e"><div class="type-head"><div class="p-title"><b>Euro</b><small>80 × 120 cm</small></div><button class="add-order" onclick="addOrderLine('e')">＋ ORDER</button></div><div class="order-lines" id="eLines"></div></div>
   <div class="p-card" data-type="b"><div class="type-head"><div class="p-title"><b>Blok</b><small>100 × 120 cm</small></div><button class="add-order" onclick="addOrderLine('b')">＋ ORDER</button></div><div class="order-lines" id="bLines"></div></div>
   <div class="p-card" data-type="m"><div class="type-head"><div class="p-title"><b>Middel</b><small>80 × 140 cm</small></div><button class="add-order" onclick="addOrderLine('m')">＋ ORDER</button></div><div class="order-lines" id="mLines"></div></div>
   <div class="p-card" data-type="l"><div class="type-head"><div class="p-title"><b>Lang</b><small>80 × 200 cm</small></div><button class="add-order" onclick="addOrderLine('l')">＋ ORDER</button></div><div class="order-lines" id="lLines"></div></div>
 </div>
-<footer><button onclick="send()">📲 WHATSAPP VISUEEL</button><button class="pdfbtn" onclick="printPlan()">📄 PDF / PRINT</button></footer>
+<footer><button onclick="send()">WHATSAPP VISUEEL</button><button class="pdfbtn" onclick="printPlan()">PDF / PRINT</button></footer>
 <script>
+function setUIMode(edit){
+ document.body.classList.toggle('editing',!!edit);
+ const vb=document.getElementById('viewBtn'), eb=document.getElementById('editBtn');
+ if(vb)vb.classList.toggle('active',!edit); if(eb)eb.classList.toggle('active',!!edit);
+ setTimeout(()=>{ if(!edit) fitView(); },40);
+}
 const TW=240, TL=1360, SNAP=10; let S=.75;
 const TYPES={
  e:{name:'Euro',w:80,l:120,c:'#3b82f6',label:'E'},
@@ -151,16 +186,25 @@ function rowsToPlacement(src,solution){
  for(const row of solution.rows){let y=0;for(const v of row.combo){const p=pools[v.type].shift();if(!p)continue;p.w=v.w;p.l=v.l;p.rot=v.rot;p.x=x;p.y=y;placed.push(p);y+=p.w}x+=row.depth}
  return placed;
 }
-function optimizePlan(src){
+function optimizeSingleOrder(src){
  const q=countsFromItems(src); const states=(q.e+1)*(q.b+1)*(q.m+1)*(q.l+1);
- // Exact dynamic programming for normal warehouse loads; safe fallback for unusually huge inputs.
  const solution=(states<=140000&&totalCount(q)<=72)?solveRowsExact(q):solveRowsGreedy(q);
  return rowsToPlacement(src,solution);
 }
-function autoPlan(){manual=false;selectedId=null;items=buildItems();items=optimizePlan(items);render();document.getElementById('modeLabel').innerText='Slim geoptimaliseerd — kortste rij-indeling; sleep pallets voor handmatige aanpassing'}
+function optimizePlan(src){
+ // Orders are hard groups: pallets from different orders are never interleaved.
+ const groups=[]; const byOrder=new Map();
+ src.forEach(p=>{if(!byOrder.has(p.order)){const g=[];byOrder.set(p.order,g);groups.push(g)}byOrder.get(p.order).push(p)});
+ const blocks=groups.map(g=>{const placed=optimizeSingleOrder(g);return {placed,len:endCm(placed),order:g[0]?.order||'—'}});
+ // Keep input order for predictable warehouse use. Each complete order block starts after the previous one.
+ const out=[];let offset=0;
+ blocks.forEach(b=>{b.placed.forEach(p=>out.push({...p,x:p.x+offset}));offset+=b.len});
+ return out;
+}
+function autoPlan(){manual=false;selectedId=null;items=buildItems();items=optimizePlan(items);render();document.getElementById('modeLabel').innerText='Order-geoptimaliseerd — ieder order blijft als één aaneengesloten laadblok; sleep pallets voor handmatige aanpassing'}
 function endCm(arr=items){return arr.reduce((m,p)=>Math.max(m,p.x+p.l),0)}function endMeters(arr=items){return endCm(arr)/100}
 function render(){const can=document.getElementById('canvas');can.innerHTML='';document.getElementById('p-out').innerText=items.length;const end=endCm();document.getElementById('m-out').innerText=(end/100).toFixed(2).replace('.',',');document.getElementById('free-out').innerText=Math.max(0,(TL-end)/100).toFixed(2).replace('.',',');
- items.forEach(p=>{const d=document.createElement('div');d.className='v-p'+(p.id===selectedId?' selected':'');d.dataset.id=p.id;d.style.left=p.x*S+'px';d.style.top=p.y*S+'px';d.style.width=p.l*S+'px';d.style.height=p.w*S+'px';d.style.backgroundColor=p.c;d.style.border=`3px solid ${orderColor(p.order)}`;d.innerHTML=`<span class="pallet-label"><span class="ord">${escapeHtml(p.order==='—'?'GEEN ORDER':'ORD '+p.order)}</span><span class="dims">${p.label} ${p.w}×${p.l}</span></span>`;d.addEventListener('pointerdown',startDrag);d.addEventListener('click',()=>{selectedId=p.id;render()});can.appendChild(d)});window.plan=makeRows();renderOrderLegend()}
+ let seenOrders=new Set(); items.forEach(p=>{const d=document.createElement('div');const isStart=!seenOrders.has(p.order);seenOrders.add(p.order);d.className='v-p'+(p.id===selectedId?' selected':'')+(isStart?' order-start':'');d.dataset.id=p.id;d.style.left=p.x*S+'px';d.style.top=p.y*S+'px';d.style.width=p.l*S+'px';d.style.height=p.w*S+'px';d.style.backgroundColor=p.c;d.style.border=`3px solid ${orderColor(p.order)}`;d.innerHTML=`<span class="pallet-label"><span class="ord">${escapeHtml(p.order==='—'?'GEEN ORDER':'ORD '+p.order)}</span><span class="dims">${p.label} ${p.w}×${p.l}</span></span>`;d.addEventListener('pointerdown',startDrag);d.addEventListener('click',()=>{selectedId=p.id;render()});can.appendChild(d)});window.plan=makeRows();renderOrderLegend()}
 function startDrag(ev){ev.preventDefault();manual=true;const id=+ev.currentTarget.dataset.id;selectedId=id;const p=items.find(x=>x.id===id);const startX=ev.clientX,startY=ev.clientY,ox=p.x,oy=p.y;const el=ev.currentTarget;el.setPointerCapture(ev.pointerId);el.classList.add('dragging');
  const move=e=>{p.x=Math.max(0,Math.min(TL-p.l,Math.round((ox+(e.clientX-startX)/S)/SNAP)*SNAP));p.y=Math.max(0,Math.min(TW-p.w,Math.round((oy+(e.clientY-startY)/S)/SNAP)*SNAP));el.style.left=p.x*S+'px';el.style.top=p.y*S+'px'};
  const up=e=>{el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.classList.remove('dragging');const others=items.filter(x=>x.id!==p.id);if(!canPlace(p,others)){p.x=ox;p.y=oy}document.getElementById('modeLabel').innerText='Handmatige modus — pallet verschoven';render()};el.addEventListener('pointermove',move);el.addEventListener('pointerup',up)}
@@ -241,14 +285,39 @@ function printPlan(){
  .visual{border:1px solid #cbd5e1;padding:3mm;background:white}.visual img{display:block;width:100%;height:auto;max-height:118mm;object-fit:contain}
  .foot{display:flex;justify-content:space-between;gap:6mm;margin-top:3mm;font-size:8.5pt;color:#475569}.note{font-weight:bold;color:#0f172a}.approval{display:grid;grid-template-columns:1fr 1.4fr;gap:5mm;margin-top:4mm}.approval .box{min-height:23mm}.signature{height:13mm;border-bottom:1px solid #64748b;margin-top:2mm}.small{font-size:7pt;color:#64748b;margin-top:1mm}
  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.sheet{break-inside:avoid}}
- </style></head><body><div class="sheet"><div class="top"><div class="mark">AWC</div><div><h1>AMSTERDAM WAREHOUSE COMPANY</h1><div class="sub">LAADPLAN - BIJLAGE CMR</div></div></div>
+ 
+/* v9.0 PRO UI */
+:root{--awc:#00a651;--awc-dark:#08783f;--panel:#111827}
+body{background:#07111f}
+.header{padding:0 0 8px;background:#0b1627;border-bottom:1px solid #26364b}
+.pro-brand{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff;color:#0f172a;border-bottom:4px solid var(--awc)}
+.pro-brand-main{display:flex;align-items:center;gap:10px}.pro-brand img{width:42px;height:42px;object-fit:contain;border-radius:8px}.pro-brand b{display:block;font-size:1rem}.pro-brand small{color:#64748b}.version-badge{font-size:.64rem;font-weight:900;background:#e8f7ef;color:#08783f;padding:6px 8px;border-radius:999px}
+.stats{margin:8px 8px 7px;background:#111d2e;border:1px solid #26364b;border-radius:12px;padding:8px}.stat-v{font-size:1.2rem;color:#35d07f}
+#viewModeBar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 8px 8px}.modebtn{padding:10px;border-radius:9px;font-size:.76rem;background:#243247}.modebtn.active{background:var(--awc)}
+#editPanel{display:none}.editing #editPanel{display:block}
+.trailer-shell{margin:0 8px}.direction-row{display:flex;justify-content:space-between;font-size:.62rem;color:#94a3b8;margin:0 2px 4px;font-weight:800;letter-spacing:.03em}
+.meter-ruler{position:relative;height:20px;margin:0 0 2px;background:#0b1320;border:1px solid #26364b;border-radius:7px;overflow:hidden}
+.meter-ruler span{position:absolute;top:3px;transform:translateX(-50%);font-size:.56rem;color:#cbd5e1}.meter-ruler span:first-child{transform:none}.meter-ruler span:last-child{transform:translateX(-100%)}
+.trailer-scroll{margin:0;max-height:390px;border:2px solid #506070;border-radius:10px;padding:6px;background:#020617}
+#canvas{height:180px;background-color:#0a0f18;border-left:12px solid #334155;border-right:18px double #94a3b8}
+.v-p{font-size:9px;border-width:1px}.v-p .ord{font-size:9px;text-shadow:0 1px 2px #000}.v-p.order-start{box-shadow:-4px 0 0 rgba(255,255,255,.75),inset 0 0 0 1px rgba(0,0,0,.3)}
+#orderLegend{margin:8px 8px 0}.warning{margin:7px 8px 0}
+.input-grid{padding:8px 10px 100px}.input-grid>.info{display:none}.editing .input-grid>.info{display:block}
+.p-card{display:none}.editing .p-card{display:block}
+#modeLabel{display:none}
+footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
+.editing .trailer-scroll{max-height:300px}
+@media(min-width:700px){.header,.input-grid,footer{max-width:900px;margin-left:auto;margin-right:auto}.pro-brand{border-radius:0}.trailer-scroll{max-height:480px}}
+</style></head><body><div class="sheet"><div class="top"><div class="mark">AWC</div><div><h1>AMSTERDAM WAREHOUSE COMPANY</h1><div class="sub">LAADPLAN - BIJLAGE CMR</div></div></div>
  <div class="meta"><div class="box"><div class="lab">ORDER / VRACHTNUMMER</div><div class="val">${escapeHtml(order)}</div></div><div class="box"><div class="lab">REFERENTIE / KLANT</div><div class="val">${escapeHtml(ref)}</div></div><div class="box"><div class="lab">DATUM</div><div class="val">${date}</div></div><div class="box"><div class="lab">LAADMETER</div><div class="val">${load} m</div></div><div class="box"><div class="lab">PALLETS</div><div class="val">${items.length}</div></div><div class="box"><div class="lab">VRIJ</div><div class="val">${free} m</div></div></div>
  <div class="transport"><div class="box"><div class="lab">CHAUFFEUR</div><div class="val">${escapeHtml(driver)}</div></div><div class="box"><div class="lab">KENTEKEN TREKKER</div><div class="val">${escapeHtml(tractor)}</div></div><div class="box"><div class="lab">KENTEKEN TRAILER</div><div class="val">${escapeHtml(trailer)}</div></div><div class="box"><div class="lab">TRANSPORTEUR</div><div class="val">${escapeHtml(carrier)}</div></div></div>
- <div class="box" style="margin-bottom:3mm"><div class="lab">ORDEROVERZICHT</div><div class="val" style="font-size:9pt">${orderStats().map(([o,n])=>`${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)}: ${n} pallet${n===1?'':'s'}`).join(' &nbsp; • &nbsp; ')}</div></div><div class="visual"><img src="${img}" alt="Visueel laadplan"></div><div class="approval"><div class="box"><div class="lab">LAADPLAN AKKOORD</div><div class="val">☐ Ja &nbsp;&nbsp; ☐ Afwijking</div><div class="small">Eventuele afwijkingen van het laadplan vermelden op de CMR.</div></div><div class="box"><div class="lab">HANDTEKENING CHAUFFEUR</div><div class="signature"></div><div class="small">Naam / handtekening</div></div></div><div class="foot"><div class="note">Bovenaanzicht - trailer 13,60 x 2,40 m</div><div>Gegenereerd met Warehouse Master v8.8</div></div></div>
+ <div class="box" style="margin-bottom:3mm"><div class="lab">ORDEROVERZICHT</div><div class="val" style="font-size:9pt">${orderStats().map(([o,n])=>`${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)}: ${n} pallet${n===1?'':'s'}`).join(' &nbsp; • &nbsp; ')}</div></div><div class="visual"><img src="${img}" alt="Visueel laadplan"></div><div class="approval"><div class="box"><div class="lab">LAADPLAN AKKOORD</div><div class="val">☐ Ja &nbsp;&nbsp; ☐ Afwijking</div><div class="small">Eventuele afwijkingen van het laadplan vermelden op de CMR.</div></div><div class="box"><div class="lab">HANDTEKENING CHAUFFEUR</div><div class="signature"></div><div class="small">Naam / handtekening</div></div></div><div class="foot"><div class="note">Bovenaanzicht - trailer 13,60 x 2,40 m</div><div>Gegenereerd met Warehouse Master v8.9</div></div></div>
  <script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
  w.document.close();
 }
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 window.onload=()=>{initOrderLines();autoPlan();setTimeout(fitView,50)};
+
+window.addEventListener('load',()=>setUIMode(false));
 </script>
 </body></html>
