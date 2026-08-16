@@ -2,21 +2,21 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Warehouse Master v8.1</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Warehouse Master v8.3</title>
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--text:#f8fafc;--accent:#3b82f6;--wa:#22c55e;--muted:#94a3b8}
 *{box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--text);min-height:100vh}
-.header{position:sticky;top:0;z-index:20;background:var(--card);padding:10px;border-bottom:2px solid #334155}
+.header{position:relative;z-index:20;background:var(--card);padding:10px;border-bottom:2px solid #334155}
 .stats{display:flex;justify-content:space-around;margin-bottom:8px}.stat-v{font-size:1.35rem;font-weight:900;color:var(--wa);display:block}
-.toolbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin:8px 5px 0}.toolbar button{padding:10px 6px;font-size:.76rem;border-radius:9px}
-.trailer-scroll{background:#000;padding:10px 0;overflow-x:auto;border-radius:8px;border:2px solid #444;margin:0 5px;touch-action:pan-x}
-#canvas{height:120px;width:680px;position:relative;background:#111;border-right:15px solid #666;background-image:linear-gradient(90deg,#1a1a1a 1px,transparent 1px);background-size:50px 100%;overflow:visible}
+.toolbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin:8px 5px 0}.toolbar button{padding:10px 6px;font-size:.76rem;border-radius:9px}.toolbar2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin:7px 5px 0}.toolbar2 button{padding:9px 6px;font-size:.73rem;border-radius:9px}.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 5px}.meta-grid input{width:100%;height:40px;font-size:.95rem;text-align:left;padding:0 10px;border:1px solid #475569;background:#0f172a}.meta-grid label{font-size:.64rem;color:#94a3b8;display:block;margin-bottom:3px}
+.trailer-scroll{background:#000;padding:10px;overflow:auto;border-radius:8px;border:2px solid #444;margin:0 5px;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;max-height:250px}
+#canvas{height:180px;width:1020px;position:relative;background:#111;border-right:15px solid #666;background-image:linear-gradient(90deg,#1a1a1a 1px,transparent 1px);background-size:75px 100%;overflow:visible;transform-origin:top left}
 .v-p{position:absolute;border:1px solid rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:white;border-radius:2px;text-align:center;user-select:none;touch-action:none;cursor:grab;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
 .v-p.selected{outline:3px solid white;z-index:10}.v-p.dragging{opacity:.8;cursor:grabbing;z-index:15}
 .input-grid{padding:10px 10px 90px}.p-card{background:var(--card);padding:12px;border-radius:12px;margin-bottom:8px;border:1px solid #334155;display:flex;align-items:center;gap:12px}.p-title{flex:1}.p-title b{display:block}.p-title small{color:var(--muted)}
-input{width:94px;height:50px;background:#000;color:#fff;border:2px solid var(--accent);border-radius:10px;text-align:center;font-size:1.55rem;font-weight:900}
+.p-card input{width:94px;height:50px;background:#000;color:#fff;border:2px solid var(--accent);border-radius:10px;text-align:center;font-size:1.55rem;font-weight:900}
 .info{font-size:.76rem;line-height:1.35;color:#cbd5e1;background:#111827;border:1px solid #334155;border-radius:10px;padding:9px;margin-bottom:10px}
 footer{position:fixed;bottom:0;left:0;right:0;padding:10px;background:var(--card);z-index:30}button{width:100%;padding:15px;background:var(--wa);color:white;border:0;border-radius:12px;font-weight:900;font-size:1rem}.secondary{background:#334155}.accent{background:var(--accent)}
 #modeLabel{font-size:.7rem;color:#cbd5e1;text-align:center;margin-top:5px}
@@ -29,16 +29,18 @@ footer{position:fixed;bottom:0;left:0;right:0;padding:10px;background:var(--card
     <div style="text-align:center"><span id="p-out" class="stat-v">0</span><span style="font-size:.6rem">PALLETS</span></div>
     <div style="text-align:center"><span id="free-out" class="stat-v">13,60</span><span style="font-size:.6rem">VRIJ</span></div>
   </div>
-  <div class="trailer-scroll"><div id="canvas"></div></div>
+  <div class="meta-grid"><div><label>ORDER / VRACHTNUMMER</label><input id="orderNo" type="text" placeholder="bijv. 123456"></div><div><label>REFERENTIE / KLANT</label><input id="reference" type="text" placeholder="optioneel"></div></div>
+  <div class="trailer-scroll" id="trailerScroll"><div id="canvas"></div></div>
   <div class="toolbar">
     <button class="accent" onclick="autoPlan()">✨ AUTO</button>
     <button class="secondary" onclick="rotateSelected()">↻ DRAAI</button>
     <button class="secondary" onclick="resetManual()">↺ RESET</button>
   </div>
-  <div id="modeLabel">Automatisch: optimale indeling zoeken</div>
+  <div class="toolbar2"><button class="secondary" onclick="zoomOut()">− UITZOOM</button><button class="secondary" onclick="fitView()">▣ PASSEND</button><button class="secondary" onclick="zoomIn()">＋ INZOOM</button></div>
+  <div id="modeLabel">Automatisch: optimale indeling zoeken • laadvlak is horizontaal én verticaal scrollbaar</div>
 </div>
 <div class="input-grid">
-  <div class="info">Voer alleen het aantal pallets in. <b>AUTO</b> vergelijkt combinaties per rij, kiest zelf de gunstigste draairichting en zoekt de kortste totale laadlengte. Daarna kun je een pallet aantikken, slepen en met <b>DRAAI</b> 90° draaien. Posities klikken vast op 10 cm.</div>
+  <div class="info">Het laadvlak is nu <b>scrollbaar en zoombaar</b>. Sleep horizontaal door de trailer, zoom in voor precies bewerken en tik een pallet aan om te draaien. Voer alleen het aantal pallets in. <b>AUTO</b> vergelijkt combinaties per rij, kiest zelf de gunstigste draairichting en zoekt de kortste totale laadlengte. Daarna kun je een pallet aantikken, slepen en met <b>DRAAI</b> 90° draaien. Posities klikken vast op 10 cm.</div>
   <div class="p-card"><div class="p-title"><b>Euro</b><small>80 × 120 cm</small></div><input type="number" min="0" id="e" value="0" oninput="autoPlan()"></div>
   <div class="p-card"><div class="p-title"><b>Blok</b><small>100 × 120 cm</small></div><input type="number" min="0" id="b" value="0" oninput="autoPlan()"></div>
   <div class="p-card"><div class="p-title"><b>Middel</b><small>80 × 140 cm</small></div><input type="number" min="0" id="m" value="0" oninput="autoPlan()"></div>
@@ -46,7 +48,7 @@ footer{position:fixed;bottom:0;left:0;right:0;padding:10px;background:var(--card
 </div>
 <footer><button onclick="send()">📲 VERSTUUR LAADPLAN</button></footer>
 <script>
-const TW=240, TL=1360, S=.5, SNAP=10;
+const TW=240, TL=1360, SNAP=10; let S=.75;
 const TYPES={
  e:{name:'Euro',w:80,l:120,c:'#3b82f6',label:'E'},
  b:{name:'Blok',w:100,l:120,c:'#f59e0b',label:'B'},
@@ -54,6 +56,10 @@ const TYPES={
  l:{name:'Lang',w:80,l:200,c:'#ef4444',label:'L'}
 };
 let items=[],selectedId=null,manual=false,uid=1;
+function applyScale(){const can=document.getElementById('canvas');can.style.width=(TL*S)+'px';can.style.height=(TW*S)+'px';can.style.backgroundSize=(100*S)+'px 100%';render()}
+function zoomIn(){S=Math.min(1.25,+(S+.1).toFixed(2));applyScale()}
+function zoomOut(){S=Math.max(.35,+(S-.1).toFixed(2));applyScale()}
+function fitView(){const sc=document.getElementById('trailerScroll');const avail=Math.max(280,sc.clientWidth-24);S=Math.max(.35,Math.min(.9,avail/TL));applyScale();sc.scrollLeft=0;sc.scrollTop=0}
 function buildItems(){const out=[];Object.entries(TYPES).forEach(([k,t])=>{const q=Math.max(0,parseInt(document.getElementById(k).value)||0);for(let i=0;i<q;i++)out.push({id:uid++,type:k,w:t.w,l:t.l,c:t.c,label:t.label,x:0,y:0,rot:false});});return out}
 function overlaps(a,b){return !(a.x+a.l<=b.x||b.x+b.l<=a.x||a.y+a.w<=b.y||b.y+b.w<=a.y)}
 function canPlace(p,placed){if(p.x<0||p.y<0||p.y+p.w>TW||p.x+p.l>TL)return false;return !placed.some(q=>q.id!==p.id&&overlaps(p,q))}
@@ -144,7 +150,38 @@ function startDrag(ev){ev.preventDefault();manual=true;const id=+ev.currentTarge
 function rotateSelected(){if(!selectedId)return;manual=true;const p=items.find(x=>x.id===selectedId);const old={w:p.w,l:p.l,rot:p.rot};[p.w,p.l]=[p.l,p.w];p.rot=!p.rot;if(!canPlace(p,items.filter(x=>x.id!==p.id))){p.w=old.w;p.l=old.l;p.rot=old.rot;alert('Hier kan de pallet niet gedraaid worden: onvoldoende ruimte of overlap.')}render()}
 function resetManual(){autoPlan()}
 function makeRows(){const cuts=[...new Set(items.map(p=>p.x))].sort((a,b)=>a-b);return cuts.map(x=>items.filter(p=>p.x===x).sort((a,b)=>a.y-b.y).map(p=>`${p.label}(${p.w}×${p.l})`).join(' + ')).filter(Boolean)}
-function send(){let t=`*🚛 LAADPLAN*\nLaadmeters: ${document.getElementById('m-out').innerText} m\nPallets: ${items.length}\n\n`;const groups={};items.slice().sort((a,b)=>a.x-b.x||a.y-b.y).forEach(p=>{const key=p.x;if(!groups[key])groups[key]=[];groups[key].push(p)});Object.keys(groups).sort((a,b)=>a-b).forEach((x,i)=>{t+=`Rij ${i+1} @ ${(+x/100).toFixed(2)}m: `+groups[x].map(p=>`${p.label} ${p.w}×${p.l}`).join(' | ')+'\n'});window.open(`https://wa.me/?text=${encodeURIComponent(t)}`)}
-window.onload=autoPlan;
+function shareText(){const order=document.getElementById('orderNo').value.trim();const ref=document.getElementById('reference').value.trim();const d=new Date().toLocaleDateString('nl-NL');let t=`🚛 AWC LAADPLAN\nDatum: ${d}\n${order?'Order/vracht: '+order+'\n':''}${ref?'Referentie: '+ref+'\n':''}Laadmeters: ${document.getElementById('m-out').innerText} m\nPallets: ${items.length}\n\n`;const groups={};items.slice().sort((a,b)=>a.x-b.x||a.y-b.y).forEach(p=>{const key=p.x;if(!groups[key])groups[key]=[];groups[key].push(p)});Object.keys(groups).sort((a,b)=>a-b).forEach((x,i)=>{t+=`Rij ${i+1} @ ${(+x/100).toFixed(2)}m: `+groups[x].map(p=>`${p.label} ${p.w}×${p.l}`).join(' | ')+'\n'});return t}
+function makePlanImage(){
+ const used=Math.max(100,endCm()), scale=2, margin=64, top=255, footerH=150;
+ const planW=Math.max(850,Math.round(used*1.15));
+ const c=document.createElement('canvas');c.width=planW+margin*2;c.height=TW*scale+top+footerH;const g=c.getContext('2d');
+ const order=document.getElementById('orderNo').value.trim()||'—';
+ const ref=document.getElementById('reference').value.trim()||'—';
+ const date=new Date().toLocaleDateString('nl-NL');
+ // Professional AWC header
+ g.fillStyle='#ffffff';g.fillRect(0,0,c.width,c.height);
+ g.fillStyle='#0f172a';g.fillRect(0,0,c.width,150);
+ g.fillStyle='#22c55e';g.fillRect(0,150,c.width,7);
+ g.strokeStyle='#22c55e';g.lineWidth=5;g.strokeRect(margin,28,92,78);
+ g.fillStyle='#ffffff';g.font='900 38px Arial';g.textAlign='center';g.textBaseline='middle';g.fillText('AWC',margin+46,67);
+ g.textAlign='left';g.textBaseline='alphabetic';g.font='900 30px Arial';g.fillText('AMSTERDAM WAREHOUSE COMPANY',margin+120,60);
+ g.font='bold 22px Arial';g.fillStyle='#cbd5e1';g.fillText('LAADPLAN • BOVENAANZICHT',margin+120,98);
+ // Metadata cards
+ const metaY=178, gap=18, cardW=(c.width-margin*2-gap)/2;
+ function card(x,title,value){g.fillStyle='#f8fafc';g.fillRect(x,metaY,cardW,55);g.strokeStyle='#cbd5e1';g.lineWidth=2;g.strokeRect(x,metaY,cardW,55);g.fillStyle='#64748b';g.font='bold 14px Arial';g.fillText(title,x+14,metaY+20);g.fillStyle='#0f172a';g.font='bold 20px Arial';g.fillText(value,x+14,metaY+45)}
+ card(margin,'ORDER / VRACHTNUMMER',order);card(margin+cardW+gap,'REFERENTIE / KLANT',ref);
+ const sx=planW/used, sy=(TW*scale)/TW, px=margin,py=top;
+ g.fillStyle='#111827';g.fillRect(px,py,planW,TW*scale);g.strokeStyle='#0f172a';g.lineWidth=5;g.strokeRect(px,py,planW,TW*scale);
+ for(let m=0;m<=Math.ceil(used/100);m++){const x=px+m*100*sx;if(x>px+planW)break;g.strokeStyle='rgba(255,255,255,.20)';g.lineWidth=1;g.beginPath();g.moveTo(x,py);g.lineTo(x,py+TW*scale);g.stroke();g.fillStyle='#475569';g.font='16px Arial';g.fillText(`${m}m`,x+3,py+TW*scale+24)}
+ items.forEach(p=>{const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy;g.fillStyle=p.c;g.fillRect(x,y,w,h);g.strokeStyle='#fff';g.lineWidth=2;g.strokeRect(x,y,w,h);g.fillStyle='#fff';g.font=`bold ${Math.max(13,Math.min(22,h*.24))}px Arial`;g.textAlign='center';g.textBaseline='middle';g.fillText(`${p.label} ${p.w}×${p.l}`,x+w/2,y+h/2)});
+ g.textAlign='left';g.textBaseline='alphabetic';
+ const fy=py+TW*scale+48;g.fillStyle='#0f172a';g.font='bold 22px Arial';g.fillText(`Gebruikt: ${(endCm()/100).toFixed(2).replace('.',',')} m`,margin,fy);g.fillText(`Pallets: ${items.length}`,margin+230,fy);g.fillText(`Vrij: ${Math.max(0,(TL-endCm())/100).toFixed(2).replace('.',',')} m`,margin+390,fy);
+ g.fillStyle='#64748b';g.font='17px Arial';g.fillText(`Datum: ${date}  •  Trailer: 13,60 × 2,40 m`,margin,fy+36);
+ // legend
+ let lx=margin, ly=fy+75;g.font='bold 16px Arial';Object.values(TYPES).forEach(t=>{g.fillStyle=t.c;g.fillRect(lx,ly-14,20,20);g.fillStyle='#334155';g.fillText(`${t.name} ${t.w}×${t.l}`,lx+28,ly+2);lx+=185});
+ return c;
+}
+async function send(){if(!items.length){alert('Voer eerst pallets in.');return}const text=shareText();const c=makePlanImage();const blob=await new Promise(r=>c.toBlob(r,'image/png',1));const file=new File([blob],'laadplan.png',{type:'image/png'});try{if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({title:'Laadplan',text,files:[file]});return}}catch(e){if(e.name==='AbortError')return}window.open(`https://wa.me/?text=${encodeURIComponent(text+'\n\nJe browser ondersteunt het meesturen van de laadplan-afbeelding niet. Gebruik op Android de Deel-functie in Chrome.')}`)}
+window.onload=()=>{autoPlan();setTimeout(fitView,50)};
 </script>
 </body></html>
