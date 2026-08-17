@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>Warehouse Master v10.0 PRO</title>
+<title>Warehouse Master v10.2.1 PRO Visual</title>
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--text:#f8fafc;--accent:#3b82f6;--wa:#22c55e;--muted:#94a3b8}
 *{box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -22,7 +22,7 @@ footer{position:fixed;bottom:0;left:0;right:0;padding:10px;background:var(--card
 #modeLabel{font-size:.7rem;color:#cbd5e1;text-align:center;margin-top:5px}
 #orderLegend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 5px 0}.order-chip{display:flex;align-items:center;gap:6px;background:#0f172a;border:1px solid #475569;border-radius:999px;padding:5px 9px;font-size:.68rem;font-weight:800}.order-dot{width:12px;height:12px;border-radius:3px;border:3px solid #fff;background:#111}.warning{display:none;margin:7px 5px 0;padding:8px 10px;border-radius:8px;background:#3f2d08;border:1px solid #f59e0b;color:#fde68a;font-size:.7rem;font-weight:700}
 
-/* v10.0 PRO UI */
+/* v10.2 PRO UI */
 :root{--awc:#00a651;--awc-dark:#08783f;--panel:#111827}
 body{background:#07111f}
 .header{padding:0 0 8px;background:#0b1627;border-bottom:1px solid #26364b}
@@ -57,40 +57,191 @@ footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
 .v-p .pallet-label{position:relative;z-index:2;background:rgba(2,6,23,.60);border-radius:4px;padding:3px 5px;max-width:92%}
 .v-p .ord{font-size:9px}.v-p .dims{font-size:7px}
 .security-note{margin:7px 8px 0;padding:7px 9px;border:1px solid #35d07f;border-radius:8px;color:#d1fae5;background:#0b2b20;font-size:.67rem;font-weight:700}
+
+/* v10.2 dashboard visual implementation */
+:root{
+ --bg:#06111f;--panel:#0c192a;--panel2:#101f32;--line:#24364c;
+ --text:#f6f8fb;--muted:#8fa2b8;--awc:#00b85c;--awc2:#087a43;
+ --blue:#2878ea;
+}
+html{background:var(--bg)}
+body{background:radial-gradient(circle at 70% 0%,#0b1b30 0,#06111f 52%,#040b14 100%);min-height:100vh}
+.app-topbar{height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid #1c3147;background:rgba(4,12,22,.96);position:sticky;top:0;z-index:60;backdrop-filter:blur(12px)}
+.brand-lockup{display:flex;align-items:center;gap:10px}.brand-lockup img{width:38px;height:38px;object-fit:contain}.brand-lockup strong{font-size:1.05rem;letter-spacing:.02em;display:block}.brand-lockup span{font-size:.62rem;color:var(--muted);display:block;margin-top:2px}.brand-lockup .version-badge{margin-left:8px;background:#1769e8;color:#fff;padding:5px 9px;border-radius:999px;font-size:.65rem}
+.save-state{font-size:.7rem;font-weight:900;color:#35d07f;letter-spacing:.05em}
+
+.dashboard{display:grid;grid-template-columns:330px minmax(0,1fr);gap:12px;max-width:1500px;margin:0 auto;padding:12px 12px 92px}
+.sidebar{display:flex;flex-direction:column;gap:10px;min-width:0}
+.workspace{display:flex;flex-direction:column;gap:10px;min-width:0}
+.panel{background:linear-gradient(180deg,rgba(15,31,50,.98),rgba(8,21,36,.98));border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 35px rgba(0,0,0,.20)}
+.panel h2{font-size:.78rem;margin:0 0 10px;letter-spacing:.04em}
+.load-data,.trailer-info{padding:12px}
+.stats{margin:0 0 10px!important;border:0!important;background:#071421!important;padding:0!important;display:grid!important;grid-template-columns:repeat(3,1fr)!important;border-radius:9px!important;overflow:hidden}
+.stats>div{padding:10px 4px;text-align:center;border-right:1px solid #203247}.stats>div:last-child{border-right:0}.stat-v{font-size:1.15rem!important}.stats small{font-size:.56rem;color:#b6c1cf}
+#viewModeBar{margin:0 0 10px!important}.modebtn{border:1px solid #2b4057!important;background:#1c3047!important}.modebtn.active{background:linear-gradient(180deg,#0abb61,#06974d)!important}
+.meta-grid,.transport-grid{margin:0!important;gap:8px!important}.meta-grid{grid-template-columns:1fr 1fr!important}.transport-grid{grid-template-columns:1fr 1fr!important;margin-top:8px!important}
+.meta-grid input,.transport-grid input{height:43px!important;background:#081423!important;border:1px solid #344a63!important;border-radius:6px!important;font-size:.83rem!important}.meta-grid label,.transport-grid label{font-size:.56rem!important;letter-spacing:.03em}
+.dimension-row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid #203247;font-size:.65rem}.dimension-row:last-child{border-bottom:0}.dimension-row span{color:var(--muted)}.dimension-row b{font-size:.68rem}
+
+.input-grid{padding:0!important}.input-grid>.info{display:none!important}.p-card{margin:0 0 8px!important;border:1px solid var(--line)!important;background:linear-gradient(180deg,#0f2033,#0a1727)!important;border-radius:10px!important;padding:10px!important}.editing .p-card{display:block!important}.p-card{display:none!important}
+.type-head{margin:0!important}.p-title b{font-size:.8rem;display:flex!important;align-items:center;gap:7px}.p-title small{font-size:.6rem}.type-swatch{width:9px;height:9px;border-radius:2px;display:inline-block}.type-swatch.euro{background:#3b82f6}.type-swatch.blok{background:#f59e0b}.type-swatch.middel{background:#10b981}.type-swatch.lang{background:#ef4444}.add-order{background:#1f6feb!important;border:1px solid #3c83ed!important;padding:7px 9px!important}
+.order-line{grid-template-columns:1fr 70px 34px!important}.order-line .order-input,.order-line input.qty{height:40px!important;border-radius:6px!important}.order-line input.qty{font-size:1rem!important}
+
+.plan-panel{padding:12px;min-height:420px}.plan-titlebar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px}.plan-titlebar h1{margin:0;font-size:1rem}.plan-titlebar span{font-size:.62rem;color:var(--muted)}.plan-actions{display:grid;grid-template-columns:1.25fr .8fr .8fr;gap:7px;min-width:340px}.plan-actions button{padding:10px 11px!important;font-size:.7rem!important;border-radius:7px!important}.accent{background:linear-gradient(180deg,#2485f4,#176bda)!important}.secondary{background:#1a2a3d!important;border:1px solid #2d435a!important}
+.trailer-shell{margin:0!important}.direction-row{font-size:.65rem!important;margin-bottom:5px!important}.meter-ruler{background:#07111c!important;border-color:#334960!important;height:25px!important}.meter-ruler span{top:5px!important;font-size:.6rem!important}
+.trailer-scroll{max-height:none!important;min-height:210px;border:2px solid #77889b!important;background:#02070d!important;padding:8px!important;border-radius:10px!important}
+#canvas{border-left:14px solid #637083!important;border-right:18px double #94a3b8!important;background-color:#08121f!important;background-image:linear-gradient(90deg,rgba(118,145,170,.12) 1px,transparent 1px)!important}
+.v-p{border-radius:4px!important;box-shadow:inset 0 0 0 2px rgba(0,0,0,.2),0 1px 3px rgba(0,0,0,.35)!important}.v-p .pallet-label{background:rgba(3,9,17,.72)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 3px 7px rgba(0,0,0,.3)}
+.compact-tools{max-width:430px;margin:9px 0 0 auto!important}.compact-tools button{padding:9px!important;font-size:.68rem!important}
+.security-note{background:#09261e!important;border-color:#159a5d!important;font-size:.67rem!important;line-height:1.4}.warning{font-size:.68rem!important}
+#orderLegend{margin:8px 0 0!important}.order-chip{background:#0a1726!important;border-color:#344960!important}
+
+.export-panel{padding:12px;display:flex;align-items:center;justify-content:space-between;gap:15px}.export-copy b{font-size:.75rem;display:block}.export-copy span{font-size:.62rem;color:var(--muted)}.export-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;min-width:450px}.export-actions button{padding:13px 8px!important;font-size:.72rem!important;border-radius:8px!important}.export-actions button:first-child{background:linear-gradient(180deg,#14c967,#08a553)!important}.pdfbtn{background:#063b2c!important;border:1px solid #15a562!important}
+
+footer{display:none!important}
+.header{display:none!important}
+
+@media(max-width:900px){
+ .app-topbar{height:60px;padding:0 12px}.brand-lockup img{width:32px;height:32px}.brand-lockup strong{font-size:.88rem}.brand-lockup span{display:none}.save-state{display:none}
+ .dashboard{grid-template-columns:1fr;padding:8px 8px 120px;gap:8px}
+ .sidebar{display:contents}.workspace{display:contents}
+ .load-data{order:1}.plan-panel{order:2}.trailer-info{display:none}.input-grid{order:3}.export-panel{order:4}
+ .plan-titlebar{display:block}.plan-titlebar>div:first-child{display:none}.plan-actions{min-width:0;margin-bottom:8px;grid-template-columns:1.2fr .9fr .9fr}
+ .plan-actions button{font-size:.66rem!important;padding:10px 5px!important}
+ .trailer-scroll{min-height:190px}
+ .compact-tools{max-width:none;margin:8px 0 0!important}
+ .export-panel{position:fixed;left:0;right:0;bottom:0;z-index:50;border-radius:0;padding:8px;background:#081525;box-shadow:0 -8px 30px rgba(0,0,0,.45)}
+ .export-copy{display:none}.export-actions{min-width:0;width:100%;grid-template-columns:1fr 1fr 1fr}
+ .export-actions button{font-size:.68rem!important;padding:13px 4px!important}
+ .load-data{padding:9px}.meta-grid,.transport-grid{grid-template-columns:1fr 1fr!important}
+}
+@media(max-width:520px){
+ .brand-lockup .version-badge{font-size:.56rem;padding:4px 7px}
+ .stats>div{padding:8px 2px}.stat-v{font-size:1.05rem!important}
+ .meta-grid input,.transport-grid input{font-size:.78rem!important}
+ .plan-panel{padding:8px}.trailer-scroll{min-height:175px;padding:5px!important}
+ .security-note{font-size:.61rem!important}
+}
+
 </style>
 </head>
 <body>
-<div class="header"><div class="pro-brand"><div class="pro-brand-main"><img src="icon.png" alt="AWC"><div><b>Amsterdam Warehouse Company</b><small>Warehouse Master · Laadplan</small></div></div><span class="version-badge">v10.0 PRO</span></div>
-  <div class="stats">
-    <div style="text-align:center"><span id="m-out" class="stat-v">0,00</span><span style="font-size:.6rem">LAADMETER</span></div>
-    <div style="text-align:center"><span id="p-out" class="stat-v">0</span><span style="font-size:.6rem">PALLETS</span></div>
-    <div style="text-align:center"><span id="free-out" class="stat-v">13,60</span><span style="font-size:.6rem">VRIJ</span></div>
+<div class="app-topbar">
+  <div class="brand-lockup">
+    <img src="icon.png" alt="AWC">
+    <div><strong>WAREHOUSE MASTER</strong><span>Amsterdam Warehouse Company</span></div>
+    <b class="version-badge">v10.2.1 PRO</b>
   </div>
-<div id="viewModeBar"><button id="viewBtn" class="modebtn active" onclick="setUIMode(false)">BEKIJK LAADPLAN</button><button id="editBtn" class="modebtn" onclick="setUIMode(true)">BEWERKEN</button></div><div id="editPanel">
-  <div class="meta-grid"><div><label>ORDER / VRACHTNUMMER</label><input id="orderNo" type="text" placeholder="bijv. 123456" oninput="autoPlan()"></div><div><label>REFERENTIE / KLANT</label><input id="reference" type="text" placeholder="optioneel"></div></div>
-  <div class="transport-grid"><div><label>CHAUFFEUR</label><input id="driver" type="text" placeholder="naam chauffeur"></div><div><label>KENTEKEN TREKKER</label><input id="tractorPlate" type="text" placeholder="bijv. 12-ABC-3"></div><div><label>KENTEKEN TRAILER</label><input id="trailerPlate" type="text" placeholder="optioneel"></div><div><label>TRANSPORTEUR</label><input id="carrier" type="text" placeholder="optioneel"></div></div>
+  <div class="save-state">✓ LAADPLAN</div>
 </div>
-  <div class="trailer-shell">
-    <div class="direction-row"><span>← CABINE</span><span>DEUREN →</span></div>
-    <div class="meter-ruler"><span style="left:0.0000%">0m</span><span style="left:14.7059%">2m</span><span style="left:29.4118%">4m</span><span style="left:44.1176%">6m</span><span style="left:58.8235%">8m</span><span style="left:73.5294%">10m</span><span style="left:88.2353%">12m</span><span style="left:100.0000%">13,6m</span></div>
-    <div class="trailer-scroll" id="trailerScroll"><div id="canvas"></div></div>
-  </div>
-  <div class="toolbar">
-    <button class="accent" onclick="autoPlan()">✨ AUTO</button>
-    <button class="secondary" onclick="rotateSelected()">↻ DRAAI</button>
-    <button class="secondary" onclick="resetManual()">↺ RESET</button>
-  </div>
-  <div class="toolbar2"><button class="secondary" onclick="zoomOut()">− UITZOOM</button><button class="secondary" onclick="fitView()">▣ PASSEND</button><button class="secondary" onclick="zoomIn()">＋ INZOOM</button></div>
-  <div id="modeLabel">Automatisch: optimale indeling zoeken • laadvlak is horizontaal én verticaal scrollbaar</div><div id="orderWarning" class="warning"></div><div class="security-note">SMARTPACK v10: volledig opnieuw opgebouwde 2D-planner. Hij probeert tientallen indelingen en draairichtingen, vult zijkanten en uitsparingen actief op en kiest de oplossing met de kortste laadlengte en de minste verloren ruimte.</div><div id="orderLegend"></div>
+
+<div class="dashboard">
+  <aside class="sidebar">
+    <section class="panel load-data">
+      <h2>LAADGEGEVENS</h2>
+      <div class="stats">
+        <div><span id="m-out" class="stat-v">0,00</span><small>LAADMETER</small></div>
+        <div><span id="p-out" class="stat-v">0</span><small>PALLETS</small></div>
+        <div><span id="free-out" class="stat-v">13,60</span><small>VRIJ</small></div>
+      </div>
+
+      <div id="viewModeBar">
+        <button id="viewBtn" class="modebtn active" onclick="setUIMode(false)">BEKIJK LAADPLAN</button>
+        <button id="editBtn" class="modebtn" onclick="setUIMode(true)">BEWERKEN</button>
+      </div>
+
+      <div id="editPanel">
+        <div class="meta-grid">
+          <div><label>ORDER / VRACHTNUMMER</label><input id="orderNo" type="text" placeholder="bijv. 123456" oninput="autoPlan()"></div>
+          <div><label>REFERENTIE / KLANT</label><input id="reference" type="text" placeholder="optioneel"></div>
+        </div>
+        <div class="transport-grid">
+          <div><label>CHAUFFEUR</label><input id="driver" type="text" placeholder="naam chauffeur"></div>
+          <div><label>KENTEKEN TREKKER</label><input id="tractorPlate" type="text" placeholder="bijv. 12-ABC-3"></div>
+          <div><label>KENTEKEN TRAILER</label><input id="trailerPlate" type="text" placeholder="optioneel"></div>
+          <div><label>TRANSPORTEUR</label><input id="carrier" type="text" placeholder="optioneel"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel trailer-info">
+      <h2>TRAILER</h2>
+      <div class="dimension-row"><span>LENGTE BINNENWERK</span><b>13,60 m</b></div>
+      <div class="dimension-row"><span>BREEDTE BINNENWERK</span><b>2,40 m</b></div>
+      <div class="dimension-row"><span>LAADPRINCIPE</span><b>TETRIS AUTO</b></div>
+    </section>
+
+    <div class="input-grid">
+      <div class="info">Meerdere orders per pallettype zijn mogelijk. Ieder order wordt afzonderlijk geoptimaliseerd en blijft als blok bij elkaar.</div>
+
+      <div class="p-card" data-type="e">
+        <div class="type-head"><div class="p-title"><b><span class="type-swatch euro"></span>Euro</b><small>80 × 120 cm</small></div><button class="add-order" onclick="addOrderLine('e')">+ ORDER</button></div>
+        <div class="order-lines" id="eLines"></div>
+      </div>
+
+      <div class="p-card" data-type="b">
+        <div class="type-head"><div class="p-title"><b><span class="type-swatch blok"></span>Blok</b><small>100 × 120 cm</small></div><button class="add-order" onclick="addOrderLine('b')">+ ORDER</button></div>
+        <div class="order-lines" id="bLines"></div>
+      </div>
+
+      <div class="p-card" data-type="m">
+        <div class="type-head"><div class="p-title"><b><span class="type-swatch middel"></span>Middel</b><small>80 × 140 cm</small></div><button class="add-order" onclick="addOrderLine('m')">+ ORDER</button></div>
+        <div class="order-lines" id="mLines"></div>
+      </div>
+
+      <div class="p-card" data-type="l">
+        <div class="type-head"><div class="p-title"><b><span class="type-swatch lang"></span>Lang</b><small>80 × 200 cm</small></div><button class="add-order" onclick="addOrderLine('l')">+ ORDER</button></div>
+        <div class="order-lines" id="lLines"></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="workspace">
+    <section class="panel plan-panel">
+      <div class="plan-titlebar">
+        <div><h1>LAADPLAN</h1><span>Bovenaanzicht trailer · 13,60 × 2,40 m</span></div>
+        <div class="plan-actions">
+          <button class="accent" onclick="autoPlan()">✨ AUTO OPTIMAAL</button>
+          <button class="secondary" onclick="rotateSelected()">↻ DRAAI</button>
+          <button class="secondary" onclick="resetManual()">↺ RESET</button>
+        </div>
+      </div>
+
+      <div class="trailer-shell">
+        <div class="direction-row"><span>← CABINE</span><span>DEUREN →</span></div>
+        <div class="meter-ruler">
+          <span style="left:0%">0m</span><span style="left:14.7059%">2m</span><span style="left:29.4118%">4m</span>
+          <span style="left:44.1176%">6m</span><span style="left:58.8235%">8m</span><span style="left:73.5294%">10m</span>
+          <span style="left:88.2353%">12m</span><span style="left:100%">13,6m</span>
+        </div>
+        <div class="trailer-scroll" id="trailerScroll"><div id="canvas"></div></div>
+      </div>
+
+      <div class="toolbar2 compact-tools">
+        <button class="secondary" onclick="zoomOut()">− UITZOOM</button>
+        <button class="secondary" onclick="fitView()">▣ PASSEND</button>
+        <button class="secondary" onclick="zoomIn()">＋ INZOOM</button>
+      </div>
+
+      <div id="modeLabel">TETRIS AUTO — elk order krijgt zijn eigen volledige optimalisatieronde</div>
+      <div id="orderWarning" class="warning"></div>
+      <div class="security-note">TETRIS AUTO v10.2: ieder order wordt afzonderlijk volledig geoptimaliseerd. Kleinere orders worden exact doorgerekend op alle zinvolle posities en draairichtingen; grotere orders gebruiken de combinatieplanner.</div>
+      <div id="orderLegend"></div>
+    </section>
+
+    <section class="panel export-panel">
+      <div class="export-copy">
+        <b>LAADPLAN DELEN</b>
+        <span>Dezelfde visuele indeling wordt gebruikt voor WhatsApp en PDF.</span>
+      </div>
+      <div class="export-actions">
+        <button onclick="send()">WHATSAPP VISUEEL</button>
+        <button class="pdfbtn" onclick="downloadPdf()">DOWNLOAD PDF</button>
+        <button class="secondary" onclick="printPlan()">PDF / PRINT</button>
+      </div>
+    </section>
+  </main>
 </div>
-<div class="input-grid">
-  <div class="info">Je kunt nu <b>meerdere orders van hetzelfde pallettype</b> invoeren. Gebruik <b>+ ORDER</b> om bijvoorbeeld 8 Euro voor order 45120 én 5 Euro voor order 45135 toe te voegen. De optimizer houdt ieder order als één aaneengesloten laadblok. Pallets van verschillende orders worden niet door elkaar geplaatst. Binnen ieder order worden pallettypes en draairichtingen wel zo efficiënt mogelijk gecombineerd.<br><br>Laat een ordernummer leeg om het algemene order/vrachtnummer bovenaan te gebruiken. Het laadvlak blijft <b>scrollbaar, zoombaar en handmatig bewerkbaar</b>.</div>
-  <div class="p-card" data-type="e"><div class="type-head"><div class="p-title"><b>Euro</b><small>80 × 120 cm</small></div><button class="add-order" onclick="addOrderLine('e')">＋ ORDER</button></div><div class="order-lines" id="eLines"></div></div>
-  <div class="p-card" data-type="b"><div class="type-head"><div class="p-title"><b>Blok</b><small>100 × 120 cm</small></div><button class="add-order" onclick="addOrderLine('b')">＋ ORDER</button></div><div class="order-lines" id="bLines"></div></div>
-  <div class="p-card" data-type="m"><div class="type-head"><div class="p-title"><b>Middel</b><small>80 × 140 cm</small></div><button class="add-order" onclick="addOrderLine('m')">＋ ORDER</button></div><div class="order-lines" id="mLines"></div></div>
-  <div class="p-card" data-type="l"><div class="type-head"><div class="p-title"><b>Lang</b><small>80 × 200 cm</small></div><button class="add-order" onclick="addOrderLine('l')">＋ ORDER</button></div><div class="order-lines" id="lLines"></div></div>
-</div>
-<footer><button onclick="send()">WHATSAPP VISUEEL</button><button class="pdfbtn" onclick="downloadPdf()">DOWNLOAD PDF</button><button class="secondary" onclick="printPlan()">PDF / PRINT</button></footer>
 <script>
 function setUIMode(edit){
  document.body.classList.toggle('editing',!!edit);
@@ -209,191 +360,223 @@ function rowsToPlacement(src,solution){
    2) least empty area inside that used length
    3) least fragmentation / fewer internal holes
    ========================================================== */
-function optimizeSingleOrder(src){
- const CELL=20, GW=Math.round(TL/CELL), GH=Math.round(TW/CELL);
- if(!src.length)return [];
 
- const base=src.map((p,i)=>({
-   ...p,_seq:i,
-   gw:Math.round(TYPES[p.type].l/CELL),
-   gh:Math.round(TYPES[p.type].w/CELL)
- }));
+function optimizeSingleOrderCombi(src){
+ const counts=countsFromItems(src);
+ const total=totalCount(counts);
+ if(!total)return [];
 
- function intersects(a,b){
-   return !(a.x+a.w<=b.x||b.x+b.w<=a.x||a.y+a.h<=b.y||b.y+b.h<=a.y);
+ // All physical orientations. w = trailer width used; l = trailer length used.
+ const vars=[];
+ Object.entries(TYPES).forEach(([type,t])=>{
+   vars.push({type,w:t.w,l:t.l,rot:false});
+   if(t.w!==t.l)vars.push({type,w:t.l,l:t.w,rot:true});
+ });
+
+ // Generate every useful side-by-side band up to 240 cm wide (max 3 pallets for these sizes).
+ const patterns=[];
+ const seen=new Set();
+ function add(combo){
+   const width=combo.reduce((s,v)=>s+v.w,0);
+   if(width>TW)return;
+   const use={e:0,b:0,m:0,l:0}; combo.forEach(v=>use[v.type]++);
+   const depth=Math.max(...combo.map(v=>v.l));
+   const occupied=combo.reduce((s,v)=>s+v.w*v.l,0);
+   const cavity=width*depth-occupied; // fillable/avoidable space behind shorter neighbours
+   const side=(TW-width)*depth;
+   const key=combo.map(v=>`${v.type}${v.w}x${v.l}`).sort().join('|');
+   if(seen.has(key))return; seen.add(key);
+   patterns.push({combo:combo.map(v=>({...v})),use,width,depth,cavity,side,full:width===TW});
  }
- function contains(a,b){
-   return b.x>=a.x&&b.y>=a.y&&b.x+b.w<=a.x+a.w&&b.y+b.h<=a.y+a.h;
- }
- function splitFree(f,u){
-   if(!intersects(f,u))return [f];
-   const out=[];
-   if(u.x>f.x)out.push({x:f.x,y:f.y,w:u.x-f.x,h:f.h});
-   if(u.x+u.w<f.x+f.w)out.push({x:u.x+u.w,y:f.y,w:(f.x+f.w)-(u.x+u.w),h:f.h});
-   if(u.y>f.y)out.push({x:f.x,y:f.y,w:f.w,h:u.y-f.y});
-   if(u.y+u.h<f.y+f.h)out.push({x:f.x,y:u.y+u.h,w:f.w,h:(f.y+f.h)-(u.y+u.h)});
-   return out.filter(r=>r.w>0&&r.h>0);
- }
- function pruneFree(rects){
-   const out=[];
-   for(let i=0;i<rects.length;i++){
-     let contained=false;
-     for(let j=0;j<rects.length;j++){
-       if(i!==j&&contains(rects[j],rects[i])){contained=true;break}
-     }
-     if(!contained)out.push(rects[i]);
+ for(let a=0;a<vars.length;a++){
+   add([vars[a]]);
+   for(let b=a;b<vars.length;b++){
+     add([vars[a],vars[b]]);
+     for(let c=b;c<vars.length;c++)add([vars[a],vars[b],vars[c]]);
    }
-   // Deduplicate
-   const seen=new Set();
-   return out.filter(r=>{
-     const k=`${r.x},${r.y},${r.w},${r.h}`;
-     if(seen.has(k))return false;seen.add(k);return true;
-   });
  }
 
- function rectVariants(p){
-   const t=TYPES[p.type], a={w:Math.round(t.l/CELL),h:Math.round(t.w/CELL),rot:false};
-   const b={w:a.h,h:a.w,rot:true};
-   return a.w===b.w&&a.h===b.h?[a]:[a,b];
+ function fits(p,q){return ['e','b','m','l'].every(k=>p.use[k]<=q[k])}
+ function sub(q,u){const r={...q};['e','b','m','l'].forEach(k=>r[k]-=u[k]);return r}
+ function key(q){return `${q.e},${q.b},${q.m},${q.l}`}
+ function nleft(q){return q.e+q.b+q.m+q.l}
+
+ // DP over counts. Full 240cm combinations get a strong preference, but depth remains primary.
+ // Cavity is penalized rather than forbidden: e.g. 200/200/140 is allowed, and later filler logic can use its 60cm pocket.
+ const memo=new Map();
+ function solve(q){
+   const k=key(q); if(k==='0,0,0,0')return {len:0,cavity:0,side:0,bands:[]};
+   if(memo.has(k))return memo.get(k);
+   let best=null,bestScore=Infinity;
+   for(const pat of patterns){
+     if(!fits(pat,q))continue;
+     const nxt=solve(sub(q,pat.use)); if(!nxt)continue;
+     const len=pat.depth+nxt.len;
+     const cavity=pat.cavity+nxt.cavity;
+     const side=pat.side+nxt.side;
+     // Primary shortest length. Then internal cavities, then side loss, then fewer bands.
+     const score=len*1000000+cavity*35+side*8+(pat.full?0:2500)+nxt.bands.length*3;
+     if(score<bestScore){
+       bestScore=score;best={len,cavity,side,bands:[pat,...nxt.bands]};
+     }
+   }
+   memo.set(k,best);return best;
  }
 
- function packSequence(seq,mode){
-   let free=[{x:0,y:0,w:GW,h:GH}], placed=[];
-   for(const p of seq){
-     let best=null;
-     for(const v of rectVariants(p)){
-       for(const fr of free){
-         if(v.w>fr.w||v.h>fr.h)continue;
-         const candidates=[
-           {x:fr.x,y:fr.y},
-           {x:fr.x,y:fr.y+fr.h-v.h}
-         ];
-         for(const c of candidates){
-           const usedEnd=Math.max(placed.reduce((m,q)=>Math.max(m,q.x+q.w),0),c.x+v.w);
-           const short=Math.min(fr.w-v.w,fr.h-v.h);
-           const long=Math.max(fr.w-v.w,fr.h-v.h);
-           const touchLeft=c.x===0||placed.some(q=>q.x+q.w===c.x && !(q.y+q.h<=c.y||c.y+v.h<=q.y));
-           const touchSide=c.y===0||c.y+v.h===GH||placed.some(q=>q.y+q.h===c.y || q.y===c.y+v.h);
-           let score=usedEnd*100000;
-           if(mode===0)score+=short*900+long*50-(touchLeft?500:0)-(touchSide?120:0);
-           if(mode===1)score+=(fr.w*v.h+fr.h*v.w-v.w*v.h)*80+short*300-(touchLeft?800:0);
-           if(mode===2)score+=c.x*1200+short*700+long*80-c.y*2;
-           if(mode===3)score+=short*400+long*120+c.y*5;
-           if(!best||score<best.score)best={...c,w:v.w,h:v.h,rot:v.rot,score};
+ const sol=solve(counts);
+ if(!sol)return [];
+
+ // Build bands from cabin to doors. Within each band, order pallets to put longer pieces
+ // against one side; this leaves any shorter-depth pocket contiguous and easy to fill manually/visually.
+ const pools={e:[],b:[],m:[],l:[]};src.forEach(p=>pools[p.type].push({...p}));
+ const placed=[]; let x=0;
+ for(const band of sol.bands){
+   const combo=band.combo.slice().sort((a,b)=>b.l-a.l||b.w-a.w);
+   let y=0;
+   for(const v of combo){
+     const p=pools[v.type].shift(); if(!p)continue;
+     p.w=v.w;p.l=v.l;p.rot=v.rot;p.x=x;p.y=y;
+     placed.push(p);y+=v.w;
+   }
+   x+=band.depth;
+ }
+
+ // Second pass: try to move every later pallet into any earlier rectangular cavity,
+ // testing both orientations. Repeat until no improvement. Never create overlap.
+ function overlap(a,b){return !(a.x+a.l<=b.x||b.x+b.l<=a.x||a.y+a.w<=b.y||b.y+b.w<=a.y)}
+ function legal(test,id){return test.x>=0&&test.y>=0&&test.x+test.l<=TL&&test.y+test.w<=TW&&
+   !placed.some(q=>q.id!==id&&overlap(test,q))}
+ function endLen(){return placed.reduce((m,p)=>Math.max(m,p.x+p.l),0)}
+ let changed=true,passes=0;
+ while(changed&&passes++<8){
+   changed=false;
+   placed.sort((a,b)=>(b.x+b.l)-(a.x+a.l));
+   for(const p of placed){
+     const old={x:p.x,y:p.y,w:p.w,l:p.l,rot:p.rot}, oldEnd=endLen();
+     let best=null,bestScore=oldEnd*100000+p.x*10+p.y;
+     const t=TYPES[p.type];
+     const orientations=[{w:t.w,l:t.l,rot:false},{w:t.l,l:t.w,rot:true}];
+     const xs=new Set([0]),ys=new Set([0]);
+     placed.forEach(q=>{if(q.id!==p.id){xs.add(q.x);xs.add(q.x+q.l);ys.add(q.y);ys.add(q.y+q.w)}});
+     for(const o of orientations)for(const xx of xs)for(const yy of ys){
+       const test={...p,...o,x:xx,y:yy};
+       if(!legal(test,p.id))continue;
+       const newEnd=Math.max(...placed.filter(q=>q.id!==p.id).map(q=>q.x+q.l),xx+o.l);
+       // prefer shorter total plan, then earlier x, then tighter side placement
+       const sc=newEnd*100000+xx*10+yy;
+       if(sc<bestScore){bestScore=sc;best=test}
+     }
+     if(best){Object.assign(p,best);changed=true}
+     else Object.assign(p,old);
+   }
+ }
+ placed.sort((a,b)=>a.x-b.x||a.y-b.y);
+ return placed;
+}
+
+// v10.2 — exact Tetris solver for each separate order.
+// For smaller order blocks we exhaustively compare rotations and every flat contact position.
+// This makes Order 2 receive the same full optimization treatment as Order 1.
+function optimizeSingleOrderExact(src){
+ const CELL=20, H=Math.round(TW/CELL);
+ const q0=countsFromItems(src);
+ const total=totalCount(q0);
+ if(!total)return [];
+
+ const variants={};
+ Object.entries(TYPES).forEach(([type,t])=>{
+   const a={type,w:Math.round(t.w/CELL),l:Math.round(t.l/CELL),rot:false,cmw:t.w,cml:t.l};
+   const b={type,w:Math.round(t.l/CELL),l:Math.round(t.w/CELL),rot:true,cmw:t.l,cml:t.w};
+   variants[type]=(a.w===b.w&&a.l===b.l)?[a]:[a,b];
+ });
+
+ const memo=new Map();
+
+ function countKey(q){return `${q.e},${q.b},${q.m},${q.l}`}
+ function rough(h){
+   let r=0;
+   for(let i=1;i<h.length;i++)r+=Math.abs(h[i]-h[i-1]);
+   return r;
+ }
+ function stateKey(q,h){return countKey(q)+'|'+h.join(',')}
+
+ function solve(q,h){
+   if(totalCount(q)===0){
+     const end=Math.max(...h);
+     return {end,rough:rough(h),moves:[]};
+   }
+   const sk=stateKey(q,h);
+   if(memo.has(sk))return memo.get(sk);
+
+   let best=null;
+   const types=['e','b','m','l'];
+
+   for(const type of types){
+     if(!q[type])continue;
+     for(const v of variants[type]){
+       if(v.w>H)continue;
+
+       // A pallet may start wherever all cells under its width have the same current x-front.
+       // That allows valleys to be filled later, but never bridges over an empty cavity.
+       for(let y=0;y<=H-v.w;y++){
+         const base=h[y];
+         let flat=true;
+         for(let k=1;k<v.w;k++){
+           if(h[y+k]!==base){flat=false;break}
+         }
+         if(!flat)continue;
+
+         const nh=h.slice();
+         const nx=base+v.l;
+         if(nx*CELL>TL)continue;
+         for(let k=0;k<v.w;k++)nh[y+k]=nx;
+
+         const nq={...q}; nq[type]--;
+         const tail=solve(nq,nh);
+         if(!tail)continue;
+
+         // Primary: shortest used trailer length.
+         // Secondary: smoothest frontier, so remaining pallets can still combine tightly.
+         const cand={
+           end:tail.end,
+           rough:tail.rough,
+           moves:[{type,x:base*CELL,y:y*CELL,w:v.cmw,l:v.cml,rot:v.rot},...tail.moves]
+         };
+         if(!best ||
+            cand.end<best.end ||
+            (cand.end===best.end && cand.rough<best.rough)){
+           best=cand;
          }
        }
      }
-     if(!best)return null;
-     const u={x:best.x,y:best.y,w:best.w,h:best.h};
-     let nf=[];
-     free.forEach(fr=>nf.push(...splitFree(fr,u)));
-     free=pruneFree(nf);
-     placed.push({...p,x:u.x,y:u.y,w:u.w,h:u.h,rot:best.rot});
    }
-   return placed;
+
+   memo.set(sk,best);
+   return best;
  }
 
- function compact(arr){
-   let a=arr.map(p=>({...p}));
-   // Repeatedly move each pallet left, then toward nearest side, whenever collision-free.
-   for(let pass=0;pass<5;pass++){
-     let changed=false;
-     a.sort((u,v)=>u.x-v.x||u.y-v.y);
-     for(const p of a){
-       const others=a.filter(q=>q._seq!==p._seq);
-       while(p.x>0){
-         const test={...p,x:p.x-1};
-         if(others.some(q=>intersects(test,q)))break;
-         p.x--;changed=true;
-       }
-       // For equal x neighbourhood, close vertical gaps.
-       let moved=true;
-       while(moved&&p.y>0){
-         const test={...p,y:p.y-1};
-         if(others.some(q=>intersects(test,q)))moved=false;
-         else {p.y--;changed=true}
-       }
-     }
-     if(!changed)break;
-   }
-   return a;
+ const solution=solve(q0,Array(H).fill(0));
+ if(!solution)return optimizeSingleOrderCombi(src);
+
+ const pools={e:[],b:[],m:[],l:[]};
+ src.forEach(p=>pools[p.type].push({...p}));
+ const placed=[];
+ for(const mv of solution.moves){
+   const p=pools[mv.type].shift();
+   if(!p)continue;
+   p.x=mv.x;p.y=mv.y;p.w=mv.w;p.l=mv.l;p.rot=mv.rot;
+   placed.push(p);
  }
+ placed.sort((a,b)=>a.x-b.x||a.y-b.y);
+ return placed;
+}
 
- function metrics(a){
-   if(!a||a.length!==base.length)return {score:Infinity};
-   const end=a.reduce((m,p)=>Math.max(m,p.x+p.w),0);
-   const occupied=a.reduce((s,p)=>s+p.w*p.h,0);
-   const boxArea=end*GH;
-   const empty=boxArea-occupied;
-
-   // Penalize empty cells surrounded on both left and right by cargo:
-   const grid=Array.from({length:end},()=>Array(GH).fill(false));
-   a.forEach(p=>{for(let x=p.x;x<p.x+p.w;x++)for(let y=p.y;y<p.y+p.h;y++)grid[x][y]=true});
-   let internal=0;
-   for(let y=0;y<GH;y++){
-     let first=-1,last=-1;
-     for(let x=0;x<end;x++)if(grid[x][y]){if(first<0)first=x;last=x}
-     if(first>=0)for(let x=first;x<=last;x++)if(!grid[x][y])internal++;
-   }
-   let jag=0;
-   for(let y=0;y<GH;y++){
-     let rowEnd=0;for(let x=0;x<end;x++)if(grid[x][y])rowEnd=x+1;
-     if(y) {
-       let prevEnd=0;for(let x=0;x<end;x++)if(grid[x][y-1])prevEnd=x+1;
-       jag+=Math.abs(rowEnd-prevEnd);
-     }
-   }
-   return {end,empty,internal,jag,score:end*1000000+internal*5000+empty*120+jag*20};
- }
-
- // Deterministic orderings + pseudo-random multi-starts.
- const orderings=[];
- const addOrder=(arr)=>orderings.push(arr.slice());
- addOrder(base.slice().sort((a,b)=>Math.max(b.gw,b.gh)-Math.max(a.gw,a.gh)||b.gw*b.gh-a.gw*a.gh));
- addOrder(base.slice().sort((a,b)=>b.gw*b.gh-a.gw*a.gh||Math.max(b.gw,b.gh)-Math.max(a.gw,a.gh)));
- addOrder(base.slice().sort((a,b)=>b.gw-a.gw||b.gh-a.gh));
- addOrder(base.slice().sort((a,b)=>b.gh-a.gh||b.gw-a.gw));
- addOrder(base.slice().sort((a,b)=>a.type.localeCompare(b.type)||b.gw*b.gh-a.gw*a.gh));
-
- let seed=2166136261>>>0;
- function rnd(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}
- const trials=base.length<=30?90:base.length<=55?55:35;
- for(let t=0;t<trials;t++){
-   const a=base.slice();
-   for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
-   // Bias larger pallets toward front while preserving variation.
-   a.sort((u,v)=>{
-     const au=u.gw*u.gh+(rnd()-.5)*24, av=v.gw*v.gh+(rnd()-.5)*24;
-     return av-au;
-   });
-   addOrder(a);
- }
-
- let best=null,bestM={score:Infinity};
- for(const seq of orderings){
-   for(let mode=0;mode<4;mode++){
-     const packed=packSequence(seq,mode);
-     if(!packed)continue;
-     const c=compact(packed);
-     const m=metrics(c);
-     if(m.score<bestM.score){best=c;bestM=m}
-   }
- }
-
- if(!best){
-   const q=countsFromItems(src);
-   return rowsToPlacement(src,solveRowsGreedy(q));
- }
-
- const lookup=new Map(src.map((p,i)=>[i,{...p}]));
- return best.map(q=>{
-   const original=lookup.get(q._seq);
-   return {...original,
-     x:q.x*CELL,y:q.y*CELL,
-     l:q.w*CELL,w:q.h*CELL,
-     rot:q.rot
-   };
- });
+function optimizeSingleOrder(src){
+ const n=src.length;
+ // Small and medium orders get the exhaustive Tetris solver.
+ // Larger orders use COMBI first, because exhaustive search would become too expensive on a phone.
+ if(n<=11)return optimizeSingleOrderExact(src);
+ return optimizeSingleOrderCombi(src);
 }
 
 function optimizePlan(src){
@@ -412,7 +595,7 @@ function palletDirection(p){
  return {lengthwise:p.l>=t.l};
 }
 
-function autoPlan(){manual=false;selectedId=null;items=buildItems();items=optimizePlan(items);render();document.getElementById('modeLabel').innerText='SMARTPACK v10 — meerdere 2D-indelingen vergeleken; beste compacte oplossing gekozen'}
+function autoPlan(){manual=false;selectedId=null;items=buildItems();items=optimizePlan(items);render();document.getElementById('modeLabel').innerText='TETRIS AUTO — elk order krijgt zijn eigen volledige optimalisatieronde'}
 function endCm(arr=items){return arr.reduce((m,p)=>Math.max(m,p.x+p.l),0)}function endMeters(arr=items){return endCm(arr)/100}
 function render(){const can=document.getElementById('canvas');can.innerHTML='';document.getElementById('p-out').innerText=items.length;const end=endCm();document.getElementById('m-out').innerText=(end/100).toFixed(2).replace('.',',');document.getElementById('free-out').innerText=Math.max(0,(TL-end)/100).toFixed(2).replace('.',',');
  let seenOrders=new Set(); items.forEach(p=>{const d=document.createElement('div');const isStart=!seenOrders.has(p.order);seenOrders.add(p.order);const pd=palletDirection(p);d.className='v-p '+(pd.lengthwise?'dir-long':'dir-cross')+(p.id===selectedId?' selected':'')+(isStart?' order-start':'');d.dataset.id=p.id;d.style.left=p.x*S+'px';d.style.top=p.y*S+'px';d.style.width=p.l*S+'px';d.style.height=p.w*S+'px';d.style.backgroundColor=p.c;d.style.border=`3px solid ${orderColor(p.order)}`;d.innerHTML=`<span class="pallet-visual">${['b1','b2','b3'].map(b=>`<i class="deck-board ${pd.lengthwise?'long':'cross'} ${b}"></i>`).join('')}</span><span class="pallet-label"><span class="ord">${escapeHtml(p.order==='—'?'GEEN ORDER':'ORD '+p.order)}</span><span class="dims">${p.label} ${p.w}×${p.l}</span></span>`;d.addEventListener('pointerdown',startDrag);d.addEventListener('click',()=>{selectedId=p.id;render()});can.appendChild(d)});window.plan=makeRows();renderOrderLegend()}
@@ -486,7 +669,8 @@ function rotateSelected(){
 function makeRows(){const cuts=[...new Set(items.map(p=>p.x))].sort((a,b)=>a-b);return cuts.map(x=>items.filter(p=>p.x===x).sort((a,b)=>a.y-b.y).map(p=>`${p.label}(${p.w}×${p.l})`).join(' + ')).filter(Boolean)}
 function makePlanImage(){
  const used=Math.max(100,endCm()), scale=2, margin=64, top=255, footerH=230;
- const planW=Math.max(850,Math.round(used*1.15));
+ // Landscape export: keep a wide trailer composition for WhatsApp and A4 landscape PDF.
+ const planW=Math.max(1180,Math.round(used*1.15));
  const c=document.createElement('canvas');c.width=planW+margin*2;c.height=TW*scale+top+footerH;const g=c.getContext('2d');
  const order=document.getElementById('orderNo').value.trim()||'—';
  const ref=document.getElementById('reference').value.trim()||'—';
@@ -504,6 +688,8 @@ function makePlanImage(){
  function card(x,title,value){g.fillStyle='#f8fafc';g.fillRect(x,metaY,cardW,55);g.strokeStyle='#cbd5e1';g.lineWidth=2;g.strokeRect(x,metaY,cardW,55);g.fillStyle='#64748b';g.font='bold 14px Arial';g.fillText(title,x+14,metaY+20);g.fillStyle='#0f172a';g.font='bold 20px Arial';g.fillText(value,x+14,metaY+45)}
  card(margin,'ORDER / VRACHTNUMMER',order);card(margin+cardW+gap,'REFERENTIE / KLANT',ref);
  const sx=planW/used, sy=(TW*scale)/TW, px=margin,py=top;
+ g.fillStyle='#475569';g.font='900 16px Arial';g.textAlign='left';g.fillText('← CABINE',px,py-12);
+ g.textAlign='right';g.fillText('DEUREN →',px+planW,py-12);g.textAlign='left';
  g.fillStyle='#111827';g.fillRect(px,py,planW,TW*scale);g.strokeStyle='#0f172a';g.lineWidth=5;g.strokeRect(px,py,planW,TW*scale);
  for(let m=0;m<=Math.ceil(used/100);m++){const x=px+m*100*sx;if(x>px+planW)break;g.strokeStyle='rgba(255,255,255,.20)';g.lineWidth=1;g.beginPath();g.moveTo(x,py);g.lineTo(x,py+TW*scale);g.stroke();g.fillStyle='#475569';g.font='16px Arial';g.fillText(`${m}m`,x+3,py+TW*scale+24)}
  items.forEach(p=>{const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy;g.fillStyle=p.c;g.fillRect(x,y,w,h);const pd=palletDirection(p);
@@ -554,6 +740,7 @@ async function downloadPdf(){
  const dataUrl=canvas.toDataURL('image/jpeg',0.94);
  const b64=dataUrl.split(',')[1];
  const raw=atob(b64); const img=new Uint8Array(raw.length); for(let i=0;i<raw.length;i++)img[i]=raw.charCodeAt(i);
+ // A4 landscape: 297 × 210 mm (842 × 595 pt)
  const pageW=842,pageH=595,margin=22;
  const scale=Math.min((pageW-margin*2)/canvas.width,(pageH-margin*2)/canvas.height);
  const w=canvas.width*scale,h=canvas.height*scale,x=(pageW-w)/2,y=(pageH-h)/2;
@@ -601,7 +788,7 @@ function printPlan(){
  .foot{display:flex;justify-content:space-between;gap:6mm;margin-top:3mm;font-size:8.5pt;color:#475569}.note{font-weight:bold;color:#0f172a}.approval{display:grid;grid-template-columns:1fr 1.4fr;gap:5mm;margin-top:4mm}.approval .box{min-height:23mm}.signature{height:13mm;border-bottom:1px solid #64748b;margin-top:2mm}.small{font-size:7pt;color:#64748b;margin-top:1mm}
  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.sheet{break-inside:avoid}}
  
-/* v10.0 PRO UI */
+/* v10.2 PRO UI */
 :root{--awc:#00a651;--awc-dark:#08783f;--panel:#111827}
 body{background:#07111f}
 .header{padding:0 0 8px;background:#0b1627;border-bottom:1px solid #26364b}
