@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>Warehouse Master v9.2 PRO</title>
+<title>Warehouse Master v9.4 PRO</title>
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--text:#f8fafc;--accent:#3b82f6;--wa:#22c55e;--muted:#94a3b8}
 *{box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -22,7 +22,7 @@ footer{position:fixed;bottom:0;left:0;right:0;padding:10px;background:var(--card
 #modeLabel{font-size:.7rem;color:#cbd5e1;text-align:center;margin-top:5px}
 #orderLegend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 5px 0}.order-chip{display:flex;align-items:center;gap:6px;background:#0f172a;border:1px solid #475569;border-radius:999px;padding:5px 9px;font-size:.68rem;font-weight:800}.order-dot{width:12px;height:12px;border-radius:3px;border:3px solid #fff;background:#111}.warning{display:none;margin:7px 5px 0;padding:8px 10px;border-radius:8px;background:#3f2d08;border:1px solid #f59e0b;color:#fde68a;font-size:.7rem;font-weight:700}
 
-/* v9.2 PRO UI */
+/* v9.4 PRO UI */
 :root{--awc:#00a651;--awc-dark:#08783f;--panel:#111827}
 body{background:#07111f}
 .header{padding:0 0 8px;background:#0b1627;border-bottom:1px solid #26364b}
@@ -45,15 +45,22 @@ footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
 .editing .trailer-scroll{max-height:300px}
 @media(min-width:700px){.header,.input-grid,footer{max-width:900px;margin-left:auto;margin-right:auto}.pro-brand{border-radius:0}.trailer-scroll{max-height:480px}}
 
-/* v9.2 direction + load-security clarity */
-.v-p .dir{display:block;font-size:10px;line-height:1;margin-top:3px;background:rgba(0,0,0,.38);border-radius:999px;padding:2px 4px;white-space:nowrap}
-.v-p.dir-long{background-image:linear-gradient(90deg,rgba(255,255,255,.16) 0 2px,transparent 2px 12px)}
-.v-p.dir-cross{background-image:linear-gradient(0deg,rgba(255,255,255,.16) 0 2px,transparent 2px 12px)}
+
+/* v9.3 visual pallet orientation */
+.v-p{overflow:hidden}
+.v-p .pallet-visual{position:absolute;inset:3px;pointer-events:none;border:1px solid rgba(255,255,255,.28);border-radius:2px}
+.v-p .deck-board{position:absolute;background:rgba(18,18,18,.26);border:1px solid rgba(255,255,255,.18);border-radius:1px}
+.v-p .deck-board.long{left:5%;right:5%;height:13%}
+.v-p .deck-board.cross{top:5%;bottom:5%;width:13%}
+.v-p .deck-board.b1.long{top:8%}.v-p .deck-board.b2.long{top:43%}.v-p .deck-board.b3.long{bottom:8%}
+.v-p .deck-board.b1.cross{left:8%}.v-p .deck-board.b2.cross{left:43%}.v-p .deck-board.b3.cross{right:8%}
+.v-p .pallet-label{position:relative;z-index:2;background:rgba(2,6,23,.60);border-radius:4px;padding:3px 5px;max-width:92%}
+.v-p .ord{font-size:9px}.v-p .dims{font-size:7px}
 .security-note{margin:7px 8px 0;padding:7px 9px;border:1px solid #35d07f;border-radius:8px;color:#d1fae5;background:#0b2b20;font-size:.67rem;font-weight:700}
 </style>
 </head>
 <body>
-<div class="header"><div class="pro-brand"><div class="pro-brand-main"><img src="icon.png" alt="AWC"><div><b>Amsterdam Warehouse Company</b><small>Warehouse Master · Laadplan</small></div></div><span class="version-badge">v9.2 PRO</span></div>
+<div class="header"><div class="pro-brand"><div class="pro-brand-main"><img src="icon.png" alt="AWC"><div><b>Amsterdam Warehouse Company</b><small>Warehouse Master · Laadplan</small></div></div><span class="version-badge">v9.4 PRO</span></div>
   <div class="stats">
     <div style="text-align:center"><span id="m-out" class="stat-v">0,00</span><span style="font-size:.6rem">LAADMETER</span></div>
     <div style="text-align:center"><span id="p-out" class="stat-v">0</span><span style="font-size:.6rem">PALLETS</span></div>
@@ -74,7 +81,7 @@ footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
     <button class="secondary" onclick="resetManual()">↺ RESET</button>
   </div>
   <div class="toolbar2"><button class="secondary" onclick="zoomOut()">− UITZOOM</button><button class="secondary" onclick="fitView()">▣ PASSEND</button><button class="secondary" onclick="zoomIn()">＋ INZOOM</button></div>
-  <div id="modeLabel">Automatisch: optimale indeling zoeken • laadvlak is horizontaal én verticaal scrollbaar</div><div id="orderWarning" class="warning"></div><div class="security-note">AUTO vult elke laadsectie vanaf één zijkant aaneengesloten. Richtingspijl op iedere pallet: ↔ = lengte trailer, ↕ = dwars/breedte.</div><div id="orderLegend"></div>
+  <div id="modeLabel">Automatisch: optimale indeling zoeken • laadvlak is horizontaal én verticaal scrollbaar</div><div id="orderWarning" class="warning"></div><div class="security-note">ZERO-GAP AUTO: pallets worden aaneengesloten geplaatst. De planner draait zelf en vermijdt interne gaten; eventuele restruimte blijft alleen langs de trailerwand of achteraan.</div><div id="orderLegend"></div>
 </div>
 <div class="input-grid">
   <div class="info">Je kunt nu <b>meerdere orders van hetzelfde pallettype</b> invoeren. Gebruik <b>+ ORDER</b> om bijvoorbeeld 8 Euro voor order 45120 én 5 Euro voor order 45135 toe te voegen. De optimizer houdt ieder order als één aaneengesloten laadblok. Pallets van verschillende orders worden niet door elkaar geplaatst. Binnen ieder order worden pallettypes en draairichtingen wel zo efficiënt mogelijk gecombineerd.<br><br>Laat een ordernummer leeg om het algemene order/vrachtnummer bovenaan te gebruiken. Het laadvlak blijft <b>scrollbaar, zoombaar en handmatig bewerkbaar</b>.</div>
@@ -134,13 +141,13 @@ function generateRowPatterns(){
  const best=new Map();
  const add=(combo)=>{
   const width=combo.reduce((s,v)=>s+v.w,0); if(width>TW)return;
-  const depth=Math.max(...combo.map(v=>v.l));
+  const depths=[...new Set(combo.map(v=>v.l))];
+  if(depths.length!==1)return; // no cavities behind shorter pallets
+  const depth=depths[0];
   const use={e:0,b:0,m:0,l:0}; combo.forEach(v=>use[v.type]++);
-  const key=`${use.e},${use.b},${use.m},${use.l}`;
+  const key=`${use.e},${use.b},${use.m},${use.l}|${depth}`;
   const cur=best.get(key);
-  // For the same pallet mix, shortest row depth wins; at equal depth, fullest width wins.
-  if(!cur||depth<cur.depth||(depth===cur.depth&&width>cur.width))
-   best.set(key,{use,width,depth,combo:combo.map(v=>({...v}))});
+  if(!cur||width>cur.width)best.set(key,{use,width,depth,combo:combo.map(v=>({...v}))});
  };
  for(let a=0;a<VARIANTS.length;a++){
   add([VARIANTS[a]]);
@@ -178,9 +185,9 @@ function solveRowsGreedy(q){
  while(totalCount(r)>0){
   let candidates=ROW_PATTERNS.filter(p=>fitsPattern(r,p));
   candidates.sort((a,b)=>{
-   // Prefer a low depth per pallet, then a full 240 cm row.
+   const wa=TW-a.width, wb=TW-b.width;
    const sa=a.depth/(a.combo.length||1), sb=b.depth/(b.combo.length||1);
-   return sa-sb||(TW-a.width)-(TW-b.width)||b.combo.length-a.combo.length;
+   return wa-wb||sa-sb||b.combo.length-a.combo.length;
   });
   const pat=candidates[0];if(!pat)break;rows.push(pat);r=subCounts(r,pat);
  }
@@ -210,14 +217,39 @@ function optimizePlan(src){
 
 function palletDirection(p){
  const t=TYPES[p.type];
- const lengthwise=p.l>=t.l;
- return {lengthwise, arrow:lengthwise?'↔':'↕', text:lengthwise?'LENGTE':'DWARS'};
+ return {lengthwise:p.l>=t.l};
 }
 
-function autoPlan(){manual=false;selectedId=null;items=buildItems();items=optimizePlan(items);render();document.getElementById('modeLabel').innerText='Order-geoptimaliseerd — ieder order blijft als één aaneengesloten laadblok; sleep pallets voor handmatige aanpassing'}
+function autoPlan(){manual=false;selectedId=null;items=buildItems();items=optimizePlan(items);render();document.getElementById('modeLabel').innerText='ZERO-GAP AUTO — geen interne gaten; restruimte alleen langs wand of achteraan'}
 function endCm(arr=items){return arr.reduce((m,p)=>Math.max(m,p.x+p.l),0)}function endMeters(arr=items){return endCm(arr)/100}
 function render(){const can=document.getElementById('canvas');can.innerHTML='';document.getElementById('p-out').innerText=items.length;const end=endCm();document.getElementById('m-out').innerText=(end/100).toFixed(2).replace('.',',');document.getElementById('free-out').innerText=Math.max(0,(TL-end)/100).toFixed(2).replace('.',',');
- let seenOrders=new Set(); items.forEach(p=>{const d=document.createElement('div');const isStart=!seenOrders.has(p.order);seenOrders.add(p.order);const pd=palletDirection(p);d.className='v-p '+(pd.lengthwise?'dir-long':'dir-cross')+(p.id===selectedId?' selected':'')+(isStart?' order-start':'');d.dataset.id=p.id;d.style.left=p.x*S+'px';d.style.top=p.y*S+'px';d.style.width=p.l*S+'px';d.style.height=p.w*S+'px';d.style.backgroundColor=p.c;d.style.border=`3px solid ${orderColor(p.order)}`;d.innerHTML=`<span class="pallet-label"><span class="ord">${escapeHtml(p.order==='—'?'GEEN ORDER':'ORD '+p.order)}</span><span class="dims">${p.label} ${p.w}×${p.l}</span><span class="dir">${pd.arrow} ${pd.text}</span></span>`;d.addEventListener('pointerdown',startDrag);d.addEventListener('click',()=>{selectedId=p.id;render()});can.appendChild(d)});window.plan=makeRows();renderOrderLegend()}
+ let seenOrders=new Set(); items.forEach(p=>{const d=document.createElement('div');const isStart=!seenOrders.has(p.order);seenOrders.add(p.order);const pd=palletDirection(p);d.className='v-p '+(pd.lengthwise?'dir-long':'dir-cross')+(p.id===selectedId?' selected':'')+(isStart?' order-start':'');d.dataset.id=p.id;d.style.left=p.x*S+'px';d.style.top=p.y*S+'px';d.style.width=p.l*S+'px';d.style.height=p.w*S+'px';d.style.backgroundColor=p.c;d.style.border=`3px solid ${orderColor(p.order)}`;d.innerHTML=`<span class="pallet-visual">${['b1','b2','b3'].map(b=>`<i class="deck-board ${pd.lengthwise?'long':'cross'} ${b}"></i>`).join('')}</span><span class="pallet-label"><span class="ord">${escapeHtml(p.order==='—'?'GEEN ORDER':'ORD '+p.order)}</span><span class="dims">${p.label} ${p.w}×${p.l}</span></span>`;d.addEventListener('pointerdown',startDrag);d.addEventListener('click',()=>{selectedId=p.id;render()});can.appendChild(d)});window.plan=makeRows();renderOrderLegend()}
+
+function candidateContactPositions(p,others){
+ const xs=new Set([0,Math.max(0,TL-p.l)]), ys=new Set([0,Math.max(0,TW-p.w)]);
+ others.forEach(q=>{xs.add(q.x+q.l);xs.add(q.x-p.l);ys.add(q.y+q.w);ys.add(q.y-p.w)});
+ const out=[];
+ xs.forEach(x=>ys.forEach(y=>{x=Math.round(x/SNAP)*SNAP;y=Math.round(y/SNAP)*SNAP;if(x>=0&&y>=0&&x+p.l<=TL&&y+p.w<=TW)out.push({x,y})}));
+ return out;
+}
+function nearestValidContact(p,others,targetX,targetY){
+ let best=null,bestScore=Infinity;
+ for(const c of candidateContactPositions(p,others)){
+  const test={...p,x:c.x,y:c.y};if(!canPlace(test,others))continue;
+  const score=Math.hypot(c.x-targetX,c.y-targetY)*1000+c.x*2+c.y;
+  if(score<bestScore){bestScore=score;best=c}
+ }
+ if(!best){
+  for(let x=0;x<=TL-p.l;x+=SNAP){for(let y=0;y<=TW-p.w;y+=SNAP){if(canPlace({...p,x,y},others)){best={x,y};break}}if(best)break}
+ }
+ return best;
+}
+function snapPalletToValidContact(p,targetX=p.x,targetY=p.y){
+ const others=items.filter(x=>x.id!==p.id);
+ const found=nearestValidContact(p,others,targetX,targetY);
+ if(found){p.x=found.x;p.y=found.y;compactManualPallet(p);return true}
+ return false;
+}
 
 function compactManualPallet(p){
  // Na handmatig plaatsen schuift de pallet naar voren tot hij cabinewand of een pallet raakt.
@@ -236,8 +268,27 @@ function compactManualPallet(p){
 
 function startDrag(ev){ev.preventDefault();manual=true;const id=+ev.currentTarget.dataset.id;selectedId=id;const p=items.find(x=>x.id===id);const startX=ev.clientX,startY=ev.clientY,ox=p.x,oy=p.y;const el=ev.currentTarget;el.setPointerCapture(ev.pointerId);el.classList.add('dragging');
  const move=e=>{p.x=Math.max(0,Math.min(TL-p.l,Math.round((ox+(e.clientX-startX)/S)/SNAP)*SNAP));p.y=Math.max(0,Math.min(TW-p.w,Math.round((oy+(e.clientY-startY)/S)/SNAP)*SNAP));el.style.left=p.x*S+'px';el.style.top=p.y*S+'px'};
- const up=e=>{el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.classList.remove('dragging');const others=items.filter(x=>x.id!==p.id);if(!canPlace(p,others)){p.x=ox;p.y=oy}else{compactManualPallet(p)}document.getElementById('modeLabel').innerText='Handmatige modus — pallet aangesloten zonder vrije tussenstrook';render()};el.addEventListener('pointermove',move);el.addEventListener('pointerup',up)}
-function rotateSelected(){if(!selectedId)return;manual=true;const p=items.find(x=>x.id===selectedId);const old={w:p.w,l:p.l,rot:p.rot};[p.w,p.l]=[p.l,p.w];p.rot=!p.rot;if(!canPlace(p,items.filter(x=>x.id!==p.id))){p.w=old.w;p.l=old.l;p.rot=old.rot;alert('Hier kan de pallet niet gedraaid worden: onvoldoende ruimte of overlap.')}render()}
+ const up=e=>{el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.classList.remove('dragging');
+ const targetX=p.x,targetY=p.y;const others=items.filter(x=>x.id!==p.id);
+ if(!canPlace(p,others)){p.x=ox;p.y=oy}
+ snapPalletToValidContact(p,targetX,targetY);
+ document.getElementById('modeLabel').innerText='Handmatig — pallet automatisch aangesloten';render()};el.addEventListener('pointermove',move);el.addEventListener('pointerup',up)}
+function rotateSelected(){
+ if(!selectedId)return;
+ manual=true;
+ const p=items.find(x=>x.id===selectedId);if(!p)return;
+ const ox=p.x,oy=p.y;
+ [p.w,p.l]=[p.l,p.w];p.rot=!p.rot;
+ if(!snapPalletToValidContact(p,ox,oy)){
+  const rotated={...p};
+  const rebuilt=optimizePlan(items.filter(x=>x.id!==p.id).map(x=>({...x})));
+  items=[...rebuilt,rotated];
+  const rp=items.find(x=>x.id===selectedId);
+  snapPalletToValidContact(rp,ox,oy);
+ }
+ document.getElementById('modeLabel').innerText='Handmatig — pallet gedraaid en automatisch passend aangesloten';
+ render();
+}
 function resetManual(){autoPlan()}
 function makeRows(){const cuts=[...new Set(items.map(p=>p.x))].sort((a,b)=>a-b);return cuts.map(x=>items.filter(p=>p.x===x).sort((a,b)=>a.y-b.y).map(p=>`${p.label}(${p.w}×${p.l})`).join(' + ')).filter(Boolean)}
 function makePlanImage(){
@@ -262,10 +313,26 @@ function makePlanImage(){
  const sx=planW/used, sy=(TW*scale)/TW, px=margin,py=top;
  g.fillStyle='#111827';g.fillRect(px,py,planW,TW*scale);g.strokeStyle='#0f172a';g.lineWidth=5;g.strokeRect(px,py,planW,TW*scale);
  for(let m=0;m<=Math.ceil(used/100);m++){const x=px+m*100*sx;if(x>px+planW)break;g.strokeStyle='rgba(255,255,255,.20)';g.lineWidth=1;g.beginPath();g.moveTo(x,py);g.lineTo(x,py+TW*scale);g.stroke();g.fillStyle='#475569';g.font='16px Arial';g.fillText(`${m}m`,x+3,py+TW*scale+24)}
- items.forEach(p=>{const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy;g.fillStyle=p.c;g.fillRect(x,y,w,h);const pd=palletDirection(p);g.save();g.strokeStyle='rgba(255,255,255,.25)';g.lineWidth=2;if(pd.lengthwise){for(let xx=x+12;xx<x+w;xx+=22){g.beginPath();g.moveTo(xx,y+4);g.lineTo(xx,y+h-4);g.stroke()}}else{for(let yy=y+12;yy<y+h;yy+=22){g.beginPath();g.moveTo(x+4,yy);g.lineTo(x+w-4,yy);g.stroke()}}g.restore();g.strokeStyle=orderColor(p.order);g.lineWidth=6;g.strokeRect(x,y,w,h);g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';const ord=p.order==='—'?'GEEN ORDER':`ORD ${p.order}`;const fs=Math.max(12,Math.min(20,h*.20));g.font=`900 ${fs}px Arial`;g.fillText(ord,x+w/2,y+h/2-fs*.55,Math.max(30,w-8));g.font=`bold ${Math.max(10,fs*.72)}px Arial`;g.fillText(`${p.label} ${p.w}×${p.l}`,x+w/2,y+h/2+fs*.45,Math.max(30,w-8));g.font=`900 ${Math.max(10,fs*.68)}px Arial`;g.fillText(`${pd.arrow} ${pd.text}`,x+w/2,y+h/2+fs*1.35,Math.max(30,w-8))});
+ items.forEach(p=>{const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy;g.fillStyle=p.c;g.fillRect(x,y,w,h);const pd=palletDirection(p);
+ // Draw pallet deck boards from top view. Boards follow the pallet's long axis.
+ g.save();g.fillStyle='rgba(20,20,20,.26)';g.strokeStyle='rgba(255,255,255,.22)';g.lineWidth=1;
+ if(pd.lengthwise){
+   const bh=Math.max(4,h*.12);[.10,.44,.78].forEach(r=>{const yy=y+h*r;g.fillRect(x+w*.05,yy,w*.90,bh);g.strokeRect(x+w*.05,yy,w*.90,bh)});
+ }else{
+   const bw=Math.max(4,w*.12);[.10,.44,.78].forEach(r=>{const xx=x+w*r;g.fillRect(xx,y+h*.05,bw,h*.90);g.strokeRect(xx,y+h*.05,bw,h*.90)});
+ }
+ g.restore();
+ g.strokeStyle=orderColor(p.order);g.lineWidth=6;g.strokeRect(x,y,w,h);
+ // dark label plate keeps order readable while the pallet remains visually obvious
+ const ord=p.order==='—'?'GEEN ORDER':`ORD ${p.order}`;const fs=Math.max(12,Math.min(20,h*.20));
+ const plateW=Math.min(w*.86,Math.max(68,g.measureText(ord).width+22)),plateH=Math.min(h*.46,fs*2.2);
+ g.fillStyle='rgba(2,6,23,.62)';g.fillRect(x+(w-plateW)/2,y+(h-plateH)/2,plateW,plateH);
+ g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';g.font=`900 ${fs}px Arial`;g.fillText(ord,x+w/2,y+h/2-fs*.35,Math.max(30,w-10));
+ g.font=`bold ${Math.max(10,fs*.72)}px Arial`;g.fillText(`${p.label} ${p.w}×${p.l}`,x+w/2,y+h/2+fs*.58,Math.max(30,w-10))
+});
  g.textAlign='left';g.textBaseline='alphabetic';
  const fy=py+TW*scale+48;g.fillStyle='#0f172a';g.font='bold 22px Arial';g.fillText(`Gebruikt: ${(endCm()/100).toFixed(2).replace('.',',')} m`,margin,fy);g.fillText(`Pallets: ${items.length}`,margin+230,fy);g.fillText(`Vrij: ${Math.max(0,(TL-endCm())/100).toFixed(2).replace('.',',')} m`,margin+390,fy);
- g.fillStyle='#64748b';g.font='17px Arial';g.fillText(`Datum: ${date}  •  Trailer: 13,60 × 2,40 m  •  ↔ LENGTE  |  ↕ DWARS`,margin,fy+36);
+ g.fillStyle='#64748b';g.font='17px Arial';g.fillText(`Datum: ${date}  •  Trailer: 13,60 × 2,40 m`,margin,fy+36);
  // legend
  let lx=margin, ly=fy+75;g.font='bold 16px Arial';Object.values(TYPES).forEach(t=>{g.fillStyle=t.c;g.fillRect(lx,ly-14,20,20);g.fillStyle='#334155';g.fillText(`${t.name} ${t.w}×${t.l}`,lx+28,ly+2);lx+=185});
  // Order legend: colored border = order, fill color = pallet type
@@ -341,7 +408,7 @@ function printPlan(){
  .foot{display:flex;justify-content:space-between;gap:6mm;margin-top:3mm;font-size:8.5pt;color:#475569}.note{font-weight:bold;color:#0f172a}.approval{display:grid;grid-template-columns:1fr 1.4fr;gap:5mm;margin-top:4mm}.approval .box{min-height:23mm}.signature{height:13mm;border-bottom:1px solid #64748b;margin-top:2mm}.small{font-size:7pt;color:#64748b;margin-top:1mm}
  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.sheet{break-inside:avoid}}
  
-/* v9.2 PRO UI */
+/* v9.4 PRO UI */
 :root{--awc:#00a651;--awc-dark:#08783f;--panel:#111827}
 body{background:#07111f}
 .header{padding:0 0 8px;background:#0b1627;border-bottom:1px solid #26364b}
