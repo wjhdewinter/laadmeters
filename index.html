@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>Warehouse Master v10.4 Dashboard</title>
+<title>Warehouse Master v10.5 Dashboard</title>
 <style>
 :root{--bg:#06111f;--panel:#0a1624;--panel2:#0e1c2c;--line:#26384d;--text:#f7f9fc;--muted:#9aacbf;--green:#00b85c;--blue:#1577eb}
 *{box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -23,7 +23,7 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
 .result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid #273a4e;border-radius:4px;overflow:hidden}.result-grid div{padding:11px 5px;text-align:center;border-right:1px solid #273a4e}.result-grid div:last-child{border:0}.result-grid span{display:block;font-size:.48rem}.result-grid b{display:block;font-size:.85rem;margin-top:8px}.result-grid div:first-child b{color:#00d265}.auto-big{width:100%;margin-top:10px;padding:15px;background:linear-gradient(#09c562,#04a34f);border-color:#08c664}
 .edit-pallets{display:none}.editing .edit-pallets{display:block}.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.p-card{background:#0b1828;border:1px solid #26394d;border-radius:7px;padding:8px}.type-head{display:flex;align-items:center;gap:6px}.p-title{flex:1}.p-title b{display:block;font-size:.7rem}.p-title small{font-size:.55rem;color:#99aabd}.add-order{width:auto;padding:5px 7px;background:#166fe5;font-size:.55rem}.order-lines{display:flex;flex-direction:column;gap:4px;margin-top:5px}.order-line{display:grid;grid-template-columns:1fr 56px 28px;gap:4px}.order-line label{font-size:.48rem;color:#91a5ba}.order-input,.qty{width:100%;height:31px;background:#06101b;color:#fff;border:1px solid #39516a;border-radius:4px;padding:0 6px}.qty{text-align:center}.remove-line{padding:0;background:#76242a}
 .rightcol{display:flex;flex-direction:column;gap:12px}
-.main-toolbar{display:flex;justify-content:space-between;gap:12px;padding-top:4px}#viewModeBar{display:grid;grid-template-columns:1fr 1fr;gap:7px;min-width:385px}.modebtn{padding:16px 18px;font-size:.77rem}.modebtn.active{background:linear-gradient(#1e81f4,#0c69d8);border-color:#2488ff}.editing #editBtn{background:linear-gradient(#08be60,#049f4e)}.quick-actions{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;flex:1}.quick-actions button{padding:12px 8px;font-size:.67rem}
+.main-toolbar{display:flex;justify-content:space-between;gap:12px;padding-top:4px}#viewModeBar{display:grid;grid-template-columns:1fr 1fr;gap:7px;min-width:385px}.modebtn{padding:16px 18px;font-size:.77rem}.modebtn.active{background:linear-gradient(#1e81f4,#0c69d8);border-color:#2488ff}.editing #editBtn{background:linear-gradient(#08be60,#049f4e)}.quick-actions{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;flex:1}.quick-actions button{padding:12px 8px;font-size:.67rem}
 .loadarea{padding:5px 0}.direction-row{display:flex;justify-content:space-between;color:#e6edf4;font-size:.7rem;font-weight:900;margin-bottom:8px}.meter-ruler{height:28px;position:relative;border-bottom:1px solid #7c8794;margin:0 8px 5px}.meter-ruler span{position:absolute;bottom:5px;transform:translateX(-50%);font-size:.58rem;color:#edf3f8}.meter-ruler span:first-child{transform:none}.meter-ruler span:last-child{transform:translateX(-100%)}
 .trailer-scroll{overflow:auto;background:#02070d;border:2px solid #d7dde4;border-radius:11px;padding:8px;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch}
 #canvas{height:440px;width:1360px;position:relative;background:#0f1721;background-image:linear-gradient(90deg,rgba(255,255,255,.11) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px);background-size:100px 100%,100% 120px;border-left:34px solid #4f5c6a;border-right:14px double #9ca8b4;transform-origin:top left}
@@ -53,6 +53,21 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
  .rightcol{gap:7px}.status-strip{padding:9px 10px}
  .bottom-grid{position:fixed;left:0;right:0;bottom:0;z-index:90;border-radius:0;padding:7px;background:#071321}
 }
+
+#canvas{min-height:101px!important}
+.v-p{display:flex!important;visibility:visible!important;opacity:1!important;min-width:20px;min-height:20px;z-index:2}
+@media(max-width:900px){#canvas{height:auto}.trailer-scroll{min-height:135px;max-height:360px}.v-p .ord{font-size:9px}.v-p .dims{font-size:7px}}
+
+.quick-actions #lockBtn.locked{background:#7c3aed;border-color:#a78bfa}
+.v-p.locked{outline:3px solid #c084fc!important;outline-offset:-3px}
+.v-p.locked::after{content:"🔒";position:absolute;right:2px;top:2px;font-size:10px;z-index:5;background:rgba(15,23,42,.8);border-radius:3px;padding:1px 2px}
+.gap-check{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:9px;border:1px solid #1f9d60;background:#07251b}
+.gap-check b{font-size:.68rem;color:#36d783}.gap-check span{font-size:.6rem;color:#cfe9dc}
+.gap-check.warn{border-color:#f59e0b;background:#3a2605}.gap-check.warn b{color:#fbbf24}.gap-check.warn span{color:#fde7aa}
+.order-line{grid-template-columns:1fr 54px 54px 28px!important}
+.order-line .stop-input{width:100%;height:31px;background:#06101b;color:#fff;border:1px solid #39516a;border-radius:4px;padding:0 4px;text-align:center}
+.stop-badge{display:block;font-size:8px;margin-top:2px;color:#fde68a}
+@media(max-width:900px){.quick-actions{grid-template-columns:repeat(4,1fr)}.gap-check{padding:8px 10px}}
 </style>
 </head>
 <body>
@@ -60,7 +75,7 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
   <div class="wm-brand">
     <img src="icon.png" alt="AWC">
     <strong>WAREHOUSE MASTER</strong>
-    <span class="version-badge">v10.4 PRO</span>
+    <span class="version-badge">v10.5 PRO</span>
   </div>
   <nav class="navtabs">
     <button class="active">▦ LAADMETER</button>
@@ -136,6 +151,7 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
       <div class="quick-actions">
         <button onclick="autoPlan()">✦ AUTO</button>
         <button onclick="rotateSelected()">↻ DRAAI</button>
+        <button id="lockBtn" onclick="toggleLockSelected()">🔒 VERGRENDEL</button>
         <button onclick="resetManual()">↺ RESET</button>
         <button onclick="zoomOut()">− UITZOOM</button>
         <button onclick="zoomIn()">＋ INZOOM</button>
@@ -156,6 +172,8 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
       <div><b>OPTIMALE INDELING GEVONDEN</b><span>Alle pallets zijn geplaatst. De planner optimaliseert ieder order afzonderlijk.</span></div>
       <button>▥ DETAILS</button>
     </section>
+
+    <section id="gapCheck" class="gap-check ok"><b>✓ GEEN INTERNE GATEN</b><span>Controle wordt automatisch uitgevoerd na iedere wijziging.</span></section>
 
     <section class="bottom-grid">
       <div class="available">
@@ -198,22 +216,37 @@ let items=[],selectedId=null,manual=false,uid=1;
 const ORDER_COLORS=['#22c55e','#a855f7','#06b6d4','#f97316','#eab308','#ec4899','#84cc16','#14b8a6','#8b5cf6','#f43f5e'];
 function hashString(str){let h=0;for(let i=0;i<str.length;i++)h=((h<<5)-h)+str.charCodeAt(i),h|=0;return Math.abs(h)}
 function orderColor(order){if(!order||order==='—')return '#94a3b8';return ORDER_COLORS[hashString(order)%ORDER_COLORS.length]}
-function orderStats(){const m=new Map();items.forEach(p=>{const k=p.order||'—';m.set(k,(m.get(k)||0)+1)});return [...m.entries()].sort((a,b)=>String(a[0]).localeCompare(String(b[0]),'nl',{numeric:true}))}
+function orderStats(){const m=new Map();items.forEach(p=>{const k=p.order||'—';const v=m.get(k)||{n:0,stop:null};v.n++;if(p.stop!=null)v.stop=v.stop==null?p.stop:Math.min(v.stop,p.stop);m.set(k,v)});return [...m.entries()].sort((a,b)=>String(a[0]).localeCompare(String(b[0]),'nl',{numeric:true})).map(([o,v])=>[o,v.n,v.stop])}
 function renderOrderLegend(){
  const el=document.getElementById('orderLegend');const warn=document.getElementById('orderWarning');if(!el||!warn)return;
- const stats=orderStats();el.innerHTML=stats.map(([o,n])=>`<div class="order-chip"><span class="order-dot" style="border-color:${orderColor(o)}"></span>${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)} · ${n}</div>`).join('');
+ const stats=orderStats();el.innerHTML=stats.map(([o,n,stop])=>`<div class="order-chip"><span class="order-dot" style="border-color:${orderColor(o)}"></span>${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)} · ${n}${stop?' · STOP '+stop:''}</div>`).join('');
  const missing=items.filter(p=>p.order==='—').length;warn.style.display=missing?'block':'none';warn.textContent=missing?`${missing} pallet${missing===1?'':'s'} zonder ordernummer. Vul een algemeen order/vrachtnummer of een ordernummer op de betreffende orderregel in.`:'';
 }
 
 function applyScale(){const can=document.getElementById('canvas');can.style.width=(TL*S)+'px';can.style.height=(TW*S)+'px';can.style.backgroundSize=(100*S)+'px 100%';render()}
 function zoomIn(){S=Math.min(1.25,+(S+.1).toFixed(2));applyScale()}
 function zoomOut(){S=Math.max(.35,+(S-.1).toFixed(2));applyScale()}
-function fitView(){const sc=document.getElementById('trailerScroll');const avail=Math.max(280,sc.clientWidth-24);S=Math.max(.35,Math.min(.9,avail/TL));applyScale();sc.scrollLeft=0;sc.scrollTop=0}
-function addOrderLine(type,order='',qty=0){const host=document.getElementById(type+'Lines');const row=document.createElement('div');row.className='order-line';row.dataset.type=type;row.innerHTML=`<div><label>Ordernr.</label><input class="order-input" type="text" placeholder="algemeen" value="${escapeHtml(order)}" oninput="autoPlan()"></div><div><label>Aantal</label><input class="qty" type="number" min="0" value="${Math.max(0,parseInt(qty)||0)}" oninput="autoPlan()"></div><button class="remove-line" title="Verwijder orderregel" onclick="removeOrderLine(this)">×</button>`;host.appendChild(row);updateRemoveButtons(type);return row}
+function fitView(){const sc=document.getElementById('trailerScroll');const avail=Math.max(280,sc.clientWidth-24);S=Math.max(.42,Math.min(.9,avail/TL));applyScale();sc.scrollLeft=0;sc.scrollTop=0}
+let rowUid=1;
+function addOrderLine(type,order='',qty=0,stop=''){
+ const host=document.getElementById(type+'Lines');const row=document.createElement('div');row.className='order-line';row.dataset.type=type;row.dataset.rowid='r'+(rowUid++);
+ row.innerHTML=`<div><label>Ordernr.</label><input class="order-input" type="text" placeholder="algemeen" value="${escapeHtml(order)}" oninput="autoPlan()"></div><div><label>Aantal</label><input class="qty" type="number" min="0" value="${Math.max(0,parseInt(qty)||0)}" oninput="autoPlan()"></div><div><label>Stop</label><input class="stop-input" type="number" min="1" placeholder="-" value="${stop||''}" oninput="autoPlan()"></div><button class="remove-line" title="Verwijder orderregel" onclick="removeOrderLine(this)">×</button>`;
+ host.appendChild(row);updateRemoveButtons(type);return row
+}
 function removeOrderLine(btn){const row=btn.closest('.order-line');const type=row.dataset.type;const host=document.getElementById(type+'Lines');if(host.children.length<=1)return;row.remove();updateRemoveButtons(type);autoPlan()}
 function updateRemoveButtons(type){const rows=[...document.getElementById(type+'Lines').children];rows.forEach(r=>{const b=r.querySelector('.remove-line');if(b)b.style.visibility=rows.length===1?'hidden':'visible'})}
 function initOrderLines(){Object.keys(TYPES).forEach(k=>{const host=document.getElementById(k+'Lines');if(host&&!host.children.length)addOrderLine(k,'',0)})}
-function buildItems(){const out=[];const general=(document.getElementById('orderNo').value||'').trim();document.querySelectorAll('.order-line').forEach(row=>{const k=row.dataset.type,t=TYPES[k];if(!t)return;const q=Math.max(0,parseInt(row.querySelector('.qty').value)||0);const own=(row.querySelector('.order-input').value||'').trim();const order=own||general||'—';for(let i=0;i<q;i++)out.push({id:uid++,type:k,w:t.w,l:t.l,c:t.c,label:t.label,order,x:0,y:0,rot:false})});return out}
+function buildItems(){
+ const out=[];const general=(document.getElementById('orderNo').value||'').trim();
+ [...document.querySelectorAll('.order-line')].forEach((row,ri)=>{
+  const k=row.dataset.type,t=TYPES[k];if(!t)return;
+  const q=Math.max(0,parseInt(row.querySelector('.qty').value)||0);
+  const own=(row.querySelector('.order-input').value||'').trim();const order=own||general||'—';
+  const stopRaw=parseInt(row.querySelector('.stop-input')?.value);const stop=Number.isFinite(stopRaw)&&stopRaw>0?stopRaw:null;
+  for(let i=0;i<q;i++)out.push({id:uid++,sourceKey:`${row.dataset.rowid||ri}:${i}`,type:k,w:t.w,l:t.l,c:t.c,label:t.label,order,stop,x:0,y:0,rot:false,locked:false})
+ });
+ return out
+}
 function overlaps(a,b){return !(a.x+a.l<=b.x||b.x+b.l<=a.x||a.y+a.w<=b.y||b.y+b.w<=a.y)}
 function canPlace(p,placed){if(p.x<0||p.y<0||p.y+p.w>TW||p.x+p.l>TL)return false;return !placed.some(q=>q.id!==p.id&&overlaps(p,q))}
 function makeVariants(){
@@ -517,11 +550,21 @@ function optimizeSingleOrder(src){
 }
 
 function optimizePlan(src){
- // Orders are hard groups: pallets from different orders are never interleaved.
- const groups=[]; const byOrder=new Map();
+ const byOrder=new Map(),groups=[];
  src.forEach(p=>{if(!byOrder.has(p.order)){const g=[];byOrder.set(p.order,g);groups.push(g)}byOrder.get(p.order).push(p)});
- const blocks=groups.map(g=>{const placed=optimizeSingleOrder(g);return {placed,len:endCm(placed),order:g[0]?.order||'—'}});
- // Keep input order for predictable warehouse use. Each complete order block starts after the previous one.
+ const blocks=groups.map((g,index)=>{
+   const placed=optimizeSingleOrder(g);
+   const stops=g.map(p=>p.stop).filter(v=>Number.isFinite(v));
+   const stop=stops.length?Math.min(...stops):null;
+   return {placed,len:endCm(placed),order:g[0]?.order||'—',stop,index};
+ });
+ // Loading direction cabin -> doors. Higher stop numbers deeper in trailer; Stop 1 closest to doors.
+ blocks.sort((a,b)=>{
+   if(a.stop==null&&b.stop==null)return a.index-b.index;
+   if(a.stop==null)return -1;
+   if(b.stop==null)return 1;
+   return b.stop-a.stop||a.index-b.index;
+ });
  const out=[];let offset=0;
  blocks.forEach(b=>{b.placed.forEach(p=>out.push({...p,x:p.x+offset}));offset+=b.len});
  return out;
@@ -532,9 +575,65 @@ function palletDirection(p){
  return {lengthwise:p.l>=t.l};
 }
 
-function autoPlan(){manual=false;selectedId=null;items=buildItems();items=optimizePlan(items);render();document.getElementById('modeLabel').innerText='TETRIS AUTO — elk order krijgt zijn eigen volledige optimalisatieronde'}
+function preserveLockedPlan(newItems){
+ const locked=items.filter(p=>p.locked).map(p=>({...p}));
+ if(!locked.length)return optimizePlan(newItems);
+ const optimized=optimizePlan(newItems);
+ // Restore locked pallets by stable sourceKey and relocate only unlocked pallets that conflict.
+ for(const lp of locked){
+   const target=optimized.find(p=>p.sourceKey===lp.sourceKey);
+   if(target)Object.assign(target,{x:lp.x,y:lp.y,w:lp.w,l:lp.l,rot:lp.rot,locked:true});
+ }
+ const fixed=optimized.filter(p=>p.locked);
+ const movable=optimized.filter(p=>!p.locked);
+ // Ensure movable pallets do not overlap locked pallets; find closest legal contact where necessary.
+ items=[...fixed,...movable];
+ movable.forEach(p=>{
+   if(!canPlace(p,items.filter(q=>q.id!==p.id))){
+     const found=nearestValidContact(p,items.filter(q=>q.id!==p.id),p.x,p.y);
+     if(found){p.x=found.x;p.y=found.y}
+   }
+ });
+ return items.slice();
+}
+
+function analyzeInternalGaps(){
+ if(!items.length)return {cells:0,areaM2:0};
+ const STEP=10,end=Math.ceil(endCm()/STEP),H=Math.ceil(TW/STEP);
+ const occ=Array.from({length:end},()=>Array(H).fill(false));
+ items.forEach(p=>{
+   const x0=Math.floor(p.x/STEP),x1=Math.ceil((p.x+p.l)/STEP),y0=Math.floor(p.y/STEP),y1=Math.ceil((p.y+p.w)/STEP);
+   for(let x=Math.max(0,x0);x<Math.min(end,x1);x++)for(let y=Math.max(0,y0);y<Math.min(H,y1);y++)occ[x][y]=true;
+ });
+ const seen=Array.from({length:end},()=>Array(H).fill(false)),q=[];
+ // Empty cells touching trailer side walls or the rear edge are exterior/remainder space.
+ for(let x=0;x<end;x++)for(const y of [0,H-1])if(!occ[x][y]&&!seen[x][y]){seen[x][y]=true;q.push([x,y])}
+ for(let y=0;y<H;y++)if(!occ[end-1][y]&&!seen[end-1][y]){seen[end-1][y]=true;q.push([end-1,y])}
+ for(let qi=0;qi<q.length;qi++){
+   const [x,y]=q[qi];
+   for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+     const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=end||ny>=H||seen[nx][ny]||occ[nx][ny])continue;
+     seen[nx][ny]=true;q.push([nx,ny]);
+   }
+ }
+ let cells=0;for(let x=0;x<end;x++)for(let y=0;y<H;y++)if(!occ[x][y]&&!seen[x][y])cells++;
+ return {cells,areaM2:cells*(STEP/100)*(STEP/100)};
+}
+function updateGapCheck(){
+ const el=document.getElementById('gapCheck');if(!el)return;
+ const g=analyzeInternalGaps();
+ if(g.cells){el.className='gap-check warn';el.innerHTML=`<b>⚠ INTERNE RUIMTE GEVONDEN</b><span>${g.areaM2.toFixed(2).replace('.',',')} m² ingesloten lege ruimte. Controleer of pallets slimmer gedraaid/geplaatst kunnen worden.</span>`}
+ else{el.className='gap-check ok';el.innerHTML='<b>✓ GEEN INTERNE GATEN</b><span>Geen ingesloten lege ruimte tussen pallets gevonden.</span>'}
+}
+function autoPlan(){
+ manual=false;selectedId=null;
+ const fresh=buildItems();
+ items=preserveLockedPlan(fresh);
+ render();
+ document.getElementById('modeLabel').innerText='TETRIS AUTO — locks behouden; Stop 1 wordt het dichtst bij de deuren geplaatst'
+}
 function endCm(arr=items){return arr.reduce((m,p)=>Math.max(m,p.x+p.l),0)}function endMeters(arr=items){return endCm(arr)/100}
-function render(){const can=document.getElementById('canvas');can.innerHTML='';document.getElementById('p-out').innerText=items.length;const end=endCm();document.getElementById('m-out').innerText=(end/100).toFixed(2).replace('.',',')+' m';document.getElementById('free-out').innerText=Math.max(0,(TL-end)/100).toFixed(2).replace('.',',')+' m';
+function render(){const can=document.getElementById('canvas');can.innerHTML='';const po=document.getElementById('p-out');if(po)po.innerText=items.length;const end=endCm();document.getElementById('m-out').innerText=(end/100).toFixed(2).replace('.',',')+' m';document.getElementById('free-out').innerText=Math.max(0,(TL-end)/100).toFixed(2).replace('.',',')+' m';
 
  const counts={e:0,b:0,m:0,l:0};items.forEach(p=>counts[p.type]++);
  const total=items.length;
@@ -542,7 +641,9 @@ function render(){const can=document.getElementById('canvas');can.innerHTML='';d
  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val};
  set('p-total-label',total);set('cnt-total',total);set('cnt-e',counts.e);set('cnt-b',counts.b);set('cnt-m',counts.m);set('cnt-l',counts.l);
  set('avail-e',counts.e);set('avail-b',counts.b);set('avail-m',counts.m);set('avail-l',counts.l);set('util-out',util+'%');
- let seenOrders=new Set(); items.forEach(p=>{const d=document.createElement('div');const isStart=!seenOrders.has(p.order);seenOrders.add(p.order);const pd=palletDirection(p);d.className='v-p '+(pd.lengthwise?'dir-long':'dir-cross')+(p.id===selectedId?' selected':'')+(isStart?' order-start':'');d.dataset.id=p.id;d.style.left=p.x*S+'px';d.style.top=p.y*S+'px';d.style.width=p.l*S+'px';d.style.height=p.w*S+'px';d.style.backgroundColor=p.c;d.style.border=`3px solid ${orderColor(p.order)}`;d.innerHTML=`<span class="pallet-visual">${['b1','b2','b3'].map(b=>`<i class="deck-board ${pd.lengthwise?'long':'cross'} ${b}"></i>`).join('')}</span><span class="pallet-label"><span class="ord">${escapeHtml(p.order==='—'?'GEEN ORDER':'ORD '+p.order)}</span><span class="dims">${p.label} ${p.w}×${p.l}</span></span>`;d.addEventListener('pointerdown',startDrag);d.addEventListener('click',()=>{selectedId=p.id;render()});can.appendChild(d)});window.plan=makeRows();renderOrderLegend()}
+ let seenOrders=new Set(); items.forEach(p=>{const d=document.createElement('div');const isStart=!seenOrders.has(p.order);seenOrders.add(p.order);const pd=palletDirection(p);d.className='v-p '+(pd.lengthwise?'dir-long':'dir-cross')+(p.id===selectedId?' selected':'')+(isStart?' order-start':'')+(p.locked?' locked':'');d.dataset.id=p.id;d.style.left=p.x*S+'px';d.style.top=p.y*S+'px';d.style.width=p.l*S+'px';d.style.height=p.w*S+'px';d.style.backgroundColor=p.c;d.style.border=`3px solid ${orderColor(p.order)}`;d.innerHTML=`<span class="pallet-visual">${['b1','b2','b3'].map(b=>`<i class="deck-board ${pd.lengthwise?'long':'cross'} ${b}"></i>`).join('')}</span><span class="pallet-label"><span class="ord">${escapeHtml(p.order==='—'?'GEEN ORDER':'ORD '+p.order)}</span><span class="dims">${p.label} ${p.w}×${p.l}</span>${p.stop?`<span class="stop-badge">STOP ${p.stop}</span>`:''}</span>`;d.addEventListener('pointerdown',startDrag);d.addEventListener('click',()=>{selectedId=p.id;render()});can.appendChild(d)});window.plan=makeRows();renderOrderLegend();
+ const lb=document.getElementById('lockBtn'),sel=items.find(p=>p.id===selectedId);if(lb){lb.classList.toggle('locked',!!sel?.locked);lb.textContent=sel?.locked?'🔓 ONTGRENDEL':'🔒 VERGRENDEL'}
+ updateGapCheck()}
 
 function candidateContactPositions(p,others){
  const xs=new Set([0,Math.max(0,TL-p.l)]), ys=new Set([0,Math.max(0,TW-p.w)]);
@@ -585,7 +686,12 @@ function compactManualPallet(p){
  }
 }
 
-function startDrag(ev){ev.preventDefault();manual=true;const id=+ev.currentTarget.dataset.id;selectedId=id;const p=items.find(x=>x.id===id);const startX=ev.clientX,startY=ev.clientY,ox=p.x,oy=p.y;const el=ev.currentTarget;el.setPointerCapture(ev.pointerId);el.classList.add('dragging');
+function toggleLockSelected(){
+ if(!selectedId)return;
+ const p=items.find(x=>x.id===selectedId);if(!p)return;
+ p.locked=!p.locked;render();
+}
+function startDrag(ev){ev.preventDefault();manual=true;const id=+ev.currentTarget.dataset.id;selectedId=id;const p=items.find(x=>x.id===id);if(p?.locked){render();return;}const startX=ev.clientX,startY=ev.clientY,ox=p.x,oy=p.y;const el=ev.currentTarget;el.setPointerCapture(ev.pointerId);el.classList.add('dragging');
  const move=e=>{p.x=Math.max(0,Math.min(TL-p.l,Math.round((ox+(e.clientX-startX)/S)/SNAP)*SNAP));p.y=Math.max(0,Math.min(TW-p.w,Math.round((oy+(e.clientY-startY)/S)/SNAP)*SNAP));el.style.left=p.x*S+'px';el.style.top=p.y*S+'px'};
  const up=e=>{el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.classList.remove('dragging');
  const targetX=p.x,targetY=p.y;const others=items.filter(x=>x.id!==p.id);
@@ -595,7 +701,7 @@ function startDrag(ev){ev.preventDefault();manual=true;const id=+ev.currentTarge
 function rotateSelected(){
  if(!selectedId)return;
  manual=true;
- const old=items.find(x=>x.id===selectedId);if(!old)return;
+ const old=items.find(x=>x.id===selectedId);if(!old||old.locked)return;
  const rotated={...old,w:old.l,l:old.w,rot:!old.rot};
  const others=items.filter(x=>x.id!==selectedId).map(x=>({...x}));
  // Keep other pallets where possible, then find nearest legal contact for the rotated pallet.
@@ -623,7 +729,7 @@ function makePlanImage(){
  // top bar
  g.fillStyle='#071321';g.fillRect(0,0,c.width,78);g.strokeStyle='#203247';g.beginPath();g.moveTo(0,77);g.lineTo(c.width,77);g.stroke();
  g.fillStyle='#ffffff';g.font='900 28px Arial';g.fillText('WAREHOUSE MASTER',34,48);
- g.fillStyle='#1677ed';g.fillRect(330,20,122,38);g.fillStyle='#fff';g.font='900 17px Arial';g.fillText('v10.4 PRO',345,46);
+ g.fillStyle='#1677ed';g.fillRect(330,20,122,38);g.fillStyle='#fff';g.font='900 17px Arial';g.fillText('v10.5 PRO',345,46);
  g.fillStyle='#00c96b';g.font='900 17px Arial';g.textAlign='right';g.fillText('✓ OPGESLAGEN',1560,46);g.textAlign='left';
 
  // left data panel
@@ -661,7 +767,7 @@ function makePlanImage(){
    g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';
    const fs=Math.max(11,Math.min(19,h*.18));
    g.font=`900 ${fs}px Arial`;g.fillText(p.order==='—'?'GEEN ORDER':'ORD '+p.order,x+w/2,y+h/2-fs*.45,Math.max(30,w-8));
-   g.font=`bold ${Math.max(10,fs*.72)}px Arial`;g.fillText(`${p.label} ${p.w}×${p.l}`,x+w/2,y+h/2+fs*.65,Math.max(30,w-8));
+   g.font=`bold ${Math.max(10,fs*.72)}px Arial`;g.fillText(`${p.label} ${p.w}×${p.l}${p.stop?' · S'+p.stop:''}`,x+w/2,y+h/2+fs*.65,Math.max(30,w-8));
  });
 
  // status strip
@@ -695,9 +801,34 @@ async function send(){
  alert('De visuele laadplan-afbeelding is opgeslagen. Deel deze afbeelding vervolgens via WhatsApp.');
 }
 
-async function downloadPdf(){
+async function makePrintPlanImage(){
+ const c=document.createElement('canvas');c.width=1600;c.height=900;const g=c.getContext('2d');
+ const order=document.getElementById('orderNo').value.trim()||'—',ref=document.getElementById('reference').value.trim()||'—';
+ const driver=document.getElementById('driver').value.trim()||'—',tractor=document.getElementById('tractorPlate').value.trim()||'—';
+ const trailer=document.getElementById('trailerPlate').value.trim()||'—',carrier=document.getElementById('carrier').value.trim()||'—';
+ const date=new Date().toLocaleDateString('nl-NL'),end=endCm(),used=(end/100).toFixed(2).replace('.',','),free=Math.max(0,(TL-end)/100).toFixed(2).replace('.',','),util=Math.round((end/TL)*100);
+ g.fillStyle='#fff';g.fillRect(0,0,1600,900);
+ g.fillStyle='#0f172a';g.fillRect(0,0,1600,70);g.fillStyle='#fff';g.font='900 27px Arial';g.fillText('AMSTERDAM WAREHOUSE COMPANY',30,43);
+ g.fillStyle='#22c55e';g.fillRect(30,57,1540,4);g.fillStyle='#0f172a';g.font='900 22px Arial';g.fillText('LAADPLAN',30,110);
+ g.fillStyle='#64748b';g.font='14px Arial';g.fillText(`Datum: ${date}   •   Order: ${order}   •   Referentie: ${ref}`,30,135);
+ const fields=[['CHAUFFEUR',driver],['TREKKER',tractor],['TRAILER',trailer],['TRANSPORTEUR',carrier],['GEBRUIKT',used+' m'],['VRIJ',free+' m'],['BENUTTING',util+'%'],['PALLETS',String(items.length)]];
+ fields.forEach((f,i)=>{const x=30+(i%4)*385,y=155+Math.floor(i/4)*58;g.fillStyle='#f8fafc';g.fillRect(x,y,365,46);g.strokeStyle='#cbd5e1';g.strokeRect(x,y,365,46);g.fillStyle='#64748b';g.font='bold 10px Arial';g.fillText(f[0],x+8,y+15);g.fillStyle='#0f172a';g.font='900 16px Arial';g.fillText(f[1],x+8,y+36)});
+ const px=45,py=300,pw=1510,ph=330;
+ g.fillStyle='#475569';g.font='900 16px Arial';g.fillText('← CABINE',px,py-32);g.textAlign='right';g.fillText('DEUREN →',px+pw,py-32);g.textAlign='left';
+ for(let m=0;m<=13;m++){const x=px+(m/13.6)*pw;g.fillStyle='#64748b';g.font='12px Arial';g.fillText(m+'m',x,py-10)}g.fillText('13,6m',px+pw-34,py-10);
+ g.fillStyle='#eef2f7';g.fillRect(px,py,pw,ph);g.strokeStyle='#334155';g.lineWidth=3;g.strokeRect(px,py,pw,ph);
+ for(let m=1;m<14;m++){const x=px+(m/13.6)*pw;g.strokeStyle='#cbd5e1';g.lineWidth=1;g.beginPath();g.moveTo(x,py);g.lineTo(x,py+ph);g.stroke()}
+ g.fillStyle='#64748b';g.fillRect(px,py,18,ph);g.fillStyle='#94a3b8';g.fillRect(px+pw-12,py,4,ph);g.fillRect(px+pw-5,py,4,ph);
+ const sx=pw/TL,sy=ph/TW;
+ items.forEach(p=>{const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy,pd=palletDirection(p);g.fillStyle=p.c;g.fillRect(x,y,w,h);g.fillStyle='rgba(15,23,42,.20)';
+  if(pd.lengthwise){const bh=Math.max(3,h*.10);[.1,.44,.78].forEach(r=>g.fillRect(x+w*.05,y+h*r,w*.9,bh))}else{const bw=Math.max(3,w*.10);[.1,.44,.78].forEach(r=>g.fillRect(x+w*r,y+h*.05,bw,h*.9))}
+  g.strokeStyle=orderColor(p.order);g.lineWidth=4;g.strokeRect(x,y,w,h);g.fillStyle='#0f172a';g.textAlign='center';g.textBaseline='middle';const fs=Math.max(10,Math.min(17,h*.18));g.font=`900 ${fs}px Arial`;g.fillText(p.order==='—'?'GEEN ORDER':'ORD '+p.order,x+w/2,y+h/2-fs*.42,Math.max(25,w-6));g.font=`bold ${Math.max(9,fs*.68)}px Arial`;g.fillText(`${p.label} ${p.w}×${p.l}${p.stop?' · S'+p.stop:''}`,x+w/2,y+h/2+fs*.58,Math.max(25,w-6))});
+ g.textAlign='left';g.textBaseline='alphabetic';g.fillStyle='#f0fdf4';g.fillRect(45,665,1510,70);g.strokeStyle='#22c55e';g.strokeRect(45,665,1510,70);g.fillStyle='#15803d';g.font='900 17px Arial';g.fillText('✓ OPTIMALE INDELING',65,695);g.fillStyle='#334155';g.font='14px Arial';g.fillText('Bovenaanzicht trailer 13,60 × 2,40 m • Ieder order afzonderlijk geoptimaliseerd.',65,719);
+ g.fillStyle='#64748b';g.font='12px Arial';g.fillText('Warehouse Master v10.5 • Printvriendelijke A4-landscape export',45,820);return c;
+}
+function downloadPdf(){
  if(!items.length){alert('Voer eerst pallets in.');return}
- const canvas=makePlanImage();
+ const canvas=makePrintPlanImage();
  const dataUrl=canvas.toDataURL('image/jpeg',0.94);
  const b64=dataUrl.split(',')[1];
  const raw=atob(b64); const img=new Uint8Array(raw.length); for(let i=0;i<raw.length;i++)img[i]=raw.charCodeAt(i);
@@ -723,7 +854,7 @@ async function downloadPdf(){
 
 function printPlan(){
  if(!items.length){alert('Voer eerst pallets in.');return}
- const c=makePlanImage();
+ const c=makePrintPlanImage();
  const img=c.toDataURL('image/png',1);
  const order=document.getElementById('orderNo').value.trim()||'—';
  const ref=document.getElementById('reference').value.trim()||'—';
@@ -774,7 +905,7 @@ footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
 </style></head><body><div class="sheet"><div class="top"><div class="mark">AWC</div><div><h1>AMSTERDAM WAREHOUSE COMPANY</h1><div class="sub">LAADPLAN - BIJLAGE CMR</div></div></div>
  <div class="meta"><div class="box"><div class="lab">ORDER / VRACHTNUMMER</div><div class="val">${escapeHtml(order)}</div></div><div class="box"><div class="lab">REFERENTIE / KLANT</div><div class="val">${escapeHtml(ref)}</div></div><div class="box"><div class="lab">DATUM</div><div class="val">${date}</div></div><div class="box"><div class="lab">LAADMETER</div><div class="val">${load} m</div></div><div class="box"><div class="lab">PALLETS</div><div class="val">${items.length}</div></div><div class="box"><div class="lab">VRIJ</div><div class="val">${free} m</div></div></div>
  <div class="transport"><div class="box"><div class="lab">CHAUFFEUR</div><div class="val">${escapeHtml(driver)}</div></div><div class="box"><div class="lab">KENTEKEN TREKKER</div><div class="val">${escapeHtml(tractor)}</div></div><div class="box"><div class="lab">KENTEKEN TRAILER</div><div class="val">${escapeHtml(trailer)}</div></div><div class="box"><div class="lab">TRANSPORTEUR</div><div class="val">${escapeHtml(carrier)}</div></div></div>
- <div class="box" style="margin-bottom:3mm"><div class="lab">ORDEROVERZICHT</div><div class="val" style="font-size:9pt">${orderStats().map(([o,n])=>`${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)}: ${n} pallet${n===1?'':'s'}`).join(' &nbsp; • &nbsp; ')}</div></div><div class="visual"><img src="${img}" alt="Visueel laadplan"></div><div class="approval"><div class="box"><div class="lab">LAADPLAN AKKOORD</div><div class="val">☐ Ja &nbsp;&nbsp; ☐ Afwijking</div><div class="small">Eventuele afwijkingen van het laadplan vermelden op de CMR.</div></div><div class="box"><div class="lab">HANDTEKENING CHAUFFEUR</div><div class="signature"></div><div class="small">Naam / handtekening</div></div></div><div class="foot"><div class="note">Bovenaanzicht - trailer 13,60 x 2,40 m</div><div>Gegenereerd met Warehouse Master v9.1</div></div></div>
+ <div class="box" style="margin-bottom:3mm"><div class="lab">ORDEROVERZICHT</div><div class="val" style="font-size:9pt">${orderStats().map(([o,n,stop])=>`${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)}${stop?' (Stop '+stop+')':''}: ${n} pallet${n===1?'':'s'}`).join(' &nbsp; • &nbsp; ')}</div></div><div class="visual"><img src="${img}" alt="Visueel laadplan"></div><div class="approval"><div class="box"><div class="lab">LAADPLAN AKKOORD</div><div class="val">☐ Ja &nbsp;&nbsp; ☐ Afwijking</div><div class="small">Eventuele afwijkingen van het laadplan vermelden op de CMR.</div></div><div class="box"><div class="lab">HANDTEKENING CHAUFFEUR</div><div class="signature"></div><div class="small">Naam / handtekening</div></div></div><div class="foot"><div class="note">Bovenaanzicht - trailer 13,60 x 2,40 m</div><div>Gegenereerd met Warehouse Master v9.1</div></div></div>
  <script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
  w.document.close();
 }
