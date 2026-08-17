@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>Warehouse Master v10.2.1 PRO Visual</title>
+<title>Warehouse Master v10.3 Unified Visual</title>
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--text:#f8fafc;--accent:#3b82f6;--wa:#22c55e;--muted:#94a3b8}
 *{box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -123,6 +123,26 @@ footer{display:none!important}
  .security-note{font-size:.61rem!important}
 }
 
+
+/* v10.3 unified load-plan renderer */
+.plan-panel{background:#f7f9fc!important;color:#0f172a!important;border-color:#cbd5e1!important}
+.plan-titlebar h1{color:#0f172a!important}.plan-titlebar span{color:#64748b!important}
+.direction-row{color:#475569!important}
+.meter-ruler{background:#eef2f7!important;border-color:#cbd5e1!important}
+.meter-ruler span{color:#475569!important;font-weight:800}
+.trailer-scroll{background:#e2e8f0!important;border:2px solid #64748b!important;box-shadow:inset 0 0 0 4px #fff!important}
+#canvas{
+ background-color:#111827!important;
+ background-image:linear-gradient(90deg,rgba(255,255,255,.13) 1px,transparent 1px)!important;
+ background-size:100px 100%!important;
+ border-left:14px solid #475569!important;border-right:18px double #94a3b8!important
+}
+.v-p{border-radius:2px!important;box-shadow:none!important}
+.v-p .pallet-visual{border-color:rgba(255,255,255,.48)!important}
+.v-p .deck-board{background:rgba(15,23,42,.30)!important;border-color:rgba(255,255,255,.42)!important}
+.v-p .pallet-label{background:rgba(15,23,42,.80)!important;color:#fff!important;border:1px solid rgba(255,255,255,.5)!important;border-radius:3px!important}
+#modeLabel{color:#334155!important}.security-note{color:#d1fae5!important}
+
 </style>
 </head>
 <body>
@@ -130,7 +150,7 @@ footer{display:none!important}
   <div class="brand-lockup">
     <img src="icon.png" alt="AWC">
     <div><strong>WAREHOUSE MASTER</strong><span>Amsterdam Warehouse Company</span></div>
-    <b class="version-badge">v10.2.1 PRO</b>
+    <b class="version-badge">v10.3 PRO</b>
   </div>
   <div class="save-state">✓ LAADPLAN</div>
 </div>
@@ -199,7 +219,7 @@ footer{display:none!important}
   <main class="workspace">
     <section class="panel plan-panel">
       <div class="plan-titlebar">
-        <div><h1>LAADPLAN</h1><span>Bovenaanzicht trailer · 13,60 × 2,40 m</span></div>
+        <div><h1>LAADPLAN</h1><span>Bovenaanzicht · identiek in app, WhatsApp en PDF</span></div>
         <div class="plan-actions">
           <button class="accent" onclick="autoPlan()">✨ AUTO OPTIMAAL</button>
           <button class="secondary" onclick="rotateSelected()">↻ DRAAI</button>
@@ -668,9 +688,9 @@ function rotateSelected(){
 }function resetManual(){autoPlan()}
 function makeRows(){const cuts=[...new Set(items.map(p=>p.x))].sort((a,b)=>a-b);return cuts.map(x=>items.filter(p=>p.x===x).sort((a,b)=>a.y-b.y).map(p=>`${p.label}(${p.w}×${p.l})`).join(' + ')).filter(Boolean)}
 function makePlanImage(){
- const used=Math.max(100,endCm()), scale=2, margin=64, top=255, footerH=230;
+ const used=TL, scale=2, margin=64, top=255, footerH=230;
  // Landscape export: keep a wide trailer composition for WhatsApp and A4 landscape PDF.
- const planW=Math.max(1180,Math.round(used*1.15));
+ const planW=1360;
  const c=document.createElement('canvas');c.width=planW+margin*2;c.height=TW*scale+top+footerH;const g=c.getContext('2d');
  const order=document.getElementById('orderNo').value.trim()||'—';
  const ref=document.getElementById('reference').value.trim()||'—';
@@ -690,7 +710,7 @@ function makePlanImage(){
  const sx=planW/used, sy=(TW*scale)/TW, px=margin,py=top;
  g.fillStyle='#475569';g.font='900 16px Arial';g.textAlign='left';g.fillText('← CABINE',px,py-12);
  g.textAlign='right';g.fillText('DEUREN →',px+planW,py-12);g.textAlign='left';
- g.fillStyle='#111827';g.fillRect(px,py,planW,TW*scale);g.strokeStyle='#0f172a';g.lineWidth=5;g.strokeRect(px,py,planW,TW*scale);
+ g.fillStyle='#111827';g.fillRect(px,py,planW,TW*scale);g.strokeStyle='#0f172a';g.lineWidth=5;g.strokeRect(px,py,planW,TW*scale);g.fillStyle='#475569';g.fillRect(px,py,12,TW*scale);g.fillStyle='#94a3b8';g.fillRect(px+planW-14,py,5,TW*scale);g.fillRect(px+planW-6,py,5,TW*scale);
  for(let m=0;m<=Math.ceil(used/100);m++){const x=px+m*100*sx;if(x>px+planW)break;g.strokeStyle='rgba(255,255,255,.20)';g.lineWidth=1;g.beginPath();g.moveTo(x,py);g.lineTo(x,py+TW*scale);g.stroke();g.fillStyle='#475569';g.font='16px Arial';g.fillText(`${m}m`,x+3,py+TW*scale+24)}
  items.forEach(p=>{const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy;g.fillStyle=p.c;g.fillRect(x,y,w,h);const pd=palletDirection(p);
  // Draw pallet deck boards from top view. Boards follow the pallet's long axis.
