@@ -75,7 +75,7 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
   <div class="wm-brand">
     <img src="icon.png" alt="AWC">
     <strong>WAREHOUSE MASTER</strong>
-    <span class="version-badge">v10.5 PRO</span>
+    <span class="version-badge">v10.5.1 PRO</span>
   </div>
   <nav class="navtabs">
     <button class="active">▦ LAADMETER</button>
@@ -801,7 +801,7 @@ async function send(){
  alert('De visuele laadplan-afbeelding is opgeslagen. Deel deze afbeelding vervolgens via WhatsApp.');
 }
 
-async function makePrintPlanImage(){
+function makePrintPlanImage(){
  const c=document.createElement('canvas');c.width=1600;c.height=900;const g=c.getContext('2d');
  const order=document.getElementById('orderNo').value.trim()||'—',ref=document.getElementById('reference').value.trim()||'—';
  const driver=document.getElementById('driver').value.trim()||'—',tractor=document.getElementById('tractorPlate').value.trim()||'—';
@@ -824,7 +824,7 @@ async function makePrintPlanImage(){
   if(pd.lengthwise){const bh=Math.max(3,h*.10);[.1,.44,.78].forEach(r=>g.fillRect(x+w*.05,y+h*r,w*.9,bh))}else{const bw=Math.max(3,w*.10);[.1,.44,.78].forEach(r=>g.fillRect(x+w*r,y+h*.05,bw,h*.9))}
   g.strokeStyle=orderColor(p.order);g.lineWidth=4;g.strokeRect(x,y,w,h);g.fillStyle='#0f172a';g.textAlign='center';g.textBaseline='middle';const fs=Math.max(10,Math.min(17,h*.18));g.font=`900 ${fs}px Arial`;g.fillText(p.order==='—'?'GEEN ORDER':'ORD '+p.order,x+w/2,y+h/2-fs*.42,Math.max(25,w-6));g.font=`bold ${Math.max(9,fs*.68)}px Arial`;g.fillText(`${p.label} ${p.w}×${p.l}${p.stop?' · S'+p.stop:''}`,x+w/2,y+h/2+fs*.58,Math.max(25,w-6))});
  g.textAlign='left';g.textBaseline='alphabetic';g.fillStyle='#f0fdf4';g.fillRect(45,665,1510,70);g.strokeStyle='#22c55e';g.strokeRect(45,665,1510,70);g.fillStyle='#15803d';g.font='900 17px Arial';g.fillText('✓ OPTIMALE INDELING',65,695);g.fillStyle='#334155';g.font='14px Arial';g.fillText('Bovenaanzicht trailer 13,60 × 2,40 m • Ieder order afzonderlijk geoptimaliseerd.',65,719);
- g.fillStyle='#64748b';g.font='12px Arial';g.fillText('Warehouse Master v10.5 • Printvriendelijke A4-landscape export',45,820);return c;
+ g.fillStyle='#64748b';g.font='12px Arial';g.fillText('Warehouse Master v10.5.1 • Printvriendelijke A4-landscape export',45,820);return c;
 }
 function downloadPdf(){
  if(!items.length){alert('Voer eerst pallets in.');return}
@@ -870,7 +870,7 @@ function printPlan(){
  w.document.write(`<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>AWC laadplan ${order}</title><style>
  @page{size:A4 landscape;margin:10mm}
  *{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;color:#0f172a;background:#fff}
- .sheet{width:100%;min-height:185mm;border:2px solid #198754;padding:0 8mm 7mm;position:relative}
+ .sheet{width:100%;min-height:185mm;border:2px solid #198754;padding:0 8mm 7mm;position:relative;background:#fff}
  .top{margin:0 -8mm 6mm;padding:6mm 8mm 4mm;border-bottom:4px solid #198754;background:#0f172a;color:white;display:flex;align-items:center;gap:8mm}
  .mark{width:23mm;height:17mm;border:2px solid #22c55e;display:flex;align-items:center;justify-content:center;font-size:20pt;font-weight:900}
  h1{margin:0;font-size:19pt;letter-spacing:.2mm}.sub{margin-top:2mm;color:#cbd5e1;font-size:10pt;font-weight:bold}
@@ -880,32 +880,10 @@ function printPlan(){
  .foot{display:flex;justify-content:space-between;gap:6mm;margin-top:3mm;font-size:8.5pt;color:#475569}.note{font-weight:bold;color:#0f172a}.approval{display:grid;grid-template-columns:1fr 1.4fr;gap:5mm;margin-top:4mm}.approval .box{min-height:23mm}.signature{height:13mm;border-bottom:1px solid #64748b;margin-top:2mm}.small{font-size:7pt;color:#64748b;margin-top:1mm}
  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.sheet{break-inside:avoid}}
  
-/* v10.2 PRO UI */
-:root{--awc:#00a651;--awc-dark:#08783f;--panel:#111827}
-body{background:#07111f}
-.header{padding:0 0 8px;background:#0b1627;border-bottom:1px solid #26364b}
-.pro-brand{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff;color:#0f172a;border-bottom:4px solid var(--awc)}
-.pro-brand-main{display:flex;align-items:center;gap:10px}.pro-brand img{width:42px;height:42px;object-fit:contain;border-radius:8px}.pro-brand b{display:block;font-size:1rem}.pro-brand small{color:#64748b}.version-badge{font-size:.64rem;font-weight:900;background:#e8f7ef;color:#08783f;padding:6px 8px;border-radius:999px}
-.stats{margin:8px 8px 7px;background:#111d2e;border:1px solid #26364b;border-radius:12px;padding:8px}.stat-v{font-size:1.2rem;color:#35d07f}
-#viewModeBar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 8px 8px}.modebtn{padding:10px;border-radius:9px;font-size:.76rem;background:#243247}.modebtn.active{background:var(--awc)}
-#editPanel{display:none}.editing #editPanel{display:block}
-.trailer-shell{margin:0 8px}.direction-row{display:flex;justify-content:space-between;font-size:.62rem;color:#94a3b8;margin:0 2px 4px;font-weight:800;letter-spacing:.03em}
-.meter-ruler{position:relative;height:20px;margin:0 0 2px;background:#0b1320;border:1px solid #26364b;border-radius:7px;overflow:hidden}
-.meter-ruler span{position:absolute;top:3px;transform:translateX(-50%);font-size:.56rem;color:#cbd5e1}.meter-ruler span:first-child{transform:none}.meter-ruler span:last-child{transform:translateX(-100%)}
-.trailer-scroll{margin:0;max-height:390px;border:2px solid #506070;border-radius:10px;padding:6px;background:#020617}
-#canvas{height:180px;background-color:#0a0f18;border-left:12px solid #334155;border-right:18px double #94a3b8}
-.v-p{font-size:9px;border-width:1px}.v-p .ord{font-size:9px;text-shadow:0 1px 2px #000}.v-p.order-start{box-shadow:-4px 0 0 rgba(255,255,255,.75),inset 0 0 0 1px rgba(0,0,0,.3)}
-#orderLegend{margin:8px 8px 0}.warning{margin:7px 8px 0}
-.input-grid{padding:8px 10px 100px}.input-grid>.info{display:none}.editing .input-grid>.info{display:block}
-.p-card{display:none}.editing .p-card{display:block}
-#modeLabel{display:none}
-footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
-.editing .trailer-scroll{max-height:300px}
-@media(min-width:700px){.header,.input-grid,footer{max-width:900px;margin-left:auto;margin-right:auto}.pro-brand{border-radius:0}.trailer-scroll{max-height:480px}}
 </style></head><body><div class="sheet"><div class="top"><div class="mark">AWC</div><div><h1>AMSTERDAM WAREHOUSE COMPANY</h1><div class="sub">LAADPLAN - BIJLAGE CMR</div></div></div>
- <div class="meta"><div class="box"><div class="lab">ORDER / VRACHTNUMMER</div><div class="val">${escapeHtml(order)}</div></div><div class="box"><div class="lab">REFERENTIE / KLANT</div><div class="val">${escapeHtml(ref)}</div></div><div class="box"><div class="lab">DATUM</div><div class="val">${date}</div></div><div class="box"><div class="lab">LAADMETER</div><div class="val">${load} m</div></div><div class="box"><div class="lab">PALLETS</div><div class="val">${items.length}</div></div><div class="box"><div class="lab">VRIJ</div><div class="val">${free} m</div></div></div>
+ <div class="meta"><div class="box"><div class="lab">ORDER / VRACHTNUMMER</div><div class="val">${escapeHtml(order)}</div></div><div class="box"><div class="lab">REFERENTIE / KLANT</div><div class="val">${escapeHtml(ref)}</div></div><div class="box"><div class="lab">DATUM</div><div class="val">${date}</div></div><div class="box"><div class="lab">LAADMETER</div><div class="val">${load}</div></div><div class="box"><div class="lab">PALLETS</div><div class="val">${items.length}</div></div><div class="box"><div class="lab">VRIJ</div><div class="val">${free}</div></div></div>
  <div class="transport"><div class="box"><div class="lab">CHAUFFEUR</div><div class="val">${escapeHtml(driver)}</div></div><div class="box"><div class="lab">KENTEKEN TREKKER</div><div class="val">${escapeHtml(tractor)}</div></div><div class="box"><div class="lab">KENTEKEN TRAILER</div><div class="val">${escapeHtml(trailer)}</div></div><div class="box"><div class="lab">TRANSPORTEUR</div><div class="val">${escapeHtml(carrier)}</div></div></div>
- <div class="box" style="margin-bottom:3mm"><div class="lab">ORDEROVERZICHT</div><div class="val" style="font-size:9pt">${orderStats().map(([o,n,stop])=>`${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)}${stop?' (Stop '+stop+')':''}: ${n} pallet${n===1?'':'s'}`).join(' &nbsp; • &nbsp; ')}</div></div><div class="visual"><img src="${img}" alt="Visueel laadplan"></div><div class="approval"><div class="box"><div class="lab">LAADPLAN AKKOORD</div><div class="val">☐ Ja &nbsp;&nbsp; ☐ Afwijking</div><div class="small">Eventuele afwijkingen van het laadplan vermelden op de CMR.</div></div><div class="box"><div class="lab">HANDTEKENING CHAUFFEUR</div><div class="signature"></div><div class="small">Naam / handtekening</div></div></div><div class="foot"><div class="note">Bovenaanzicht - trailer 13,60 x 2,40 m</div><div>Gegenereerd met Warehouse Master v9.1</div></div></div>
+ <div class="box" style="margin-bottom:3mm"><div class="lab">ORDEROVERZICHT</div><div class="val" style="font-size:9pt">${orderStats().map(([o,n,stop])=>`${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)}${stop?' (Stop '+stop+')':''}: ${n} pallet${n===1?'':'s'}`).join(' &nbsp; • &nbsp; ')}</div></div><div class="visual"><img src="${img}" alt="Visueel laadplan"></div><div class="approval"><div class="box"><div class="lab">LAADPLAN AKKOORD</div><div class="val">☐ Ja &nbsp;&nbsp; ☐ Afwijking</div><div class="small">Eventuele afwijkingen van het laadplan vermelden op de CMR.</div></div><div class="box"><div class="lab">HANDTEKENING CHAUFFEUR</div><div class="signature"></div><div class="small">Naam / handtekening</div></div></div><div class="foot"><div class="note">Bovenaanzicht - trailer 13,60 x 2,40 m</div><div>Gegenereerd met Warehouse Master v10.5.1</div></div></div>
  <script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
  w.document.close();
 }
