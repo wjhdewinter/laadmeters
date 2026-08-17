@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>Warehouse Master v10.5 Dashboard</title>
+<title>Warehouse Master v1.0</title>
 <style>
 :root{--bg:#06111f;--panel:#0a1624;--panel2:#0e1c2c;--line:#26384d;--text:#f7f9fc;--muted:#9aacbf;--green:#00b85c;--blue:#1577eb}
 *{box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -68,6 +68,16 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
 .order-line .stop-input{width:100%;height:31px;background:#06101b;color:#fff;border:1px solid #39516a;border-radius:4px;padding:0 4px;text-align:center}
 .stop-badge{display:block;font-size:8px;margin-top:2px;color:#fde68a}
 @media(max-width:900px){.quick-actions{grid-template-columns:repeat(4,1fr)}.gap-check{padding:8px 10px}}
+
+.unload-flow{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;margin:6px 4px 8px;font-size:.62rem;color:#d8e3ed}
+.unload-flow span{text-align:center;color:#facc15;font-weight:900;letter-spacing:.04em}
+.order-group-label{position:absolute;z-index:20;pointer-events:none;background:#071321;color:#fff;border:2px solid currentColor;border-radius:5px;padding:3px 6px;font-size:9px;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.gap-hole{position:absolute;z-index:1;pointer-events:none;background:repeating-linear-gradient(45deg,rgba(239,68,68,.42),rgba(239,68,68,.42) 6px,rgba(239,68,68,.12) 6px,rgba(239,68,68,.12) 12px);border:2px dashed #ef4444}
+.snap-guide{position:absolute;z-index:30;pointer-events:none;background:#22c55e;opacity:.85}
+.v-p.dragging{filter:brightness(1.12);box-shadow:0 0 0 3px rgba(34,197,94,.7)!important}
+.v-p .pallet-label .ord{font-size:13px;font-weight:900}
+.v-p .pallet-label .dims{font-size:8px;opacity:.9}
+@media(max-width:900px){.order-group-label{font-size:7px;padding:2px 4px}.unload-flow{font-size:.52rem}}
 </style>
 </head>
 <body>
@@ -75,7 +85,7 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
   <div class="wm-brand">
     <img src="icon.png" alt="AWC">
     <strong>WAREHOUSE MASTER</strong>
-    <span class="version-badge">v10.5.1 PRO</span>
+    <span class="version-badge">v1.0 PRO</span>
   </div>
   <nav class="navtabs">
     <button class="active">▦ LAADMETER</button>
@@ -164,12 +174,13 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
       <div class="meter-ruler">
         <span style="left:0%">0m</span><span style="left:7.35%">1m</span><span style="left:14.7%">2m</span><span style="left:22.05%">3m</span><span style="left:29.4%">4m</span><span style="left:36.75%">5m</span><span style="left:44.1%">6m</span><span style="left:51.45%">7m</span><span style="left:58.8%">8m</span><span style="left:66.15%">9m</span><span style="left:73.5%">10m</span><span style="left:80.85%">11m</span><span style="left:88.2%">12m</span><span style="left:95.55%">13m</span><span style="left:100%">13,6m</span>
       </div>
-      <div class="trailer-scroll" id="trailerScroll"><div id="canvas"></div></div>
+      <div class="unload-flow"><b>CABINE</b><span id="stopFlow">LAADVOLGORDE</span><b>DEUREN →</b></div>
+      <div class="trailer-scroll" id="trailerScroll"><div id="canvas"><div id="gapOverlay"></div></div></div>
     </section>
 
     <section class="status-strip">
       <div class="okicon">✓</div>
-      <div><b>OPTIMALE INDELING GEVONDEN</b><span>Alle pallets zijn geplaatst. De planner optimaliseert ieder order afzonderlijk.</span></div>
+      <div><b id="planStatusTitle">OPTIMALE INDELING GEVONDEN</b><span id="planStatusText">Laadplan gereed.</span></div>
       <button>▥ DETAILS</button>
     </section>
 
@@ -598,7 +609,7 @@ function preserveLockedPlan(newItems){
 }
 
 function analyzeInternalGaps(){
- if(!items.length)return {cells:0,areaM2:0};
+ if(!items.length)return {cells:0,areaM2:0,holes:[]};
  const STEP=10,end=Math.ceil(endCm()/STEP),H=Math.ceil(TW/STEP);
  const occ=Array.from({length:end},()=>Array(H).fill(false));
  items.forEach(p=>{
@@ -617,13 +628,44 @@ function analyzeInternalGaps(){
    }
  }
  let cells=0;for(let x=0;x<end;x++)for(let y=0;y<H;y++)if(!occ[x][y]&&!seen[x][y])cells++;
- return {cells,areaM2:cells*(STEP/100)*(STEP/100)};
+ const holes=[];for(let x=0;x<end;x++)for(let y=0;y<H;y++)if(!occ[x][y]&&!seen[x][y])holes.push({x:x*STEP,y:y*STEP,w:STEP,h:STEP});
+ return {cells,areaM2:cells*(STEP/100)*(STEP/100),holes};
 }
 function updateGapCheck(){
  const el=document.getElementById('gapCheck');if(!el)return;
  const g=analyzeInternalGaps();
  if(g.cells){el.className='gap-check warn';el.innerHTML=`<b>⚠ INTERNE RUIMTE GEVONDEN</b><span>${g.areaM2.toFixed(2).replace('.',',')} m² ingesloten lege ruimte. Controleer of pallets slimmer gedraaid/geplaatst kunnen worden.</span>`}
  else{el.className='gap-check ok';el.innerHTML='<b>✓ GEEN INTERNE GATEN</b><span>Geen ingesloten lege ruimte tussen pallets gevonden.</span>'}
+}
+
+function stopFlowText(){
+ const stops=[...new Set(items.map(p=>p.stop).filter(v=>Number.isFinite(v)))].sort((a,b)=>b-a);
+ return stops.length?stops.map(s=>'STOP '+s).join('  ←  '):'ORDERS BIJ ELKAAR · LOSRICHTING NAAR DEUREN';
+}
+function renderGapOverlay(){
+ const can=document.getElementById('canvas');if(!can)return;
+ can.querySelectorAll('.gap-hole,.order-group-label').forEach(x=>x.remove());
+ const gap=analyzeInternalGaps();
+ // Merge visual impression by drawing 10 cm cells; only shown when a true enclosed hole exists.
+ gap.holes.forEach(h=>{const d=document.createElement('div');d.className='gap-hole';d.style.left=h.x*S+'px';d.style.top=h.y*S+'px';d.style.width=Math.max(2,h.w*S)+'px';d.style.height=Math.max(2,h.h*S)+'px';can.appendChild(d)});
+ const orders=[...new Set(items.map(p=>p.order))];
+ orders.forEach(o=>{
+   const ps=items.filter(p=>p.order===o);if(!ps.length)return;
+   const minX=Math.min(...ps.map(p=>p.x)),minY=Math.min(...ps.map(p=>p.y));
+   const maxX=Math.max(...ps.map(p=>p.x+p.l)),maxY=Math.max(...ps.map(p=>p.y+p.w));
+   const stop=ps.find(p=>p.stop)?.stop;
+   const box=document.createElement('div');box.className='order-group-label';box.style.color=orderColor(o);
+   box.style.left=(minX*S+4)+'px';box.style.top=(minY*S+4)+'px';
+   box.textContent=(o==='—'?'GEEN ORDER':'ORDER '+o)+(stop?' · STOP '+stop:'');
+   can.appendChild(box);
+ });
+ const sf=document.getElementById('stopFlow');if(sf)sf.textContent=stopFlowText();
+ const title=document.getElementById('planStatusTitle'),st=document.getElementById('planStatusText');
+ if(title&&st){
+   if(gap.cells){title.textContent='AANDACHT: INTERNE RUIMTE';title.style.color='#fbbf24'}
+   else{title.textContent='LAADPLAN OK';title.style.color='#00cf6d'}
+   st.textContent=`${items.length} pallets · ${(endCm()/100).toFixed(2).replace('.',',')} m gebruikt · ${Math.max(0,(TL-endCm())/100).toFixed(2).replace('.',',')} m vrij · ${gap.cells?gap.areaM2.toFixed(2).replace('.',',')+' m² intern gat':'geen interne gaten'} · ${new Set(items.map(p=>p.stop).filter(Boolean)).size} stops`;
+ }
 }
 function autoPlan(){
  manual=false;selectedId=null;
@@ -643,7 +685,7 @@ function render(){const can=document.getElementById('canvas');can.innerHTML='';c
  set('avail-e',counts.e);set('avail-b',counts.b);set('avail-m',counts.m);set('avail-l',counts.l);set('util-out',util+'%');
  let seenOrders=new Set(); items.forEach(p=>{const d=document.createElement('div');const isStart=!seenOrders.has(p.order);seenOrders.add(p.order);const pd=palletDirection(p);d.className='v-p '+(pd.lengthwise?'dir-long':'dir-cross')+(p.id===selectedId?' selected':'')+(isStart?' order-start':'')+(p.locked?' locked':'');d.dataset.id=p.id;d.style.left=p.x*S+'px';d.style.top=p.y*S+'px';d.style.width=p.l*S+'px';d.style.height=p.w*S+'px';d.style.backgroundColor=p.c;d.style.border=`3px solid ${orderColor(p.order)}`;d.innerHTML=`<span class="pallet-visual">${['b1','b2','b3'].map(b=>`<i class="deck-board ${pd.lengthwise?'long':'cross'} ${b}"></i>`).join('')}</span><span class="pallet-label"><span class="ord">${escapeHtml(p.order==='—'?'GEEN ORDER':'ORD '+p.order)}</span><span class="dims">${p.label} ${p.w}×${p.l}</span>${p.stop?`<span class="stop-badge">STOP ${p.stop}</span>`:''}</span>`;d.addEventListener('pointerdown',startDrag);d.addEventListener('click',()=>{selectedId=p.id;render()});can.appendChild(d)});window.plan=makeRows();renderOrderLegend();
  const lb=document.getElementById('lockBtn'),sel=items.find(p=>p.id===selectedId);if(lb){lb.classList.toggle('locked',!!sel?.locked);lb.textContent=sel?.locked?'🔓 ONTGRENDEL':'🔒 VERGRENDEL'}
- updateGapCheck()}
+ updateGapCheck();renderGapOverlay()}
 
 function candidateContactPositions(p,others){
  const xs=new Set([0,Math.max(0,TL-p.l)]), ys=new Set([0,Math.max(0,TW-p.w)]);
@@ -692,7 +734,17 @@ function toggleLockSelected(){
  p.locked=!p.locked;render();
 }
 function startDrag(ev){ev.preventDefault();manual=true;const id=+ev.currentTarget.dataset.id;selectedId=id;const p=items.find(x=>x.id===id);if(p?.locked){render();return;}const startX=ev.clientX,startY=ev.clientY,ox=p.x,oy=p.y;const el=ev.currentTarget;el.setPointerCapture(ev.pointerId);el.classList.add('dragging');
- const move=e=>{p.x=Math.max(0,Math.min(TL-p.l,Math.round((ox+(e.clientX-startX)/S)/SNAP)*SNAP));p.y=Math.max(0,Math.min(TW-p.w,Math.round((oy+(e.clientY-startY)/S)/SNAP)*SNAP));el.style.left=p.x*S+'px';el.style.top=p.y*S+'px'};
+ const move=e=>{
+   let nx=Math.max(0,Math.min(TL-p.l,Math.round((ox+(e.clientX-startX)/S)/SNAP)*SNAP));
+   let ny=Math.max(0,Math.min(TW-p.w,Math.round((oy+(e.clientY-startY)/S)/SNAP)*SNAP));
+   const MAG=12,others=items.filter(x=>x.id!==p.id);
+   const xTargets=[0,TL-p.l],yTargets=[0,TW-p.w];
+   others.forEach(q=>{xTargets.push(q.x-p.l,q.x+q.l);yTargets.push(q.y-p.w,q.y+q.w)});
+   const near=(v,arr)=>arr.reduce((best,t)=>Math.abs(t-v)<Math.abs(best-v)&&Math.abs(t-v)<=MAG?t:best,v);
+   nx=near(nx,xTargets);ny=near(ny,yTargets);
+   const test={...p,x:nx,y:ny};if(canPlace(test,others)){p.x=nx;p.y=ny}else{p.x=Math.max(0,Math.min(TL-p.l,nx));p.y=Math.max(0,Math.min(TW-p.w,ny))}
+   el.style.left=p.x*S+'px';el.style.top=p.y*S+'px'
+ };
  const up=e=>{el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.classList.remove('dragging');
  const targetX=p.x,targetY=p.y;const others=items.filter(x=>x.id!==p.id);
  if(!canPlace(p,others)){p.x=ox;p.y=oy}
@@ -718,72 +770,21 @@ function rotateSelected(){
 }function resetManual(){autoPlan()}
 function makeRows(){const cuts=[...new Set(items.map(p=>p.x))].sort((a,b)=>a-b);return cuts.map(x=>items.filter(p=>p.x===x).sort((a,b)=>a.y-b.y).map(p=>`${p.label}(${p.w}×${p.l})`).join(' + ')).filter(Boolean)}
 function makePlanImage(){
- const c=document.createElement('canvas');c.width=1600;c.height=900;const g=c.getContext('2d');
- const order=document.getElementById('orderNo').value.trim()||'—';
- const ref=document.getElementById('reference').value.trim()||'—';
- const date=new Date().toLocaleDateString('nl-NL');
- const end=endCm(), used=(end/100).toFixed(2).replace('.',','), free=Math.max(0,(TL-end)/100).toFixed(2).replace('.',',');
- const util=Math.round((end/TL)*100);
- g.fillStyle='#06111f';g.fillRect(0,0,c.width,c.height);
-
- // top bar
- g.fillStyle='#071321';g.fillRect(0,0,c.width,78);g.strokeStyle='#203247';g.beginPath();g.moveTo(0,77);g.lineTo(c.width,77);g.stroke();
- g.fillStyle='#ffffff';g.font='900 28px Arial';g.fillText('WAREHOUSE MASTER',34,48);
- g.fillStyle='#1677ed';g.fillRect(330,20,122,38);g.fillStyle='#fff';g.font='900 17px Arial';g.fillText('v10.5 PRO',345,46);
- g.fillStyle='#00c96b';g.font='900 17px Arial';g.textAlign='right';g.fillText('✓ OPGESLAGEN',1560,46);g.textAlign='left';
-
- // left data panel
- const lx=20,ly=96,lw=405;
- function panel(x,y,w,h,title){g.fillStyle='#0a1725';g.fillRect(x,y,w,h);g.strokeStyle='#26384d';g.strokeRect(x,y,w,h);g.fillStyle='#fff';g.font='900 17px Arial';g.fillText(title,x+14,y+25)}
- panel(lx,ly,lw,255,'LAADGEGEVENS');
- const boxes=[['ORDER / VRACHTNUMMER',order],['REFERENTIE / KLANT',ref],['DATUM',date],['TRAILER','13,60 × 2,40 m']];
- boxes.forEach((b,i)=>{const bx=lx+14+(i%2)*190,by=ly+45+Math.floor(i/2)*82;g.fillStyle='#071321';g.fillRect(bx,by,176,62);g.strokeStyle='#34495f';g.strokeRect(bx,by,176,62);g.fillStyle='#a7b4c3';g.font='bold 11px Arial';g.fillText(b[0],bx+8,by+18);g.fillStyle='#fff';g.font='900 18px Arial';g.fillText(b[1],bx+8,by+45)});
-
- panel(lx,ly+268,lw,178,'LAADRESULTAAT');
- const rs=[['GEBRUIKTE LENGTE',used+' m','#00d265'],['REST LENGTE',free+' m','#fff'],['BENUTTING',util+'%','#fff']];
- rs.forEach((r,i)=>{const x=lx+14+i*126,y=ly+315;g.fillStyle='#071321';g.fillRect(x,y,114,86);g.strokeStyle='#273a4e';g.strokeRect(x,y,114,86);g.fillStyle='#d7e0e9';g.font='bold 10px Arial';g.fillText(r[0],x+7,y+22);g.fillStyle=r[2];g.font='900 23px Arial';g.fillText(r[1],x+7,y+58)});
-
- // main trailer header
- const px=455,py=160,pw=1100,ph=360;
- g.fillStyle='#fff';g.font='900 18px Arial';g.fillText('← CABINE',px,128);g.textAlign='right';g.fillText('DEUREN →',px+pw,128);g.textAlign='left';
- for(let m=0;m<=13;m++){const x=px+(m/13.6)*pw;g.fillStyle='#dbe4ec';g.font='13px Arial';g.fillText(m+'m',x,151)}
- g.fillText('13,6m',px+pw-35,151);
-
- // trailer
+ const c=document.createElement('canvas');c.width=1600;c.height=720;const g=c.getContext('2d');
+ const order=document.getElementById('orderNo').value.trim()||'—',end=endCm(),util=Math.round((end/TL)*100);
+ g.fillStyle='#06111f';g.fillRect(0,0,1600,720);
+ g.fillStyle='#071321';g.fillRect(0,0,1600,82);g.fillStyle='#fff';g.font='900 28px Arial';g.fillText('WAREHOUSE MASTER · LAADPLAN',30,42);
+ g.fillStyle='#9fb0c2';g.font='15px Arial';g.fillText(`Rit/order ${order}  •  ${items.length} pallets  •  ${(end/100).toFixed(2).replace('.',',')} laadmeter  •  ${util}% benut`,30,67);
+ const stops=[...new Set(items.map(p=>p.stop).filter(Boolean))].sort((a,b)=>b-a);
+ g.fillStyle='#facc15';g.font='900 16px Arial';g.textAlign='center';g.fillText(stops.length?`CABINE  ←  ${stops.map(s=>'STOP '+s).join('  ←  ')}  ←  DEUREN`:'CABINE  ←  ORDERS BIJ ELKAAR  ←  DEUREN',800,112);
+ const px=35,py=145,pw=1530,ph=360,sx=pw/TL,sy=ph/TW;
  g.fillStyle='#0f1721';g.fillRect(px,py,pw,ph);g.strokeStyle='#d7dde4';g.lineWidth=3;g.strokeRect(px,py,pw,ph);
  for(let m=1;m<14;m++){const x=px+(m/13.6)*pw;g.strokeStyle='rgba(255,255,255,.12)';g.lineWidth=1;g.beginPath();g.moveTo(x,py);g.lineTo(x,py+ph);g.stroke()}
- g.fillStyle='#4f5c6a';g.fillRect(px,py,28,ph);g.fillStyle='#9ca8b4';g.fillRect(px+pw-14,py,4,ph);g.fillRect(px+pw-7,py,4,ph);
-
- const sx=pw/TL, sy=ph/TW;
- items.forEach(p=>{
-   const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy;
-   g.fillStyle=p.c;g.fillRect(x,y,w,h);
-   const pd=palletDirection(p);
-   g.save();g.fillStyle='rgba(30,20,10,.20)';g.strokeStyle='rgba(0,0,0,.25)';
-   if(pd.lengthwise){const bh=Math.max(3,h*.10);[.10,.44,.78].forEach(r=>{const yy=y+h*r;g.fillRect(x+w*.05,yy,w*.9,bh);g.strokeRect(x+w*.05,yy,w*.9,bh)})}
-   else{const bw=Math.max(3,w*.10);[.10,.44,.78].forEach(r=>{const xx=x+w*r;g.fillRect(xx,y+h*.05,bw,h*.9);g.strokeRect(xx,y+h*.05,bw,h*.9)})}
-   g.restore();
-   g.strokeStyle=orderColor(p.order);g.lineWidth=5;g.strokeRect(x,y,w,h);
-   g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';
-   const fs=Math.max(11,Math.min(19,h*.18));
-   g.font=`900 ${fs}px Arial`;g.fillText(p.order==='—'?'GEEN ORDER':'ORD '+p.order,x+w/2,y+h/2-fs*.45,Math.max(30,w-8));
-   g.font=`bold ${Math.max(10,fs*.72)}px Arial`;g.fillText(`${p.label} ${p.w}×${p.l}${p.stop?' · S'+p.stop:''}`,x+w/2,y+h/2+fs*.65,Math.max(30,w-8));
- });
-
- // status strip
- g.textAlign='left';g.textBaseline='alphabetic';
- panel(px,548,pw,96,'');
- g.strokeStyle='#00c96b';g.lineWidth=3;g.beginPath();g.arc(px+36,596,18,0,Math.PI*2);g.stroke();g.fillStyle='#00c96b';g.font='900 21px Arial';g.fillText('✓',px+28,603);
- g.font='900 18px Arial';g.fillText('OPTIMALE INDELING GEVONDEN',px+72,586);
- g.fillStyle='#e0e7ef';g.font='15px Arial';g.fillText('Alle pallets zijn geplaatst. Ieder order is afzonderlijk geoptimaliseerd.',px+72,612);
-
- // bottom legend cards
- panel(px,660,pw,190,'BESCHIKBARE PALLETS / LEGENDA');
- const types=[TYPES.e,TYPES.b,TYPES.m,TYPES.l];
- types.forEach((t,i)=>{const x=px+24+i*145,y=705;g.fillStyle=t.c;g.fillRect(x,y,118,104);g.strokeStyle='#657587';g.strokeRect(x,y,118,104);g.fillStyle='#fff';g.textAlign='center';g.font='900 18px Arial';g.fillText(t.name.toUpperCase(),x+59,y+44);g.font='bold 14px Arial';g.fillText(`${t.l}×${t.w}`,x+59,y+67)});
- g.textAlign='left';
-
- return c;
+ items.forEach(p=>{const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy,pd=palletDirection(p);g.fillStyle=p.c;g.fillRect(x,y,w,h);g.fillStyle='rgba(15,23,42,.22)';
+  if(pd.lengthwise){[.1,.44,.78].forEach(r=>g.fillRect(x+w*.05,y+h*r,w*.9,Math.max(3,h*.1)))}else{[.1,.44,.78].forEach(r=>g.fillRect(x+w*r,y+h*.05,Math.max(3,w*.1),h*.9))}
+  g.strokeStyle=orderColor(p.order);g.lineWidth=4;g.strokeRect(x,y,w,h);g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';const fs=Math.max(10,Math.min(18,h*.18));g.font=`900 ${fs}px Arial`;g.fillText(p.order==='—'?'—':p.order,x+w/2,y+h/2-5,Math.max(25,w-6));g.font=`bold ${Math.max(8,fs*.65)}px Arial`;g.fillText(`${p.label}${p.stop?' · S'+p.stop:''}`,x+w/2,y+h/2+12,Math.max(25,w-6))});
+ const gap=analyzeInternalGaps();g.textAlign='left';g.textBaseline='alphabetic';g.fillStyle=gap.cells?'#f59e0b':'#22c55e';g.fillRect(35,535,1530,70);g.fillStyle='#06111f';g.font='900 19px Arial';g.fillText(gap.cells?`⚠ ${gap.areaM2.toFixed(2).replace('.',',')} m² interne ruimte gevonden`:'✓ LAADPLAN OK · GEEN INTERNE GATEN',55,578);
+ g.fillStyle='#9fb0c2';g.font='13px Arial';g.fillText('Warehouse Master v1.0',35,675);return c;
 }
 async function send(){
  if(!items.length){alert('Voer eerst pallets in.');return}
@@ -814,7 +815,7 @@ function makePrintPlanImage(){
  const fields=[['CHAUFFEUR',driver],['TREKKER',tractor],['TRAILER',trailer],['TRANSPORTEUR',carrier],['GEBRUIKT',used+' m'],['VRIJ',free+' m'],['BENUTTING',util+'%'],['PALLETS',String(items.length)]];
  fields.forEach((f,i)=>{const x=30+(i%4)*385,y=155+Math.floor(i/4)*58;g.fillStyle='#f8fafc';g.fillRect(x,y,365,46);g.strokeStyle='#cbd5e1';g.strokeRect(x,y,365,46);g.fillStyle='#64748b';g.font='bold 10px Arial';g.fillText(f[0],x+8,y+15);g.fillStyle='#0f172a';g.font='900 16px Arial';g.fillText(f[1],x+8,y+36)});
  const px=45,py=300,pw=1510,ph=330;
- g.fillStyle='#475569';g.font='900 16px Arial';g.fillText('← CABINE',px,py-32);g.textAlign='right';g.fillText('DEUREN →',px+pw,py-32);g.textAlign='left';
+ g.fillStyle='#475569';g.font='900 16px Arial';g.fillText('← CABINE',px,py-32);g.textAlign='right';g.fillText('DEUREN →',px+pw,py-32);g.textAlign='center';const stops=[...new Set(items.map(p=>p.stop).filter(Boolean))].sort((a,b)=>b-a);g.fillStyle='#b45309';g.fillText(stops.length?stops.map(s=>'STOP '+s).join('  ←  '):'ORDERS BIJ ELKAAR',px+pw/2,py-32);g.textAlign='left';
  for(let m=0;m<=13;m++){const x=px+(m/13.6)*pw;g.fillStyle='#64748b';g.font='12px Arial';g.fillText(m+'m',x,py-10)}g.fillText('13,6m',px+pw-34,py-10);
  g.fillStyle='#eef2f7';g.fillRect(px,py,pw,ph);g.strokeStyle='#334155';g.lineWidth=3;g.strokeRect(px,py,pw,ph);
  for(let m=1;m<14;m++){const x=px+(m/13.6)*pw;g.strokeStyle='#cbd5e1';g.lineWidth=1;g.beginPath();g.moveTo(x,py);g.lineTo(x,py+ph);g.stroke()}
@@ -824,7 +825,7 @@ function makePrintPlanImage(){
   if(pd.lengthwise){const bh=Math.max(3,h*.10);[.1,.44,.78].forEach(r=>g.fillRect(x+w*.05,y+h*r,w*.9,bh))}else{const bw=Math.max(3,w*.10);[.1,.44,.78].forEach(r=>g.fillRect(x+w*r,y+h*.05,bw,h*.9))}
   g.strokeStyle=orderColor(p.order);g.lineWidth=4;g.strokeRect(x,y,w,h);g.fillStyle='#0f172a';g.textAlign='center';g.textBaseline='middle';const fs=Math.max(10,Math.min(17,h*.18));g.font=`900 ${fs}px Arial`;g.fillText(p.order==='—'?'GEEN ORDER':'ORD '+p.order,x+w/2,y+h/2-fs*.42,Math.max(25,w-6));g.font=`bold ${Math.max(9,fs*.68)}px Arial`;g.fillText(`${p.label} ${p.w}×${p.l}${p.stop?' · S'+p.stop:''}`,x+w/2,y+h/2+fs*.58,Math.max(25,w-6))});
  g.textAlign='left';g.textBaseline='alphabetic';g.fillStyle='#f0fdf4';g.fillRect(45,665,1510,70);g.strokeStyle='#22c55e';g.strokeRect(45,665,1510,70);g.fillStyle='#15803d';g.font='900 17px Arial';g.fillText('✓ OPTIMALE INDELING',65,695);g.fillStyle='#334155';g.font='14px Arial';g.fillText('Bovenaanzicht trailer 13,60 × 2,40 m • Ieder order afzonderlijk geoptimaliseerd.',65,719);
- g.fillStyle='#64748b';g.font='12px Arial';g.fillText('Warehouse Master v10.5.1 • Printvriendelijke A4-landscape export',45,820);return c;
+ g.fillStyle='#64748b';g.font='12px Arial';g.fillText('Warehouse Master v1.0 • Printvriendelijke A4-landscape export',45,820);return c;
 }
 function downloadPdf(){
  if(!items.length){alert('Voer eerst pallets in.');return}
@@ -883,7 +884,7 @@ function printPlan(){
 </style></head><body><div class="sheet"><div class="top"><div class="mark">AWC</div><div><h1>AMSTERDAM WAREHOUSE COMPANY</h1><div class="sub">LAADPLAN - BIJLAGE CMR</div></div></div>
  <div class="meta"><div class="box"><div class="lab">ORDER / VRACHTNUMMER</div><div class="val">${escapeHtml(order)}</div></div><div class="box"><div class="lab">REFERENTIE / KLANT</div><div class="val">${escapeHtml(ref)}</div></div><div class="box"><div class="lab">DATUM</div><div class="val">${date}</div></div><div class="box"><div class="lab">LAADMETER</div><div class="val">${load}</div></div><div class="box"><div class="lab">PALLETS</div><div class="val">${items.length}</div></div><div class="box"><div class="lab">VRIJ</div><div class="val">${free}</div></div></div>
  <div class="transport"><div class="box"><div class="lab">CHAUFFEUR</div><div class="val">${escapeHtml(driver)}</div></div><div class="box"><div class="lab">KENTEKEN TREKKER</div><div class="val">${escapeHtml(tractor)}</div></div><div class="box"><div class="lab">KENTEKEN TRAILER</div><div class="val">${escapeHtml(trailer)}</div></div><div class="box"><div class="lab">TRANSPORTEUR</div><div class="val">${escapeHtml(carrier)}</div></div></div>
- <div class="box" style="margin-bottom:3mm"><div class="lab">ORDEROVERZICHT</div><div class="val" style="font-size:9pt">${orderStats().map(([o,n,stop])=>`${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)}${stop?' (Stop '+stop+')':''}: ${n} pallet${n===1?'':'s'}`).join(' &nbsp; • &nbsp; ')}</div></div><div class="visual"><img src="${img}" alt="Visueel laadplan"></div><div class="approval"><div class="box"><div class="lab">LAADPLAN AKKOORD</div><div class="val">☐ Ja &nbsp;&nbsp; ☐ Afwijking</div><div class="small">Eventuele afwijkingen van het laadplan vermelden op de CMR.</div></div><div class="box"><div class="lab">HANDTEKENING CHAUFFEUR</div><div class="signature"></div><div class="small">Naam / handtekening</div></div></div><div class="foot"><div class="note">Bovenaanzicht - trailer 13,60 x 2,40 m</div><div>Gegenereerd met Warehouse Master v10.5.1</div></div></div>
+ <div class="box" style="margin-bottom:3mm"><div class="lab">ORDEROVERZICHT</div><div class="val" style="font-size:9pt">${orderStats().map(([o,n,stop])=>`${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)}${stop?' (Stop '+stop+')':''}: ${n} pallet${n===1?'':'s'}`).join(' &nbsp; • &nbsp; ')}</div></div><div class="visual"><img src="${img}" alt="Visueel laadplan"></div><div class="approval"><div class="box"><div class="lab">LAADPLAN AKKOORD</div><div class="val">☐ Ja &nbsp;&nbsp; ☐ Afwijking</div><div class="small">Eventuele afwijkingen van het laadplan vermelden op de CMR.</div></div><div class="box"><div class="lab">HANDTEKENING CHAUFFEUR</div><div class="signature"></div><div class="small">Naam / handtekening</div></div></div><div class="foot"><div class="note">Bovenaanzicht - trailer 13,60 x 2,40 m</div><div>Gegenereerd met Warehouse Master v1.0</div></div></div>
  <script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
  w.document.close();
 }
