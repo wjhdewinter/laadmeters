@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>Warehouse Master v9.4 PRO</title>
+<title>Warehouse Master v9.5 PRO</title>
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--text:#f8fafc;--accent:#3b82f6;--wa:#22c55e;--muted:#94a3b8}
 *{box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -22,7 +22,7 @@ footer{position:fixed;bottom:0;left:0;right:0;padding:10px;background:var(--card
 #modeLabel{font-size:.7rem;color:#cbd5e1;text-align:center;margin-top:5px}
 #orderLegend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 5px 0}.order-chip{display:flex;align-items:center;gap:6px;background:#0f172a;border:1px solid #475569;border-radius:999px;padding:5px 9px;font-size:.68rem;font-weight:800}.order-dot{width:12px;height:12px;border-radius:3px;border:3px solid #fff;background:#111}.warning{display:none;margin:7px 5px 0;padding:8px 10px;border-radius:8px;background:#3f2d08;border:1px solid #f59e0b;color:#fde68a;font-size:.7rem;font-weight:700}
 
-/* v9.4 PRO UI */
+/* v9.5 PRO UI */
 :root{--awc:#00a651;--awc-dark:#08783f;--panel:#111827}
 body{background:#07111f}
 .header{padding:0 0 8px;background:#0b1627;border-bottom:1px solid #26364b}
@@ -60,7 +60,7 @@ footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
 </style>
 </head>
 <body>
-<div class="header"><div class="pro-brand"><div class="pro-brand-main"><img src="icon.png" alt="AWC"><div><b>Amsterdam Warehouse Company</b><small>Warehouse Master · Laadplan</small></div></div><span class="version-badge">v9.4 PRO</span></div>
+<div class="header"><div class="pro-brand"><div class="pro-brand-main"><img src="icon.png" alt="AWC"><div><b>Amsterdam Warehouse Company</b><small>Warehouse Master · Laadplan</small></div></div><span class="version-badge">v9.5 PRO</span></div>
   <div class="stats">
     <div style="text-align:center"><span id="m-out" class="stat-v">0,00</span><span style="font-size:.6rem">LAADMETER</span></div>
     <div style="text-align:center"><span id="p-out" class="stat-v">0</span><span style="font-size:.6rem">PALLETS</span></div>
@@ -81,7 +81,7 @@ footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
     <button class="secondary" onclick="resetManual()">↺ RESET</button>
   </div>
   <div class="toolbar2"><button class="secondary" onclick="zoomOut()">− UITZOOM</button><button class="secondary" onclick="fitView()">▣ PASSEND</button><button class="secondary" onclick="zoomIn()">＋ INZOOM</button></div>
-  <div id="modeLabel">Automatisch: optimale indeling zoeken • laadvlak is horizontaal én verticaal scrollbaar</div><div id="orderWarning" class="warning"></div><div class="security-note">ZERO-GAP AUTO: pallets worden aaneengesloten geplaatst. De planner draait zelf en vermijdt interne gaten; eventuele restruimte blijft alleen langs de trailerwand of achteraan.</div><div id="orderLegend"></div>
+  <div id="modeLabel">Automatisch: optimale indeling zoeken • laadvlak is horizontaal én verticaal scrollbaar</div><div id="orderWarning" class="warning"></div><div class="security-note">SMART 2D AUTO: de planner combineert verschillende palletlengtes naast elkaar, draait pallets zelf en vult ontstane uitsparingen later opnieuw op. Interne lege vakken worden vermeden; onvermijdelijke rest blijft alleen aan de buitenrand.</div><div id="orderLegend"></div>
 </div>
 <div class="input-grid">
   <div class="info">Je kunt nu <b>meerdere orders van hetzelfde pallettype</b> invoeren. Gebruik <b>+ ORDER</b> om bijvoorbeeld 8 Euro voor order 45120 én 5 Euro voor order 45135 toe te voegen. De optimizer houdt ieder order als één aaneengesloten laadblok. Pallets van verschillende orders worden niet door elkaar geplaatst. Binnen ieder order worden pallettypes en draairichtingen wel zo efficiënt mogelijk gecombineerd.<br><br>Laat een ordernummer leeg om het algemene order/vrachtnummer bovenaan te gebruiken. Het laadvlak blijft <b>scrollbaar, zoombaar en handmatig bewerkbaar</b>.</div>
@@ -200,9 +200,86 @@ function rowsToPlacement(src,solution){
  return placed;
 }
 function optimizeSingleOrder(src){
- const q=countsFromItems(src); const states=(q.e+1)*(q.b+1)*(q.m+1)*(q.l+1);
- const solution=(states<=140000&&totalCount(q)<=72)?solveRowsExact(q):solveRowsGreedy(q);
- return rowsToPlacement(src,solution);
+ // v9.5: real 2D strip packing on a 20 cm grid.
+ // A pallet may only start on a flat frontier, so it never bridges over an empty cavity.
+ // Valleys created by shorter pallets remain available and are filled by later pallets whenever dimensions fit.
+ const U=20, W=Math.round(TW/U);
+ const counts=countsFromItems(src);
+ const total=totalCount(counts);
+ if(!total)return [];
+
+ const variantsByType={};
+ Object.entries(TYPES).forEach(([type,t])=>{
+   const arr=[{type,w:t.w,l:t.l,rot:false}];
+   if(t.w!==t.l)arr.push({type,w:t.l,l:t.w,rot:true});
+   variantsByType[type]=arr;
+ });
+
+ const initial={q:{...counts},h:Array(W).fill(0),moves:[]};
+ let beam=[initial];
+ const BEAM= total<=28 ? 420 : total<=50 ? 240 : 140;
+
+ function stateScore(s){
+   const mx=Math.max(...s.h);
+   const mn=Math.min(...s.h);
+   let rough=0, valleys=0;
+   for(let i=0;i<W-1;i++)rough+=Math.abs(s.h[i]-s.h[i+1]);
+   for(let i=1;i<W-1;i++)if(s.h[i]<s.h[i-1]&&s.h[i]<s.h[i+1])valleys++;
+   // Primary: shortest trailer length. Secondary: flatter frontier, so remaining side gaps are easier to fill.
+   return mx*100000 + (mx-mn)*800 + rough*35 + valleys*120;
+ }
+ function qKey(q){return `${q.e},${q.b},${q.m},${q.l}`}
+ function stateKey(s){return qKey(s.q)+'|'+s.h.join(',')}
+
+ for(let step=0;step<total;step++){
+   const nextMap=new Map();
+   for(const s of beam){
+     for(const type of ['e','b','m','l']){
+       if(!s.q[type])continue;
+       for(const v of variantsByType[type]){
+         const wc=Math.round(v.w/U), lc=Math.round(v.l/U);
+         if(wc>W)continue;
+         for(let y=0;y<=W-wc;y++){
+           // ZERO INTERNAL GAP: every width cell under this pallet must have the same current x-front.
+           const base=s.h[y];
+           let flat=true;
+           for(let k=1;k<wc;k++)if(s.h[y+k]!==base){flat=false;break}
+           if(!flat)continue;
+
+           const nh=s.h.slice();
+           const nx=base+lc;
+           for(let k=0;k<wc;k++)nh[y+k]=nx;
+           if(nx*U>TL)continue;
+
+           const nq={...s.q}; nq[type]--;
+           const ns={q:nq,h:nh,moves:s.moves.concat([{type,w:v.w,l:v.l,rot:v.rot,x:base*U,y:y*U}])};
+           const key=stateKey(ns), score=stateScore(ns);
+           const prev=nextMap.get(key);
+           if(!prev||score<prev.score)nextMap.set(key,{state:ns,score});
+         }
+       }
+     }
+   }
+   if(!nextMap.size)break;
+   beam=[...nextMap.values()].sort((a,b)=>a.score-b.score).slice(0,BEAM).map(x=>x.state);
+ }
+
+ let best=beam.filter(s=>totalCount(s.q)===0).sort((a,b)=>stateScore(a)-stateScore(b))[0];
+ if(!best){
+   // Conservative fallback to the previous row solver if a very unusual input defeats the beam.
+   const q=countsFromItems(src);
+   const solution=solveRowsGreedy(q);
+   return rowsToPlacement(src,solution);
+ }
+
+ const pools={e:[],b:[],m:[],l:[]}; src.forEach(p=>pools[p.type].push({...p}));
+ const placed=[];
+ for(const mv of best.moves){
+   const p=pools[mv.type].shift(); if(!p)continue;
+   p.w=mv.w;p.l=mv.l;p.rot=mv.rot;p.x=mv.x;p.y=mv.y;
+   placed.push(p);
+ }
+ return placed;
 }
 function optimizePlan(src){
  // Orders are hard groups: pallets from different orders are never interleaved.
@@ -220,7 +297,7 @@ function palletDirection(p){
  return {lengthwise:p.l>=t.l};
 }
 
-function autoPlan(){manual=false;selectedId=null;items=buildItems();items=optimizePlan(items);render();document.getElementById('modeLabel').innerText='ZERO-GAP AUTO — geen interne gaten; restruimte alleen langs wand of achteraan'}
+function autoPlan(){manual=false;selectedId=null;items=buildItems();items=optimizePlan(items);render();document.getElementById('modeLabel').innerText='SMART 2D AUTO — vult uitsparingen op en gebruikt ook de zijkanten'}
 function endCm(arr=items){return arr.reduce((m,p)=>Math.max(m,p.x+p.l),0)}function endMeters(arr=items){return endCm(arr)/100}
 function render(){const can=document.getElementById('canvas');can.innerHTML='';document.getElementById('p-out').innerText=items.length;const end=endCm();document.getElementById('m-out').innerText=(end/100).toFixed(2).replace('.',',');document.getElementById('free-out').innerText=Math.max(0,(TL-end)/100).toFixed(2).replace('.',',');
  let seenOrders=new Set(); items.forEach(p=>{const d=document.createElement('div');const isStart=!seenOrders.has(p.order);seenOrders.add(p.order);const pd=palletDirection(p);d.className='v-p '+(pd.lengthwise?'dir-long':'dir-cross')+(p.id===selectedId?' selected':'')+(isStart?' order-start':'');d.dataset.id=p.id;d.style.left=p.x*S+'px';d.style.top=p.y*S+'px';d.style.width=p.l*S+'px';d.style.height=p.w*S+'px';d.style.backgroundColor=p.c;d.style.border=`3px solid ${orderColor(p.order)}`;d.innerHTML=`<span class="pallet-visual">${['b1','b2','b3'].map(b=>`<i class="deck-board ${pd.lengthwise?'long':'cross'} ${b}"></i>`).join('')}</span><span class="pallet-label"><span class="ord">${escapeHtml(p.order==='—'?'GEEN ORDER':'ORD '+p.order)}</span><span class="dims">${p.label} ${p.w}×${p.l}</span></span>`;d.addEventListener('pointerdown',startDrag);d.addEventListener('click',()=>{selectedId=p.id;render()});can.appendChild(d)});window.plan=makeRows();renderOrderLegend()}
@@ -408,7 +485,7 @@ function printPlan(){
  .foot{display:flex;justify-content:space-between;gap:6mm;margin-top:3mm;font-size:8.5pt;color:#475569}.note{font-weight:bold;color:#0f172a}.approval{display:grid;grid-template-columns:1fr 1.4fr;gap:5mm;margin-top:4mm}.approval .box{min-height:23mm}.signature{height:13mm;border-bottom:1px solid #64748b;margin-top:2mm}.small{font-size:7pt;color:#64748b;margin-top:1mm}
  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.sheet{break-inside:avoid}}
  
-/* v9.4 PRO UI */
+/* v9.5 PRO UI */
 :root{--awc:#00a651;--awc-dark:#08783f;--panel:#111827}
 body{background:#07111f}
 .header{padding:0 0 8px;background:#0b1627;border-bottom:1px solid #26364b}
