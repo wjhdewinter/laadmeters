@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>Warehouse Master v1.0</title>
+<title>Warehouse Master v1.1</title>
 <style>
 :root{--bg:#06111f;--panel:#0a1624;--panel2:#0e1c2c;--line:#26384d;--text:#f7f9fc;--muted:#9aacbf;--green:#00b85c;--blue:#1577eb}
 *{box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -78,6 +78,24 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
 .v-p .pallet-label .ord{font-size:13px;font-weight:900}
 .v-p .pallet-label .dims{font-size:8px;opacity:.9}
 @media(max-width:900px){.order-group-label{font-size:7px;padding:2px 4px}.unload-flow{font-size:.52rem}}
+
+.order-manager{background:#081522;border:1px solid #26394d;border-radius:9px;padding:10px}
+.order-manager-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.order-manager-head b{display:block;font-size:.72rem}.order-manager-head span{display:block;color:#91a5ba;font-size:.56rem;margin-top:3px}
+.new-order-btn{width:auto;background:#0aa957;border-color:#14c36b;padding:9px 12px;font-size:.62rem}
+#ordersContainer{display:flex;flex-direction:column;gap:8px}
+.order-card{background:#0c1c2d;border:1px solid #31465d;border-radius:8px;padding:9px}
+.order-card-head{display:grid;grid-template-columns:1.5fr .65fr 34px;gap:7px;align-items:end}
+.order-card label{display:block;font-size:.5rem;color:#9cafc2;margin-bottom:3px}
+.order-card input{width:100%;height:36px;background:#06111e;color:#fff;border:1px solid #3b536d;border-radius:5px;padding:0 7px;font-size:.76rem}
+.order-card .remove-order{height:36px;padding:0;background:#78252c;border-color:#9a3038}
+.order-qty-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.qty-box{background:#071421;border:1px solid #26394d;border-radius:6px;padding:6px}
+.qty-box span{display:flex;align-items:center;gap:5px;font-size:.58rem;font-weight:900;margin-bottom:4px}
+.qty-dot{width:9px;height:9px;border-radius:2px;display:inline-block}.qty-dot.e{background:#3b82f6}.qty-dot.b{background:#f59e0b}.qty-dot.m{background:#10b981}.qty-dot.l{background:#ef4444}
+.qty-box input{text-align:center;font-size:.95rem;font-weight:900;height:34px}
+.order-help{margin-top:8px;color:#abc0d2;font-size:.55rem;line-height:1.4}
+@media(max-width:520px){.order-qty-grid{grid-template-columns:1fr 1fr}.order-card-head{grid-template-columns:1fr 70px 32px}}
 </style>
 </head>
 <body>
@@ -85,7 +103,7 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
   <div class="wm-brand">
     <img src="icon.png" alt="AWC">
     <strong>WAREHOUSE MASTER</strong>
-    <span class="version-badge">v1.0 PRO</span>
+    <span class="version-badge">v1.1 PRO</span>
   </div>
   <nav class="navtabs">
     <button class="active">▦ LAADMETER</button>
@@ -102,7 +120,7 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
     <section class="dash-card">
       <h2>LAADGEGEVENS</h2>
       <div class="meta-grid">
-        <div><label>ORDER / VRACHTNUMMER</label><input id="orderNo" type="text" placeholder="123456" oninput="autoPlan()"></div>
+        <div><label>RIT / VRACHTNUMMER</label><input id="orderNo" type="text" placeholder="123456" oninput="autoPlan()"></div>
         <div><label>REFERENTIE / KLANT</label><input id="reference" type="text" placeholder="optioneel"></div>
       </div>
       <div class="transport-grid">
@@ -143,12 +161,14 @@ button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;b
     </section>
 
     <div class="edit-pallets">
-      <div class="input-grid">
-        <div class="p-card" data-type="e"><div class="type-head"><div class="p-title"><b>Euro</b><small>80 × 120 cm</small></div><button class="add-order" onclick="addOrderLine('e')">+ ORDER</button></div><div class="order-lines" id="eLines"></div></div>
-        <div class="p-card" data-type="b"><div class="type-head"><div class="p-title"><b>Blok</b><small>100 × 120 cm</small></div><button class="add-order" onclick="addOrderLine('b')">+ ORDER</button></div><div class="order-lines" id="bLines"></div></div>
-        <div class="p-card" data-type="m"><div class="type-head"><div class="p-title"><b>Middel</b><small>80 × 140 cm</small></div><button class="add-order" onclick="addOrderLine('m')">+ ORDER</button></div><div class="order-lines" id="mLines"></div></div>
-        <div class="p-card" data-type="l"><div class="type-head"><div class="p-title"><b>Lang</b><small>80 × 200 cm</small></div><button class="add-order" onclick="addOrderLine('l')">+ ORDER</button></div><div class="order-lines" id="lLines"></div></div>
-      </div>
+      <section class="order-manager">
+        <div class="order-manager-head">
+          <div><b>ORDERS IN DEZE TRAILER</b><span>Voeg per order het losstopnummer en de aantallen pallets toe.</span></div>
+          <button class="new-order-btn" onclick="addOrderCard()">+ ORDER</button>
+        </div>
+        <div id="ordersContainer"></div>
+        <div class="order-help"><b>Losvolgorde:</b> Stop 1 komt het dichtst bij de deuren, daarna Stop 2, Stop 3 enzovoort.</div>
+      </section>
     </div>
   </aside>
 
@@ -238,25 +258,48 @@ function applyScale(){const can=document.getElementById('canvas');can.style.widt
 function zoomIn(){S=Math.min(1.25,+(S+.1).toFixed(2));applyScale()}
 function zoomOut(){S=Math.max(.35,+(S-.1).toFixed(2));applyScale()}
 function fitView(){const sc=document.getElementById('trailerScroll');const avail=Math.max(280,sc.clientWidth-24);S=Math.max(.42,Math.min(.9,avail/TL));applyScale();sc.scrollLeft=0;sc.scrollTop=0}
-let rowUid=1;
-function addOrderLine(type,order='',qty=0,stop=''){
- const host=document.getElementById(type+'Lines');const row=document.createElement('div');row.className='order-line';row.dataset.type=type;row.dataset.rowid='r'+(rowUid++);
- row.innerHTML=`<div><label>Ordernr.</label><input class="order-input" type="text" placeholder="algemeen" value="${escapeHtml(order)}" oninput="autoPlan()"></div><div><label>Aantal</label><input class="qty" type="number" min="0" value="${Math.max(0,parseInt(qty)||0)}" oninput="autoPlan()"></div><div><label>Stop</label><input class="stop-input" type="number" min="1" placeholder="-" value="${stop||''}" oninput="autoPlan()"></div><button class="remove-line" title="Verwijder orderregel" onclick="removeOrderLine(this)">×</button>`;
- host.appendChild(row);updateRemoveButtons(type);return row
+let orderCardUid=1;
+function addOrderCard(order='',stop='',counts={}){
+ const host=document.getElementById('ordersContainer');if(!host)return;
+ const card=document.createElement('div');card.className='order-card';card.dataset.cardid='oc'+(orderCardUid++);
+ card.innerHTML=`<div class="order-card-head">
+   <div><label>ORDERNUMMER</label><input class="card-order" type="text" placeholder="bijv. 45120" value="${escapeHtml(order)}" oninput="autoPlan()"></div>
+   <div><label>STOP</label><input class="card-stop" type="number" min="1" placeholder="1" value="${stop||''}" oninput="autoPlan()"></div>
+   <button class="remove-order" onclick="removeOrderCard(this)" title="Verwijder order">×</button>
+ </div>
+ <div class="order-qty-grid">
+   <div class="qty-box"><span><i class="qty-dot e"></i>EURO 80×120</span><input class="card-qty" data-type="e" type="number" min="0" value="${counts.e||0}" oninput="autoPlan()"></div>
+   <div class="qty-box"><span><i class="qty-dot b"></i>BLOK 100×120</span><input class="card-qty" data-type="b" type="number" min="0" value="${counts.b||0}" oninput="autoPlan()"></div>
+   <div class="qty-box"><span><i class="qty-dot m"></i>MIDDEL 80×140</span><input class="card-qty" data-type="m" type="number" min="0" value="${counts.m||0}" oninput="autoPlan()"></div>
+   <div class="qty-box"><span><i class="qty-dot l"></i>LANG 80×200</span><input class="card-qty" data-type="l" type="number" min="0" value="${counts.l||0}" oninput="autoPlan()"></div>
+ </div>`;
+ host.appendChild(card);updateOrderCardButtons();return card;
 }
-function removeOrderLine(btn){const row=btn.closest('.order-line');const type=row.dataset.type;const host=document.getElementById(type+'Lines');if(host.children.length<=1)return;row.remove();updateRemoveButtons(type);autoPlan()}
-function updateRemoveButtons(type){const rows=[...document.getElementById(type+'Lines').children];rows.forEach(r=>{const b=r.querySelector('.remove-line');if(b)b.style.visibility=rows.length===1?'hidden':'visible'})}
-function initOrderLines(){Object.keys(TYPES).forEach(k=>{const host=document.getElementById(k+'Lines');if(host&&!host.children.length)addOrderLine(k,'',0)})}
+function removeOrderCard(btn){
+ const card=btn.closest('.order-card'),host=document.getElementById('ordersContainer');
+ if(!card||!host)return;
+ if(host.children.length<=1){card.querySelectorAll('input').forEach(i=>i.value='');card.querySelectorAll('.card-qty').forEach(i=>i.value=0);autoPlan();return}
+ card.remove();updateOrderCardButtons();autoPlan();
+}
+function updateOrderCardButtons(){
+ const cards=[...document.querySelectorAll('.order-card')];
+ cards.forEach(c=>{const b=c.querySelector('.remove-order');if(b)b.style.visibility=cards.length===1?'hidden':'visible'});
+}
+function initOrders(){
+ const host=document.getElementById('ordersContainer');if(host&&!host.children.length)addOrderCard('',1,{});
+}
 function buildItems(){
- const out=[];const general=(document.getElementById('orderNo').value||'').trim();
- [...document.querySelectorAll('.order-line')].forEach((row,ri)=>{
-  const k=row.dataset.type,t=TYPES[k];if(!t)return;
-  const q=Math.max(0,parseInt(row.querySelector('.qty').value)||0);
-  const own=(row.querySelector('.order-input').value||'').trim();const order=own||general||'—';
-  const stopRaw=parseInt(row.querySelector('.stop-input')?.value);const stop=Number.isFinite(stopRaw)&&stopRaw>0?stopRaw:null;
-  for(let i=0;i<q;i++)out.push({id:uid++,sourceKey:`${row.dataset.rowid||ri}:${i}`,type:k,w:t.w,l:t.l,c:t.c,label:t.label,order,stop,x:0,y:0,rot:false,locked:false})
+ const out=[];
+ [...document.querySelectorAll('.order-card')].forEach((card,ci)=>{
+   const order=(card.querySelector('.card-order')?.value||'').trim()||'—';
+   const s=parseInt(card.querySelector('.card-stop')?.value);const stop=Number.isFinite(s)&&s>0?s:null;
+   card.querySelectorAll('.card-qty').forEach(inp=>{
+     const type=inp.dataset.type,t=TYPES[type];if(!t)return;
+     const q=Math.max(0,parseInt(inp.value)||0);
+     for(let i=0;i<q;i++)out.push({id:uid++,sourceKey:`${card.dataset.cardid||ci}:${type}:${i}`,type,w:t.w,l:t.l,c:t.c,label:t.label,order,stop,x:0,y:0,rot:false,locked:false});
+   });
  });
- return out
+ return out;
 }
 function overlaps(a,b){return !(a.x+a.l<=b.x||b.x+b.l<=a.x||a.y+a.w<=b.y||b.y+b.w<=a.y)}
 function canPlace(p,placed){if(p.x<0||p.y<0||p.y+p.w>TW||p.x+p.l>TL)return false;return !placed.some(q=>q.id!==p.id&&overlaps(p,q))}
@@ -769,64 +812,141 @@ function rotateSelected(){
  render();
 }function resetManual(){autoPlan()}
 function makeRows(){const cuts=[...new Set(items.map(p=>p.x))].sort((a,b)=>a-b);return cuts.map(x=>items.filter(p=>p.x===x).sort((a,b)=>a.y-b.y).map(p=>`${p.label}(${p.w}×${p.l})`).join(' + ')).filter(Boolean)}
-function makePlanImage(){
- const c=document.createElement('canvas');c.width=1600;c.height=720;const g=c.getContext('2d');
- const order=document.getElementById('orderNo').value.trim()||'—',end=endCm(),util=Math.round((end/TL)*100);
- g.fillStyle='#06111f';g.fillRect(0,0,1600,720);
- g.fillStyle='#071321';g.fillRect(0,0,1600,82);g.fillStyle='#fff';g.font='900 28px Arial';g.fillText('WAREHOUSE MASTER · LAADPLAN',30,42);
- g.fillStyle='#9fb0c2';g.font='15px Arial';g.fillText(`Rit/order ${order}  •  ${items.length} pallets  •  ${(end/100).toFixed(2).replace('.',',')} laadmeter  •  ${util}% benut`,30,67);
+function makeStandardOutputCanvas(){
+ const c=document.createElement('canvas');c.width=1600;c.height=1131;const g=c.getContext('2d');
+ const rit=document.getElementById('orderNo').value.trim()||'—';
+ const ref=document.getElementById('reference').value.trim()||'—';
+ const driver=document.getElementById('driver').value.trim()||'—';
+ const tractor=document.getElementById('tractorPlate').value.trim()||'—';
+ const trailer=document.getElementById('trailerPlate').value.trim()||'—';
+ const carrier=document.getElementById('carrier').value.trim()||'—';
+ const date=new Date().toLocaleDateString('nl-NL');
+ const end=endCm(),used=(end/100).toFixed(2).replace('.',','),free=Math.max(0,(TL-end)/100).toFixed(2).replace('.',','),util=Math.round((end/TL)*100);
+ const gap=analyzeInternalGaps();
+
+ function box(x,y,w,h,label,value){
+   g.fillStyle='#ffffff';g.fillRect(x,y,w,h);g.strokeStyle='#cbd5e1';g.lineWidth=1;g.strokeRect(x,y,w,h);
+   g.fillStyle='#64748b';g.font='bold 11px Arial';g.fillText(label,x+10,y+17);
+   g.fillStyle='#0f172a';g.font='900 17px Arial';g.fillText(String(value),x+10,y+42);
+ }
+ function fitText(text,maxWidth,fontSize=17){
+   let fs=fontSize;while(fs>10){g.font=`900 ${fs}px Arial`;if(g.measureText(text).width<=maxWidth)break;fs--}return fs;
+ }
+
+ // A4-landscape proportion with a white print-friendly background.
+ g.fillStyle='#ffffff';g.fillRect(0,0,c.width,c.height);
+ g.strokeStyle='#16a05d';g.lineWidth=3;g.strokeRect(3,3,c.width-6,c.height-6);
+
+ // Header
+ g.fillStyle='#0f172a';g.fillRect(0,0,c.width,118);
+ g.fillStyle='#22c55e';g.fillRect(0,114,c.width,5);
+ g.strokeStyle='#22c55e';g.lineWidth=4;g.strokeRect(48,28,120,70);
+ g.fillStyle='#ffffff';g.textAlign='center';g.textBaseline='middle';g.font='900 28px Arial';g.fillText('AWC',108,63);
+ g.textAlign='left';g.textBaseline='alphabetic';g.font='900 31px Arial';g.fillText('AMSTERDAM WAREHOUSE COMPANY',194,58);
+ g.fillStyle='#cbd5e1';g.font='bold 15px Arial';g.fillText('LAADPLAN · BIJLAGE CMR',194,84);
+
+ // Top metadata row
+ const x0=48,y0=148,gapx=16;
+ const widths=[330,330,190,175,175,175];
+ const vals=[
+   ['RIT / VRACHTNUMMER',rit],['REFERENTIE / KLANT',ref],['DATUM',date],
+   ['LAADMETER',used+' m'],['PALLETS',items.length],['VRIJ',free+' m']
+ ];
+ let xx=x0;vals.forEach((v,i)=>{box(xx,y0,widths[i],66,v[0],v[1]);xx+=widths[i]+gapx});
+
+ // Transport row
+ const ty=230,tw=(c.width-96-3*16)/4;
+ [['CHAUFFEUR',driver],['KENTEKEN TREKKER',tractor],['KENTEKEN TRAILER',trailer],['TRANSPORTEUR',carrier]]
+  .forEach((v,i)=>box(48+i*(tw+16),ty,tw,66,v[0],v[1]));
+
+ // Order overview
+ g.fillStyle='#fff';g.fillRect(48,312,c.width-96,76);g.strokeStyle='#cbd5e1';g.strokeRect(48,312,c.width-96,76);
+ g.fillStyle='#64748b';g.font='bold 11px Arial';g.fillText('ORDEROVERZICHT',60,331);
+ const orderLine=orderStats().map(([o,n,stop])=>`${o==='—'?'GEEN ORDER':'ORD '+o}${stop?' (Stop '+stop+')':''}: ${n} pallet${n===1?'':'s'}`).join('   •   ')||'—';
+ g.fillStyle='#0f172a';g.font=`900 ${fitText(orderLine,c.width-130,16)}px Arial`;g.fillText(orderLine,60,362);
+
+ // Visual frame
+ const frameX=48,frameY=410,frameW=c.width-96,frameH=475;
+ g.fillStyle='#fff';g.fillRect(frameX,frameY,frameW,frameH);g.strokeStyle='#cbd5e1';g.strokeRect(frameX,frameY,frameW,frameH);
+
+ // plan header within frame
+ g.fillStyle='#0f172a';g.fillRect(frameX+26,frameY+22,frameW-52,54);
+ g.fillStyle='#fff';g.font='900 18px Arial';g.fillText('AMSTERDAM WAREHOUSE COMPANY',frameX+48,frameY+56);
+ g.fillStyle='#22c55e';g.fillRect(frameX+48,frameY+65,frameW-96,2);
+
+ // Compact plan info
+ const infoY=frameY+90;
+ const fi=[['RIT',rit],['REFERENTIE',ref],['TREKKER',tractor],['TRAILER',trailer],['GEBRUIKT',used+' m'],['VRIJ',free+' m'],['BENUTTING',util+'%'],['PALLETS',items.length]];
+ const fw=(frameW-52-7*10)/8;
+ fi.forEach((v,i)=>{
+   const bx=frameX+26+i*(fw+10);g.fillStyle='#f8fafc';g.fillRect(bx,infoY,fw,48);g.strokeStyle='#e2e8f0';g.strokeRect(bx,infoY,fw,48);
+   g.fillStyle='#64748b';g.font='bold 8px Arial';g.fillText(v[0],bx+5,infoY+14);
+   g.fillStyle='#0f172a';g.font='900 12px Arial';g.fillText(String(v[1]),bx+5,infoY+35);
+ });
+
+ // Stop flow
  const stops=[...new Set(items.map(p=>p.stop).filter(Boolean))].sort((a,b)=>b-a);
- g.fillStyle='#facc15';g.font='900 16px Arial';g.textAlign='center';g.fillText(stops.length?`CABINE  ←  ${stops.map(s=>'STOP '+s).join('  ←  ')}  ←  DEUREN`:'CABINE  ←  ORDERS BIJ ELKAAR  ←  DEUREN',800,112);
- const px=35,py=145,pw=1530,ph=360,sx=pw/TL,sy=ph/TW;
- g.fillStyle='#0f1721';g.fillRect(px,py,pw,ph);g.strokeStyle='#d7dde4';g.lineWidth=3;g.strokeRect(px,py,pw,ph);
- for(let m=1;m<14;m++){const x=px+(m/13.6)*pw;g.strokeStyle='rgba(255,255,255,.12)';g.lineWidth=1;g.beginPath();g.moveTo(x,py);g.lineTo(x,py+ph);g.stroke()}
- items.forEach(p=>{const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy,pd=palletDirection(p);g.fillStyle=p.c;g.fillRect(x,y,w,h);g.fillStyle='rgba(15,23,42,.22)';
-  if(pd.lengthwise){[.1,.44,.78].forEach(r=>g.fillRect(x+w*.05,y+h*r,w*.9,Math.max(3,h*.1)))}else{[.1,.44,.78].forEach(r=>g.fillRect(x+w*r,y+h*.05,Math.max(3,w*.1),h*.9))}
-  g.strokeStyle=orderColor(p.order);g.lineWidth=4;g.strokeRect(x,y,w,h);g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';const fs=Math.max(10,Math.min(18,h*.18));g.font=`900 ${fs}px Arial`;g.fillText(p.order==='—'?'—':p.order,x+w/2,y+h/2-5,Math.max(25,w-6));g.font=`bold ${Math.max(8,fs*.65)}px Arial`;g.fillText(`${p.label}${p.stop?' · S'+p.stop:''}`,x+w/2,y+h/2+12,Math.max(25,w-6))});
- const gap=analyzeInternalGaps();g.textAlign='left';g.textBaseline='alphabetic';g.fillStyle=gap.cells?'#f59e0b':'#22c55e';g.fillRect(35,535,1530,70);g.fillStyle='#06111f';g.font='900 19px Arial';g.fillText(gap.cells?`⚠ ${gap.areaM2.toFixed(2).replace('.',',')} m² interne ruimte gevonden`:'✓ LAADPLAN OK · GEEN INTERNE GATEN',55,578);
- g.fillStyle='#9fb0c2';g.font='13px Arial';g.fillText('Warehouse Master v1.0',35,675);return c;
+ g.fillStyle='#92400e';g.font='900 12px Arial';g.textAlign='center';
+ g.fillText(stops.length?`CABINE  ←  ${stops.map(s=>'STOP '+s).join('  ←  ')}  ←  DEUREN`:'CABINE  ←  ORDERS BIJ ELKAAR  ←  DEUREN',c.width/2,frameY+157);
+ g.textAlign='left';
+
+ // Trailer
+ const px=frameX+58,py=frameY+174,pw=frameW-116,ph=210,sx=pw/TL,sy=ph/TW;
+ g.fillStyle='#eef2f7';g.fillRect(px,py,pw,ph);g.strokeStyle='#334155';g.lineWidth=2;g.strokeRect(px,py,pw,ph);
+ for(let m=0;m<=13;m++){const mx=px+(m/13.6)*pw;g.strokeStyle='#cbd5e1';g.lineWidth=1;g.beginPath();g.moveTo(mx,py);g.lineTo(mx,py+ph);g.stroke();g.fillStyle='#64748b';g.font='9px Arial';g.fillText(m+'m',mx+2,py-5)}
+ g.fillText('13,6m',px+pw-28,py-5);
+ g.fillStyle='#64748b';g.fillRect(px,py,12,ph);g.fillStyle='#94a3b8';g.fillRect(px+pw-10,py,3,ph);g.fillRect(px+pw-4,py,3,ph);
+
+ items.forEach(p=>{
+   const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy,pd=palletDirection(p);
+   g.fillStyle=p.c;g.fillRect(x,y,w,h);
+   g.fillStyle='rgba(15,23,42,.18)';
+   if(pd.lengthwise){[.10,.44,.78].forEach(r=>g.fillRect(x+w*.05,y+h*r,w*.9,Math.max(2,h*.10)))}
+   else{[.10,.44,.78].forEach(r=>g.fillRect(x+w*r,y+h*.05,Math.max(2,w*.10),h*.9))}
+   g.strokeStyle=orderColor(p.order);g.lineWidth=3;g.strokeRect(x,y,w,h);
+   g.fillStyle='#0f172a';g.textAlign='center';g.textBaseline='middle';
+   const fs=Math.max(8,Math.min(13,h*.18));g.font=`900 ${fs}px Arial`;g.fillText(p.order==='—'?'—':'ORD '+p.order,x+w/2,y+h/2-4,Math.max(20,w-4));
+   g.font=`bold ${Math.max(7,fs*.68)}px Arial`;g.fillText(`${p.label}${p.stop?' · S'+p.stop:''}`,x+w/2,y+h/2+8,Math.max(20,w-4));
+ });
+ g.textAlign='left';g.textBaseline='alphabetic';
+
+ // Status inside plan frame
+ const sy0=frameY+400;
+ g.fillStyle=gap.cells?'#fff7ed':'#f0fdf4';g.fillRect(frameX+58,sy0,frameW-116,48);
+ g.strokeStyle=gap.cells?'#f59e0b':'#22c55e';g.strokeRect(frameX+58,sy0,frameW-116,48);
+ g.fillStyle=gap.cells?'#b45309':'#15803d';g.font='900 13px Arial';
+ g.fillText(gap.cells?`⚠ INTERNE RUIMTE: ${gap.areaM2.toFixed(2).replace('.',',')} m²`:'✓ OPTIMALE INDELING · GEEN INTERNE GATEN',frameX+72,sy0+29);
+
+ // Approval/signature
+ const ay=906,aw=(c.width-112)/2;
+ box(48,ay,aw,125,'LAADPLAN AKKOORD','☐ Ja    ☐ Afwijking');
+ g.fillStyle='#64748b';g.font='11px Arial';g.fillText('Eventuele afwijkingen van het laadplan vermelden op de CMR.',60,ay+92);
+ g.fillStyle='#fff';g.fillRect(64+aw,ay,aw,125);g.strokeStyle='#cbd5e1';g.strokeRect(64+aw,ay,aw,125);
+ g.fillStyle='#64748b';g.font='bold 11px Arial';g.fillText('HANDTEKENING CHAUFFEUR',76+aw,ay+20);
+ g.strokeStyle='#94a3b8';g.beginPath();g.moveTo(82+aw,ay+91);g.lineTo(c.width-70,ay+91);g.stroke();
+ g.fillStyle='#64748b';g.font='10px Arial';g.fillText('Naam / handtekening',82+aw,ay+110);
+
+ // Footer
+ g.fillStyle='#334155';g.font='bold 11px Arial';g.fillText('Bovenaanzicht · trailer 13,60 × 2,40 m',48,1080);
+ g.textAlign='right';g.fillStyle='#64748b';g.fillText('Gegenereerd met Warehouse Master v1.1',c.width-48,1080);g.textAlign='left';
+ return c;
 }
+function makePlanImage(){return makeStandardOutputCanvas()}
+function makePrintPlanImage(){return makeStandardOutputCanvas()}
+
 async function send(){
  if(!items.length){alert('Voer eerst pallets in.');return}
- const c=makePlanImage();
+ const c=makeStandardOutputCanvas();
  const blob=await new Promise(r=>c.toBlob(r,'image/png',1));
- const order=(document.getElementById('orderNo').value.trim()||'laadplan').replace(/[^a-z0-9_-]+/gi,'-');
- const file=new File([blob],`AWC-laadplan-${order}.png`,{type:'image/png'});
+ const rit=(document.getElementById('orderNo').value.trim()||'laadplan').replace(/[^a-z0-9_-]+/gi,'-');
+ const file=new File([blob],`AWC-laadplan-${rit}.png`,{type:'image/png'});
  try{
-  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-   await navigator.share({files:[file]});
-   return;
-  }
+  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return}
  }catch(e){if(e.name==='AbortError')return}
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
- alert('De visuele laadplan-afbeelding is opgeslagen. Deel deze afbeelding vervolgens via WhatsApp.');
+ alert('Het standaard AWC-laadplan is opgeslagen. Deel de afbeelding via WhatsApp.');
 }
 
-function makePrintPlanImage(){
- const c=document.createElement('canvas');c.width=1600;c.height=900;const g=c.getContext('2d');
- const order=document.getElementById('orderNo').value.trim()||'—',ref=document.getElementById('reference').value.trim()||'—';
- const driver=document.getElementById('driver').value.trim()||'—',tractor=document.getElementById('tractorPlate').value.trim()||'—';
- const trailer=document.getElementById('trailerPlate').value.trim()||'—',carrier=document.getElementById('carrier').value.trim()||'—';
- const date=new Date().toLocaleDateString('nl-NL'),end=endCm(),used=(end/100).toFixed(2).replace('.',','),free=Math.max(0,(TL-end)/100).toFixed(2).replace('.',','),util=Math.round((end/TL)*100);
- g.fillStyle='#fff';g.fillRect(0,0,1600,900);
- g.fillStyle='#0f172a';g.fillRect(0,0,1600,70);g.fillStyle='#fff';g.font='900 27px Arial';g.fillText('AMSTERDAM WAREHOUSE COMPANY',30,43);
- g.fillStyle='#22c55e';g.fillRect(30,57,1540,4);g.fillStyle='#0f172a';g.font='900 22px Arial';g.fillText('LAADPLAN',30,110);
- g.fillStyle='#64748b';g.font='14px Arial';g.fillText(`Datum: ${date}   •   Order: ${order}   •   Referentie: ${ref}`,30,135);
- const fields=[['CHAUFFEUR',driver],['TREKKER',tractor],['TRAILER',trailer],['TRANSPORTEUR',carrier],['GEBRUIKT',used+' m'],['VRIJ',free+' m'],['BENUTTING',util+'%'],['PALLETS',String(items.length)]];
- fields.forEach((f,i)=>{const x=30+(i%4)*385,y=155+Math.floor(i/4)*58;g.fillStyle='#f8fafc';g.fillRect(x,y,365,46);g.strokeStyle='#cbd5e1';g.strokeRect(x,y,365,46);g.fillStyle='#64748b';g.font='bold 10px Arial';g.fillText(f[0],x+8,y+15);g.fillStyle='#0f172a';g.font='900 16px Arial';g.fillText(f[1],x+8,y+36)});
- const px=45,py=300,pw=1510,ph=330;
- g.fillStyle='#475569';g.font='900 16px Arial';g.fillText('← CABINE',px,py-32);g.textAlign='right';g.fillText('DEUREN →',px+pw,py-32);g.textAlign='center';const stops=[...new Set(items.map(p=>p.stop).filter(Boolean))].sort((a,b)=>b-a);g.fillStyle='#b45309';g.fillText(stops.length?stops.map(s=>'STOP '+s).join('  ←  '):'ORDERS BIJ ELKAAR',px+pw/2,py-32);g.textAlign='left';
- for(let m=0;m<=13;m++){const x=px+(m/13.6)*pw;g.fillStyle='#64748b';g.font='12px Arial';g.fillText(m+'m',x,py-10)}g.fillText('13,6m',px+pw-34,py-10);
- g.fillStyle='#eef2f7';g.fillRect(px,py,pw,ph);g.strokeStyle='#334155';g.lineWidth=3;g.strokeRect(px,py,pw,ph);
- for(let m=1;m<14;m++){const x=px+(m/13.6)*pw;g.strokeStyle='#cbd5e1';g.lineWidth=1;g.beginPath();g.moveTo(x,py);g.lineTo(x,py+ph);g.stroke()}
- g.fillStyle='#64748b';g.fillRect(px,py,18,ph);g.fillStyle='#94a3b8';g.fillRect(px+pw-12,py,4,ph);g.fillRect(px+pw-5,py,4,ph);
- const sx=pw/TL,sy=ph/TW;
- items.forEach(p=>{const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy,pd=palletDirection(p);g.fillStyle=p.c;g.fillRect(x,y,w,h);g.fillStyle='rgba(15,23,42,.20)';
-  if(pd.lengthwise){const bh=Math.max(3,h*.10);[.1,.44,.78].forEach(r=>g.fillRect(x+w*.05,y+h*r,w*.9,bh))}else{const bw=Math.max(3,w*.10);[.1,.44,.78].forEach(r=>g.fillRect(x+w*r,y+h*.05,bw,h*.9))}
-  g.strokeStyle=orderColor(p.order);g.lineWidth=4;g.strokeRect(x,y,w,h);g.fillStyle='#0f172a';g.textAlign='center';g.textBaseline='middle';const fs=Math.max(10,Math.min(17,h*.18));g.font=`900 ${fs}px Arial`;g.fillText(p.order==='—'?'GEEN ORDER':'ORD '+p.order,x+w/2,y+h/2-fs*.42,Math.max(25,w-6));g.font=`bold ${Math.max(9,fs*.68)}px Arial`;g.fillText(`${p.label} ${p.w}×${p.l}${p.stop?' · S'+p.stop:''}`,x+w/2,y+h/2+fs*.58,Math.max(25,w-6))});
- g.textAlign='left';g.textBaseline='alphabetic';g.fillStyle='#f0fdf4';g.fillRect(45,665,1510,70);g.strokeStyle='#22c55e';g.strokeRect(45,665,1510,70);g.fillStyle='#15803d';g.font='900 17px Arial';g.fillText('✓ OPTIMALE INDELING',65,695);g.fillStyle='#334155';g.font='14px Arial';g.fillText('Bovenaanzicht trailer 13,60 × 2,40 m • Ieder order afzonderlijk geoptimaliseerd.',65,719);
- g.fillStyle='#64748b';g.font='12px Arial';g.fillText('Warehouse Master v1.0 • Printvriendelijke A4-landscape export',45,820);return c;
-}
 function downloadPdf(){
  if(!items.length){alert('Voer eerst pallets in.');return}
  const canvas=makePrintPlanImage();
@@ -855,41 +975,17 @@ function downloadPdf(){
 
 function printPlan(){
  if(!items.length){alert('Voer eerst pallets in.');return}
- const c=makePrintPlanImage();
- const img=c.toDataURL('image/png',1);
- const order=document.getElementById('orderNo').value.trim()||'—';
- const ref=document.getElementById('reference').value.trim()||'—';
- const driver=document.getElementById('driver').value.trim()||'—';
- const tractor=document.getElementById('tractorPlate').value.trim()||'—';
- const trailer=document.getElementById('trailerPlate').value.trim()||'—';
- const carrier=document.getElementById('carrier').value.trim()||'—';
- const date=new Date().toLocaleDateString('nl-NL');
- const load=document.getElementById('m-out').innerText;
- const free=document.getElementById('free-out').innerText;
- const w=window.open('','_blank');
- if(!w){alert('Sta pop-ups toe om de PDF/printweergave te openen.');return}
- w.document.write(`<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>AWC laadplan ${order}</title><style>
- @page{size:A4 landscape;margin:10mm}
- *{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;color:#0f172a;background:#fff}
- .sheet{width:100%;min-height:185mm;border:2px solid #198754;padding:0 8mm 7mm;position:relative;background:#fff}
- .top{margin:0 -8mm 6mm;padding:6mm 8mm 4mm;border-bottom:4px solid #198754;background:#0f172a;color:white;display:flex;align-items:center;gap:8mm}
- .mark{width:23mm;height:17mm;border:2px solid #22c55e;display:flex;align-items:center;justify-content:center;font-size:20pt;font-weight:900}
- h1{margin:0;font-size:19pt;letter-spacing:.2mm}.sub{margin-top:2mm;color:#cbd5e1;font-size:10pt;font-weight:bold}
- .meta{display:grid;grid-template-columns:1.2fr 1.2fr .75fr .65fr .65fr .65fr;gap:2.5mm;margin-bottom:3mm}.transport{display:grid;grid-template-columns:1.2fr 1fr 1fr 1.2fr;gap:2.5mm;margin-bottom:4mm}
- .box{border:1px solid #cbd5e1;padding:2.5mm;min-height:15mm}.lab{font-size:7pt;color:#64748b;font-weight:bold}.val{font-size:11pt;font-weight:800;margin-top:1.5mm;overflow-wrap:anywhere}
- .visual{border:1px solid #cbd5e1;padding:3mm;background:white}.visual img{display:block;width:100%;height:auto;max-height:118mm;object-fit:contain}
- .foot{display:flex;justify-content:space-between;gap:6mm;margin-top:3mm;font-size:8.5pt;color:#475569}.note{font-weight:bold;color:#0f172a}.approval{display:grid;grid-template-columns:1fr 1.4fr;gap:5mm;margin-top:4mm}.approval .box{min-height:23mm}.signature{height:13mm;border-bottom:1px solid #64748b;margin-top:2mm}.small{font-size:7pt;color:#64748b;margin-top:1mm}
- @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.sheet{break-inside:avoid}}
- 
-</style></head><body><div class="sheet"><div class="top"><div class="mark">AWC</div><div><h1>AMSTERDAM WAREHOUSE COMPANY</h1><div class="sub">LAADPLAN - BIJLAGE CMR</div></div></div>
- <div class="meta"><div class="box"><div class="lab">ORDER / VRACHTNUMMER</div><div class="val">${escapeHtml(order)}</div></div><div class="box"><div class="lab">REFERENTIE / KLANT</div><div class="val">${escapeHtml(ref)}</div></div><div class="box"><div class="lab">DATUM</div><div class="val">${date}</div></div><div class="box"><div class="lab">LAADMETER</div><div class="val">${load}</div></div><div class="box"><div class="lab">PALLETS</div><div class="val">${items.length}</div></div><div class="box"><div class="lab">VRIJ</div><div class="val">${free}</div></div></div>
- <div class="transport"><div class="box"><div class="lab">CHAUFFEUR</div><div class="val">${escapeHtml(driver)}</div></div><div class="box"><div class="lab">KENTEKEN TREKKER</div><div class="val">${escapeHtml(tractor)}</div></div><div class="box"><div class="lab">KENTEKEN TRAILER</div><div class="val">${escapeHtml(trailer)}</div></div><div class="box"><div class="lab">TRANSPORTEUR</div><div class="val">${escapeHtml(carrier)}</div></div></div>
- <div class="box" style="margin-bottom:3mm"><div class="lab">ORDEROVERZICHT</div><div class="val" style="font-size:9pt">${orderStats().map(([o,n,stop])=>`${escapeHtml(o==='—'?'GEEN ORDER':'ORD '+o)}${stop?' (Stop '+stop+')':''}: ${n} pallet${n===1?'':'s'}`).join(' &nbsp; • &nbsp; ')}</div></div><div class="visual"><img src="${img}" alt="Visueel laadplan"></div><div class="approval"><div class="box"><div class="lab">LAADPLAN AKKOORD</div><div class="val">☐ Ja &nbsp;&nbsp; ☐ Afwijking</div><div class="small">Eventuele afwijkingen van het laadplan vermelden op de CMR.</div></div><div class="box"><div class="lab">HANDTEKENING CHAUFFEUR</div><div class="signature"></div><div class="small">Naam / handtekening</div></div></div><div class="foot"><div class="note">Bovenaanzicht - trailer 13,60 x 2,40 m</div><div>Gegenereerd met Warehouse Master v1.0</div></div></div>
- <script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
+ const c=makeStandardOutputCanvas(),img=c.toDataURL('image/png',1);
+ const rit=document.getElementById('orderNo').value.trim()||'laadplan';
+ const w=window.open('','_blank');if(!w){alert('Sta pop-ups toe om te printen.');return}
+ w.document.write(`<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>AWC laadplan ${escapeHtml(rit)}</title><style>
+ @page{size:A4 landscape;margin:5mm}html,body{margin:0;background:#fff}img{display:block;width:100%;height:auto;max-height:200mm;object-fit:contain}
+ @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+ </style></head><body><img src="${img}" alt="AWC laadplan"><script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
  w.document.close();
 }
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-window.onload=()=>{initOrderLines();autoPlan();setTimeout(fitView,50)};
+window.onload=()=>{initOrders();autoPlan();setTimeout(fitView,50)};
 
 window.addEventListener('load',()=>setUIMode(false));
 </script>
