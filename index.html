@@ -3,263 +3,180 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>Warehouse Master v10.3 Unified Visual</title>
+<title>Warehouse Master v10.4 Dashboard</title>
 <style>
-:root{--bg:#0f172a;--card:#1e293b;--text:#f8fafc;--accent:#3b82f6;--wa:#22c55e;--muted:#94a3b8}
+:root{--bg:#06111f;--panel:#0a1624;--panel2:#0e1c2c;--line:#26384d;--text:#f7f9fc;--muted:#9aacbf;--green:#00b85c;--blue:#1577eb}
 *{box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--text);min-height:100vh}
-.header{position:relative;z-index:20;background:var(--card);padding:10px;border-bottom:2px solid #334155}
-.stats{display:flex;justify-content:space-around;margin-bottom:8px}.stat-v{font-size:1.35rem;font-weight:900;color:var(--wa);display:block}
-.toolbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin:8px 5px 0}.toolbar button{padding:10px 6px;font-size:.76rem;border-radius:9px}.toolbar2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin:7px 5px 0}.toolbar2 button{padding:9px 6px;font-size:.73rem;border-radius:9px}.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 5px}.transport-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 5px}.transport-grid input{width:100%;height:40px;font-size:.95rem;text-align:left;padding:0 10px;border:1px solid #475569;background:#0f172a;color:#fff;border-radius:2px}.transport-grid label{font-size:.64rem;color:#94a3b8;display:block;margin-bottom:3px}.meta-grid input{width:100%;height:40px;font-size:.95rem;text-align:left;padding:0 10px;border:1px solid #475569;background:#0f172a}.meta-grid label{font-size:.64rem;color:#94a3b8;display:block;margin-bottom:3px}
-.trailer-scroll{background:#000;padding:10px;overflow:auto;border-radius:8px;border:2px solid #444;margin:0 5px;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;max-height:250px}
-#canvas{height:180px;width:1020px;position:relative;background:#111;border-right:15px solid #666;background-image:linear-gradient(90deg,#1a1a1a 1px,transparent 1px);background-size:75px 100%;overflow:visible;transform-origin:top left}
-.v-p{position:absolute;border:1px solid rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:white;border-radius:2px;text-align:center;user-select:none;touch-action:none;cursor:grab;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
-.v-p.selected{outline:3px solid white;z-index:10}.v-p.dragging{opacity:.8;cursor:grabbing;z-index:15}
-.input-grid{padding:10px 10px 90px}.p-card{background:var(--card);padding:12px;border-radius:12px;margin-bottom:8px;border:1px solid #334155;display:flex;align-items:center;gap:12px}.p-title{flex:1}.p-title b{display:block}.p-title small{color:var(--muted)}
-.p-card{display:block}.type-head{display:flex;align-items:center;gap:10px;margin-bottom:9px}.type-head .p-title{flex:1}.add-order{width:auto;padding:8px 11px;border-radius:8px;font-size:.72rem;background:#2563eb}.order-lines{display:flex;flex-direction:column;gap:7px}.order-line{display:grid;grid-template-columns:1fr 84px 38px;gap:7px;align-items:end}.order-line label{display:block;font-size:.58rem;color:#94a3b8;text-transform:uppercase;margin-bottom:3px}.order-line .order-input{width:100%;height:46px;background:#0f172a;color:#fff;border:1px solid #64748b;border-radius:9px;padding:0 9px;font-size:.9rem;font-weight:700}.order-line input.qty{width:100%;height:46px;background:#000;color:#fff;border:2px solid var(--accent);border-radius:9px;text-align:center;font-size:1.25rem;font-weight:900}.remove-line{height:46px;padding:0;border-radius:9px;background:#7f1d1d;font-size:1.15rem}.order-line:only-child .remove-line{visibility:hidden}.v-p .pallet-label{line-height:1.05;pointer-events:none}.v-p .ord{display:block;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding:0 2px}.v-p .dims{display:block;font-size:7px;opacity:.9;margin-top:2px}
-.info{font-size:.76rem;line-height:1.35;color:#cbd5e1;background:#111827;border:1px solid #334155;border-radius:10px;padding:9px;margin-bottom:10px}
-footer{position:fixed;bottom:0;left:0;right:0;padding:10px;background:var(--card);z-index:30;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}button{width:100%;padding:15px;background:var(--wa);color:white;border:0;border-radius:12px;font-weight:900;font-size:1rem}.secondary{background:#334155}.accent{background:var(--accent)}.pdfbtn{background:#0b3b2e;border:1px solid #22c55e}
-#modeLabel{font-size:.7rem;color:#cbd5e1;text-align:center;margin-top:5px}
-#orderLegend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 5px 0}.order-chip{display:flex;align-items:center;gap:6px;background:#0f172a;border:1px solid #475569;border-radius:999px;padding:5px 9px;font-size:.68rem;font-weight:800}.order-dot{width:12px;height:12px;border-radius:3px;border:3px solid #fff;background:#111}.warning{display:none;margin:7px 5px 0;padding:8px 10px;border-radius:8px;background:#3f2d08;border:1px solid #f59e0b;color:#fde68a;font-size:.7rem;font-weight:700}
-
-/* v10.2 PRO UI */
-:root{--awc:#00a651;--awc-dark:#08783f;--panel:#111827}
-body{background:#07111f}
-.header{padding:0 0 8px;background:#0b1627;border-bottom:1px solid #26364b}
-.pro-brand{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff;color:#0f172a;border-bottom:4px solid var(--awc)}
-.pro-brand-main{display:flex;align-items:center;gap:10px}.pro-brand img{width:42px;height:42px;object-fit:contain;border-radius:8px}.pro-brand b{display:block;font-size:1rem}.pro-brand small{color:#64748b}.version-badge{font-size:.64rem;font-weight:900;background:#e8f7ef;color:#08783f;padding:6px 8px;border-radius:999px}
-.stats{margin:8px 8px 7px;background:#111d2e;border:1px solid #26364b;border-radius:12px;padding:8px}.stat-v{font-size:1.2rem;color:#35d07f}
-#viewModeBar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 8px 8px}.modebtn{padding:10px;border-radius:9px;font-size:.76rem;background:#243247}.modebtn.active{background:var(--awc)}
-#editPanel{display:none}.editing #editPanel{display:block}
-.trailer-shell{margin:0 8px}.direction-row{display:flex;justify-content:space-between;font-size:.62rem;color:#94a3b8;margin:0 2px 4px;font-weight:800;letter-spacing:.03em}
-.meter-ruler{position:relative;height:20px;margin:0 0 2px;background:#0b1320;border:1px solid #26364b;border-radius:7px;overflow:hidden}
-.meter-ruler span{position:absolute;top:3px;transform:translateX(-50%);font-size:.56rem;color:#cbd5e1}.meter-ruler span:first-child{transform:none}.meter-ruler span:last-child{transform:translateX(-100%)}
-.trailer-scroll{margin:0;max-height:390px;border:2px solid #506070;border-radius:10px;padding:6px;background:#020617}
-#canvas{height:180px;background-color:#0a0f18;border-left:12px solid #334155;border-right:18px double #94a3b8}
-.v-p{font-size:9px;border-width:1px}.v-p .ord{font-size:9px;text-shadow:0 1px 2px #000}.v-p.order-start{box-shadow:-4px 0 0 rgba(255,255,255,.75),inset 0 0 0 1px rgba(0,0,0,.3)}
-#orderLegend{margin:8px 8px 0}.warning{margin:7px 8px 0}
-.input-grid{padding:8px 10px 100px}.input-grid>.info{display:none}.editing .input-grid>.info{display:block}
-.p-card{display:none}.editing .p-card{display:block}
+html,body{margin:0;background:#050d17;color:var(--text);min-height:100%}
+body{min-height:100vh;background:linear-gradient(180deg,#06111f,#040a12)}
+button{font-weight:900;color:white;border:1px solid #2a3c51;background:#122235;border-radius:7px;cursor:pointer}
+.topnav{height:72px;background:#06101c;border-bottom:1px solid #203247;display:flex;align-items:center;padding:0 20px;position:sticky;top:0;z-index:100}
+.wm-brand{display:flex;align-items:center;gap:10px;min-width:420px}.wm-brand img{width:34px;height:34px}.wm-brand strong{font-size:1.35rem}.version-badge{background:#1677ed;border-radius:999px;padding:6px 11px;font-size:.7rem}
+.navtabs{align-self:stretch;display:flex}.navtabs button{border:0;border-radius:0;background:transparent;padding:0 23px;font-size:.75rem;border-bottom:3px solid transparent}.navtabs button.active{background:#0b1a2a;border-bottom-color:#1685ff;color:#fff}.saved{margin-left:auto;color:#00c96b;font-size:.74rem;font-weight:900}
+.appgrid{display:grid;grid-template-columns:420px minmax(0,1fr);gap:14px;padding:8px 12px 16px;max-width:1600px;margin:auto}
+.leftcol,.rightcol{min-width:0}.leftcol{display:flex;flex-direction:column;gap:3px}
+.dash-card,.status-strip,.bottom-grid{background:linear-gradient(180deg,#0a1725,#07121e);border:1px solid #24364a;border-radius:10px}
+.dash-card{padding:10px}.dash-card h2{font-size:.78rem;margin:0 0 10px}
+.meta-grid,.transport-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.transport-grid{margin-top:8px}.meta-grid label,.transport-grid label{display:block;color:#d4dde7;font-size:.56rem;margin-bottom:4px}.meta-grid input,.transport-grid input{width:100%;height:39px;background:#08131f;border:1px solid #34495f;color:white;border-radius:4px;padding:0 9px;font-size:.8rem}
+.trailer-mini{display:grid;grid-template-columns:1fr 1.05fr;align-items:center;gap:10px}.truckbox{height:100px;border:1px solid #5f6f7f;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:4rem;color:#8c99a7}.trailer-mini p{display:flex;justify-content:space-between;margin:0;padding:7px 0;font-size:.56rem}.trailer-mini p span{color:#c0cad5}.trailer-mini p b{font-size:.68rem}
+.pallet-head,.pallet-row{display:grid;grid-template-columns:1fr 1.25fr .65fr 1fr;align-items:center;gap:6px}.pallet-head{font-size:.54rem;color:#d0d8e2;padding:4px 6px;border-bottom:1px solid #26394d}.pallet-row{padding:6px;border-bottom:1px solid #17283b;font-size:.65rem}.tag{width:max-content;padding:3px 8px;border-radius:3px;font-size:.58rem}.tag.e{background:#1d5fb8}.tag.b{background:#b86b08}.tag.m{background:#299844}.tag.l{background:#b63b36}.orientation-badges{display:flex;gap:4px}.orientation-badges i{font-style:normal;background:#154b8e;padding:3px 10px;border-radius:3px}.pallet-total-row{display:flex;justify-content:space-between;padding:8px 6px 2px;font-size:.7rem}
+.result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid #273a4e;border-radius:4px;overflow:hidden}.result-grid div{padding:11px 5px;text-align:center;border-right:1px solid #273a4e}.result-grid div:last-child{border:0}.result-grid span{display:block;font-size:.48rem}.result-grid b{display:block;font-size:.85rem;margin-top:8px}.result-grid div:first-child b{color:#00d265}.auto-big{width:100%;margin-top:10px;padding:15px;background:linear-gradient(#09c562,#04a34f);border-color:#08c664}
+.edit-pallets{display:none}.editing .edit-pallets{display:block}.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.p-card{background:#0b1828;border:1px solid #26394d;border-radius:7px;padding:8px}.type-head{display:flex;align-items:center;gap:6px}.p-title{flex:1}.p-title b{display:block;font-size:.7rem}.p-title small{font-size:.55rem;color:#99aabd}.add-order{width:auto;padding:5px 7px;background:#166fe5;font-size:.55rem}.order-lines{display:flex;flex-direction:column;gap:4px;margin-top:5px}.order-line{display:grid;grid-template-columns:1fr 56px 28px;gap:4px}.order-line label{font-size:.48rem;color:#91a5ba}.order-input,.qty{width:100%;height:31px;background:#06101b;color:#fff;border:1px solid #39516a;border-radius:4px;padding:0 6px}.qty{text-align:center}.remove-line{padding:0;background:#76242a}
+.rightcol{display:flex;flex-direction:column;gap:12px}
+.main-toolbar{display:flex;justify-content:space-between;gap:12px;padding-top:4px}#viewModeBar{display:grid;grid-template-columns:1fr 1fr;gap:7px;min-width:385px}.modebtn{padding:16px 18px;font-size:.77rem}.modebtn.active{background:linear-gradient(#1e81f4,#0c69d8);border-color:#2488ff}.editing #editBtn{background:linear-gradient(#08be60,#049f4e)}.quick-actions{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;flex:1}.quick-actions button{padding:12px 8px;font-size:.67rem}
+.loadarea{padding:5px 0}.direction-row{display:flex;justify-content:space-between;color:#e6edf4;font-size:.7rem;font-weight:900;margin-bottom:8px}.meter-ruler{height:28px;position:relative;border-bottom:1px solid #7c8794;margin:0 8px 5px}.meter-ruler span{position:absolute;bottom:5px;transform:translateX(-50%);font-size:.58rem;color:#edf3f8}.meter-ruler span:first-child{transform:none}.meter-ruler span:last-child{transform:translateX(-100%)}
+.trailer-scroll{overflow:auto;background:#02070d;border:2px solid #d7dde4;border-radius:11px;padding:8px;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch}
+#canvas{height:440px;width:1360px;position:relative;background:#0f1721;background-image:linear-gradient(90deg,rgba(255,255,255,.11) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px);background-size:100px 100%,100% 120px;border-left:34px solid #4f5c6a;border-right:14px double #9ca8b4;transform-origin:top left}
+.v-p{position:absolute;display:flex;align-items:center;justify-content:center;color:white;text-align:center;font-weight:900;border-radius:1px;user-select:none;touch-action:none;cursor:grab;overflow:hidden}
+.v-p.selected{outline:4px solid white;z-index:10}.v-p.dragging{opacity:.8;z-index:15}
+.v-p .pallet-visual{position:absolute;inset:4px;pointer-events:none;border:1px solid rgba(255,255,255,.28)}
+.v-p .deck-board{position:absolute;background:rgba(30,30,20,.20);border:1px solid rgba(0,0,0,.22)}
+.v-p .deck-board.long{left:4%;right:4%;height:12%}.v-p .deck-board.cross{top:4%;bottom:4%;width:12%}.v-p .deck-board.b1.long{top:8%}.v-p .deck-board.b2.long{top:44%}.v-p .deck-board.b3.long{bottom:8%}.v-p .deck-board.b1.cross{left:8%}.v-p .deck-board.b2.cross{left:44%}.v-p .deck-board.b3.cross{right:8%}
+.v-p .pallet-label{position:relative;z-index:2;line-height:1.12;text-shadow:0 1px 2px #000}.v-p .ord{display:block;font-size:12px}.v-p .dims{display:block;font-size:10px;margin-top:3px}
+.status-strip{display:grid;grid-template-columns:42px 1fr 130px;align-items:center;padding:14px 18px}.okicon{width:30px;height:30px;border:2px solid #00c96b;color:#00c96b;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900}.status-strip b{display:block;color:#00cf6d;font-size:.7rem}.status-strip span{display:block;color:#d1d9e2;font-size:.62rem;margin-top:4px}.status-strip button{padding:11px}
+.bottom-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:14px;padding:12px}.available h3{font-size:.68rem;margin:0 0 10px}.mini-pallets{display:flex;gap:8px}.mini{width:94px;height:100px;border:1px solid #566678;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}.mini.e{background:#205cac}.mini.b{background:#a9650d}.mini.m{background:#30843c}.mini.l{background:#a9413b}.mini b{font-size:.7rem}.mini span{font-size:.6rem}.mini small{position:absolute;bottom:-20px;font-size:.66rem}.exports{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.exports button{font-size:.85rem}.exports .wa{background:linear-gradient(#0ac960,#04aa50);border-color:#0bca61}.exports .pdf{background:#053d2d;border-color:#0c9957}.exports .print{background:#162438}
+.warning{display:none;background:#4b2b00;border:1px solid #d08b15;color:#ffe29a;border-radius:7px;padding:8px;font-size:.62rem}
+#orderLegend{display:flex;gap:6px;flex-wrap:wrap}.order-chip{background:#0d1a29;border:1px solid #34465b;border-radius:999px;padding:5px 9px;font-size:.58rem}.order-dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
 #modeLabel{display:none}
-footer{background:#0b1627;border-top:1px solid #26364b;padding:8px}
-.editing .trailer-scroll{max-height:300px}
-@media(min-width:700px){.header,.input-grid,footer{max-width:900px;margin-left:auto;margin-right:auto}.pro-brand{border-radius:0}.trailer-scroll{max-height:480px}}
-
-
-/* v9.3 visual pallet orientation */
-.v-p{overflow:hidden}
-.v-p .pallet-visual{position:absolute;inset:3px;pointer-events:none;border:1px solid rgba(255,255,255,.28);border-radius:2px}
-.v-p .deck-board{position:absolute;background:rgba(18,18,18,.26);border:1px solid rgba(255,255,255,.18);border-radius:1px}
-.v-p .deck-board.long{left:5%;right:5%;height:13%}
-.v-p .deck-board.cross{top:5%;bottom:5%;width:13%}
-.v-p .deck-board.b1.long{top:8%}.v-p .deck-board.b2.long{top:43%}.v-p .deck-board.b3.long{bottom:8%}
-.v-p .deck-board.b1.cross{left:8%}.v-p .deck-board.b2.cross{left:43%}.v-p .deck-board.b3.cross{right:8%}
-.v-p .pallet-label{position:relative;z-index:2;background:rgba(2,6,23,.60);border-radius:4px;padding:3px 5px;max-width:92%}
-.v-p .ord{font-size:9px}.v-p .dims{font-size:7px}
-.security-note{margin:7px 8px 0;padding:7px 9px;border:1px solid #35d07f;border-radius:8px;color:#d1fae5;background:#0b2b20;font-size:.67rem;font-weight:700}
-
-/* v10.2 dashboard visual implementation */
-:root{
- --bg:#06111f;--panel:#0c192a;--panel2:#101f32;--line:#24364c;
- --text:#f6f8fb;--muted:#8fa2b8;--awc:#00b85c;--awc2:#087a43;
- --blue:#2878ea;
-}
-html{background:var(--bg)}
-body{background:radial-gradient(circle at 70% 0%,#0b1b30 0,#06111f 52%,#040b14 100%);min-height:100vh}
-.app-topbar{height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid #1c3147;background:rgba(4,12,22,.96);position:sticky;top:0;z-index:60;backdrop-filter:blur(12px)}
-.brand-lockup{display:flex;align-items:center;gap:10px}.brand-lockup img{width:38px;height:38px;object-fit:contain}.brand-lockup strong{font-size:1.05rem;letter-spacing:.02em;display:block}.brand-lockup span{font-size:.62rem;color:var(--muted);display:block;margin-top:2px}.brand-lockup .version-badge{margin-left:8px;background:#1769e8;color:#fff;padding:5px 9px;border-radius:999px;font-size:.65rem}
-.save-state{font-size:.7rem;font-weight:900;color:#35d07f;letter-spacing:.05em}
-
-.dashboard{display:grid;grid-template-columns:330px minmax(0,1fr);gap:12px;max-width:1500px;margin:0 auto;padding:12px 12px 92px}
-.sidebar{display:flex;flex-direction:column;gap:10px;min-width:0}
-.workspace{display:flex;flex-direction:column;gap:10px;min-width:0}
-.panel{background:linear-gradient(180deg,rgba(15,31,50,.98),rgba(8,21,36,.98));border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 35px rgba(0,0,0,.20)}
-.panel h2{font-size:.78rem;margin:0 0 10px;letter-spacing:.04em}
-.load-data,.trailer-info{padding:12px}
-.stats{margin:0 0 10px!important;border:0!important;background:#071421!important;padding:0!important;display:grid!important;grid-template-columns:repeat(3,1fr)!important;border-radius:9px!important;overflow:hidden}
-.stats>div{padding:10px 4px;text-align:center;border-right:1px solid #203247}.stats>div:last-child{border-right:0}.stat-v{font-size:1.15rem!important}.stats small{font-size:.56rem;color:#b6c1cf}
-#viewModeBar{margin:0 0 10px!important}.modebtn{border:1px solid #2b4057!important;background:#1c3047!important}.modebtn.active{background:linear-gradient(180deg,#0abb61,#06974d)!important}
-.meta-grid,.transport-grid{margin:0!important;gap:8px!important}.meta-grid{grid-template-columns:1fr 1fr!important}.transport-grid{grid-template-columns:1fr 1fr!important;margin-top:8px!important}
-.meta-grid input,.transport-grid input{height:43px!important;background:#081423!important;border:1px solid #344a63!important;border-radius:6px!important;font-size:.83rem!important}.meta-grid label,.transport-grid label{font-size:.56rem!important;letter-spacing:.03em}
-.dimension-row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid #203247;font-size:.65rem}.dimension-row:last-child{border-bottom:0}.dimension-row span{color:var(--muted)}.dimension-row b{font-size:.68rem}
-
-.input-grid{padding:0!important}.input-grid>.info{display:none!important}.p-card{margin:0 0 8px!important;border:1px solid var(--line)!important;background:linear-gradient(180deg,#0f2033,#0a1727)!important;border-radius:10px!important;padding:10px!important}.editing .p-card{display:block!important}.p-card{display:none!important}
-.type-head{margin:0!important}.p-title b{font-size:.8rem;display:flex!important;align-items:center;gap:7px}.p-title small{font-size:.6rem}.type-swatch{width:9px;height:9px;border-radius:2px;display:inline-block}.type-swatch.euro{background:#3b82f6}.type-swatch.blok{background:#f59e0b}.type-swatch.middel{background:#10b981}.type-swatch.lang{background:#ef4444}.add-order{background:#1f6feb!important;border:1px solid #3c83ed!important;padding:7px 9px!important}
-.order-line{grid-template-columns:1fr 70px 34px!important}.order-line .order-input,.order-line input.qty{height:40px!important;border-radius:6px!important}.order-line input.qty{font-size:1rem!important}
-
-.plan-panel{padding:12px;min-height:420px}.plan-titlebar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px}.plan-titlebar h1{margin:0;font-size:1rem}.plan-titlebar span{font-size:.62rem;color:var(--muted)}.plan-actions{display:grid;grid-template-columns:1.25fr .8fr .8fr;gap:7px;min-width:340px}.plan-actions button{padding:10px 11px!important;font-size:.7rem!important;border-radius:7px!important}.accent{background:linear-gradient(180deg,#2485f4,#176bda)!important}.secondary{background:#1a2a3d!important;border:1px solid #2d435a!important}
-.trailer-shell{margin:0!important}.direction-row{font-size:.65rem!important;margin-bottom:5px!important}.meter-ruler{background:#07111c!important;border-color:#334960!important;height:25px!important}.meter-ruler span{top:5px!important;font-size:.6rem!important}
-.trailer-scroll{max-height:none!important;min-height:210px;border:2px solid #77889b!important;background:#02070d!important;padding:8px!important;border-radius:10px!important}
-#canvas{border-left:14px solid #637083!important;border-right:18px double #94a3b8!important;background-color:#08121f!important;background-image:linear-gradient(90deg,rgba(118,145,170,.12) 1px,transparent 1px)!important}
-.v-p{border-radius:4px!important;box-shadow:inset 0 0 0 2px rgba(0,0,0,.2),0 1px 3px rgba(0,0,0,.35)!important}.v-p .pallet-label{background:rgba(3,9,17,.72)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 3px 7px rgba(0,0,0,.3)}
-.compact-tools{max-width:430px;margin:9px 0 0 auto!important}.compact-tools button{padding:9px!important;font-size:.68rem!important}
-.security-note{background:#09261e!important;border-color:#159a5d!important;font-size:.67rem!important;line-height:1.4}.warning{font-size:.68rem!important}
-#orderLegend{margin:8px 0 0!important}.order-chip{background:#0a1726!important;border-color:#344960!important}
-
-.export-panel{padding:12px;display:flex;align-items:center;justify-content:space-between;gap:15px}.export-copy b{font-size:.75rem;display:block}.export-copy span{font-size:.62rem;color:var(--muted)}.export-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;min-width:450px}.export-actions button{padding:13px 8px!important;font-size:.72rem!important;border-radius:8px!important}.export-actions button:first-child{background:linear-gradient(180deg,#14c967,#08a553)!important}.pdfbtn{background:#063b2c!important;border:1px solid #15a562!important}
-
-footer{display:none!important}
-.header{display:none!important}
-
 @media(max-width:900px){
- .app-topbar{height:60px;padding:0 12px}.brand-lockup img{width:32px;height:32px}.brand-lockup strong{font-size:.88rem}.brand-lockup span{display:none}.save-state{display:none}
- .dashboard{grid-template-columns:1fr;padding:8px 8px 120px;gap:8px}
- .sidebar{display:contents}.workspace{display:contents}
- .load-data{order:1}.plan-panel{order:2}.trailer-info{display:none}.input-grid{order:3}.export-panel{order:4}
- .plan-titlebar{display:block}.plan-titlebar>div:first-child{display:none}.plan-actions{min-width:0;margin-bottom:8px;grid-template-columns:1.2fr .9fr .9fr}
- .plan-actions button{font-size:.66rem!important;padding:10px 5px!important}
- .trailer-scroll{min-height:190px}
- .compact-tools{max-width:none;margin:8px 0 0!important}
- .export-panel{position:fixed;left:0;right:0;bottom:0;z-index:50;border-radius:0;padding:8px;background:#081525;box-shadow:0 -8px 30px rgba(0,0,0,.45)}
- .export-copy{display:none}.export-actions{min-width:0;width:100%;grid-template-columns:1fr 1fr 1fr}
- .export-actions button{font-size:.68rem!important;padding:13px 4px!important}
- .load-data{padding:9px}.meta-grid,.transport-grid{grid-template-columns:1fr 1fr!important}
+ .topnav{height:58px;padding:0 10px}.wm-brand{min-width:0}.wm-brand strong{font-size:.9rem}.wm-brand img{width:28px;height:28px}.version-badge{font-size:.55rem;padding:4px 7px}.navtabs,.saved{display:none}
+ .appgrid{grid-template-columns:1fr;padding:7px 7px 118px}.leftcol{order:2}.rightcol{order:1}
+ .main-toolbar{display:block}.quick-actions{grid-template-columns:repeat(3,1fr);margin-top:7px}#viewModeBar{min-width:0}
+ .leftcol .trailer-dims,.leftcol .pallet-total,.leftcol .result-card{display:none}
+ .loadarea{padding-top:5px}.trailer-scroll{max-height:330px}#canvas{height:240px}
+ .status-strip{grid-template-columns:34px 1fr}.status-strip button{display:none}
+ .bottom-grid{display:block}.available{display:none}.exports{height:90px}
+ .meta-grid,.transport-grid{grid-template-columns:1fr 1fr}
+ .editing .leftcol .result-card{display:block}
+ .edit-pallets{display:none}.editing .edit-pallets{display:block}
+ .leftcol{gap:7px}.dash-card{padding:9px}
+ .rightcol{gap:7px}.status-strip{padding:9px 10px}
+ .bottom-grid{position:fixed;left:0;right:0;bottom:0;z-index:90;border-radius:0;padding:7px;background:#071321}
 }
-@media(max-width:520px){
- .brand-lockup .version-badge{font-size:.56rem;padding:4px 7px}
- .stats>div{padding:8px 2px}.stat-v{font-size:1.05rem!important}
- .meta-grid input,.transport-grid input{font-size:.78rem!important}
- .plan-panel{padding:8px}.trailer-scroll{min-height:175px;padding:5px!important}
- .security-note{font-size:.61rem!important}
-}
-
-
-/* v10.3 unified load-plan renderer */
-.plan-panel{background:#f7f9fc!important;color:#0f172a!important;border-color:#cbd5e1!important}
-.plan-titlebar h1{color:#0f172a!important}.plan-titlebar span{color:#64748b!important}
-.direction-row{color:#475569!important}
-.meter-ruler{background:#eef2f7!important;border-color:#cbd5e1!important}
-.meter-ruler span{color:#475569!important;font-weight:800}
-.trailer-scroll{background:#e2e8f0!important;border:2px solid #64748b!important;box-shadow:inset 0 0 0 4px #fff!important}
-#canvas{
- background-color:#111827!important;
- background-image:linear-gradient(90deg,rgba(255,255,255,.13) 1px,transparent 1px)!important;
- background-size:100px 100%!important;
- border-left:14px solid #475569!important;border-right:18px double #94a3b8!important
-}
-.v-p{border-radius:2px!important;box-shadow:none!important}
-.v-p .pallet-visual{border-color:rgba(255,255,255,.48)!important}
-.v-p .deck-board{background:rgba(15,23,42,.30)!important;border-color:rgba(255,255,255,.42)!important}
-.v-p .pallet-label{background:rgba(15,23,42,.80)!important;color:#fff!important;border:1px solid rgba(255,255,255,.5)!important;border-radius:3px!important}
-#modeLabel{color:#334155!important}.security-note{color:#d1fae5!important}
-
 </style>
 </head>
 <body>
-<div class="app-topbar">
-  <div class="brand-lockup">
+<header class="topnav">
+  <div class="wm-brand">
     <img src="icon.png" alt="AWC">
-    <div><strong>WAREHOUSE MASTER</strong><span>Amsterdam Warehouse Company</span></div>
-    <b class="version-badge">v10.3 PRO</b>
+    <strong>WAREHOUSE MASTER</strong>
+    <span class="version-badge">v10.4 PRO</span>
   </div>
-  <div class="save-state">✓ LAADPLAN</div>
-</div>
+  <nav class="navtabs">
+    <button class="active">▦ LAADMETER</button>
+    <button>▧ PALLETS</button>
+    <button>▣ ORDERS</button>
+    <button>⚙ INSTELLINGEN</button>
+    <button>ⓘ INFO</button>
+  </nav>
+  <div class="saved">☼ &nbsp; ✓ OPGESLAGEN</div>
+</header>
 
-<div class="dashboard">
-  <aside class="sidebar">
-    <section class="panel load-data">
+<div class="appgrid">
+  <aside class="leftcol">
+    <section class="dash-card">
       <h2>LAADGEGEVENS</h2>
-      <div class="stats">
-        <div><span id="m-out" class="stat-v">0,00</span><small>LAADMETER</small></div>
-        <div><span id="p-out" class="stat-v">0</span><small>PALLETS</small></div>
-        <div><span id="free-out" class="stat-v">13,60</span><small>VRIJ</small></div>
+      <div class="meta-grid">
+        <div><label>ORDER / VRACHTNUMMER</label><input id="orderNo" type="text" placeholder="123456" oninput="autoPlan()"></div>
+        <div><label>REFERENTIE / KLANT</label><input id="reference" type="text" placeholder="optioneel"></div>
       </div>
-
-      <div id="viewModeBar">
-        <button id="viewBtn" class="modebtn active" onclick="setUIMode(false)">BEKIJK LAADPLAN</button>
-        <button id="editBtn" class="modebtn" onclick="setUIMode(true)">BEWERKEN</button>
-      </div>
-
-      <div id="editPanel">
-        <div class="meta-grid">
-          <div><label>ORDER / VRACHTNUMMER</label><input id="orderNo" type="text" placeholder="bijv. 123456" oninput="autoPlan()"></div>
-          <div><label>REFERENTIE / KLANT</label><input id="reference" type="text" placeholder="optioneel"></div>
-        </div>
-        <div class="transport-grid">
-          <div><label>CHAUFFEUR</label><input id="driver" type="text" placeholder="naam chauffeur"></div>
-          <div><label>KENTEKEN TREKKER</label><input id="tractorPlate" type="text" placeholder="bijv. 12-ABC-3"></div>
-          <div><label>KENTEKEN TRAILER</label><input id="trailerPlate" type="text" placeholder="optioneel"></div>
-          <div><label>TRANSPORTEUR</label><input id="carrier" type="text" placeholder="optioneel"></div>
-        </div>
+      <div class="transport-grid">
+        <div><label>CHAUFFEUR</label><input id="driver" type="text" placeholder="naam chauffeur"></div>
+        <div><label>KENTEKEN TREKKER</label><input id="tractorPlate" type="text" placeholder="12-ABC-3"></div>
+        <div><label>KENTEKEN TRAILER</label><input id="trailerPlate" type="text" placeholder="optioneel"></div>
+        <div><label>TRANSPORTEUR</label><input id="carrier" type="text" placeholder="optioneel"></div>
       </div>
     </section>
 
-    <section class="panel trailer-info">
-      <h2>TRAILER</h2>
-      <div class="dimension-row"><span>LENGTE BINNENWERK</span><b>13,60 m</b></div>
-      <div class="dimension-row"><span>BREEDTE BINNENWERK</span><b>2,40 m</b></div>
-      <div class="dimension-row"><span>LAADPRINCIPE</span><b>TETRIS AUTO</b></div>
+    <section class="dash-card trailer-dims">
+      <h2>TRAILER AFMETINGEN</h2>
+      <div class="trailer-mini"><div class="truckbox">▯</div><div>
+        <p><span>LENGTE BINNENWERK</span><b>13,60 m</b></p>
+        <p><span>BREEDTE BINNENWERK</span><b>2,40 m</b></p>
+        <p><span>HOOGTE BINNENWERK</span><b>2,70 m</b></p>
+      </div></div>
     </section>
 
-    <div class="input-grid">
-      <div class="info">Meerdere orders per pallettype zijn mogelijk. Ieder order wordt afzonderlijk geoptimaliseerd en blijft als blok bij elkaar.</div>
+    <section class="dash-card pallet-total">
+      <h2>PALLET TOTAAL (<span id="p-total-label">0</span>)</h2>
+      <div class="pallet-head"><span>TYPE</span><span>AFMETING (CM)</span><span>AANTAL</span><span>WEERGAVE</span></div>
+      <div class="pallet-row"><b class="tag e">EURO</b><span>120 × 80</span><strong id="cnt-e">0</strong><span class="orientation-badges"><i>L</i><i>D</i></span></div>
+      <div class="pallet-row"><b class="tag b">BLOK</b><span>100 × 120</span><strong id="cnt-b">0</strong><span class="orientation-badges"><i>L</i><i>D</i></span></div>
+      <div class="pallet-row"><b class="tag m">MIDDEL</b><span>140 × 80</span><strong id="cnt-m">0</strong><span class="orientation-badges"><i>L</i><i>D</i></span></div>
+      <div class="pallet-row"><b class="tag l">LANG</b><span>200 × 80</span><strong id="cnt-l">0</strong><span class="orientation-badges"><i>L</i><i>D</i></span></div>
+      <div class="pallet-total-row"><b>TOTAAL</b><strong id="cnt-total">0</strong></div>
+    </section>
 
-      <div class="p-card" data-type="e">
-        <div class="type-head"><div class="p-title"><b><span class="type-swatch euro"></span>Euro</b><small>80 × 120 cm</small></div><button class="add-order" onclick="addOrderLine('e')">+ ORDER</button></div>
-        <div class="order-lines" id="eLines"></div>
+    <section class="dash-card result-card">
+      <h2>LAADRESULTAAT</h2>
+      <div class="result-grid">
+        <div><span>GEBRUIKTE LENGTE</span><b id="m-out">0,00 m</b></div>
+        <div><span>REST LENGTE</span><b id="free-out">13,60 m</b></div>
+        <div><span>BENUTTING</span><b id="util-out">0%</b></div>
       </div>
+      <button class="auto-big" onclick="autoPlan()">✦ AUTO OPTIMAAL LADEN</button>
+    </section>
 
-      <div class="p-card" data-type="b">
-        <div class="type-head"><div class="p-title"><b><span class="type-swatch blok"></span>Blok</b><small>100 × 120 cm</small></div><button class="add-order" onclick="addOrderLine('b')">+ ORDER</button></div>
-        <div class="order-lines" id="bLines"></div>
-      </div>
-
-      <div class="p-card" data-type="m">
-        <div class="type-head"><div class="p-title"><b><span class="type-swatch middel"></span>Middel</b><small>80 × 140 cm</small></div><button class="add-order" onclick="addOrderLine('m')">+ ORDER</button></div>
-        <div class="order-lines" id="mLines"></div>
-      </div>
-
-      <div class="p-card" data-type="l">
-        <div class="type-head"><div class="p-title"><b><span class="type-swatch lang"></span>Lang</b><small>80 × 200 cm</small></div><button class="add-order" onclick="addOrderLine('l')">+ ORDER</button></div>
-        <div class="order-lines" id="lLines"></div>
+    <div class="edit-pallets">
+      <div class="input-grid">
+        <div class="p-card" data-type="e"><div class="type-head"><div class="p-title"><b>Euro</b><small>80 × 120 cm</small></div><button class="add-order" onclick="addOrderLine('e')">+ ORDER</button></div><div class="order-lines" id="eLines"></div></div>
+        <div class="p-card" data-type="b"><div class="type-head"><div class="p-title"><b>Blok</b><small>100 × 120 cm</small></div><button class="add-order" onclick="addOrderLine('b')">+ ORDER</button></div><div class="order-lines" id="bLines"></div></div>
+        <div class="p-card" data-type="m"><div class="type-head"><div class="p-title"><b>Middel</b><small>80 × 140 cm</small></div><button class="add-order" onclick="addOrderLine('m')">+ ORDER</button></div><div class="order-lines" id="mLines"></div></div>
+        <div class="p-card" data-type="l"><div class="type-head"><div class="p-title"><b>Lang</b><small>80 × 200 cm</small></div><button class="add-order" onclick="addOrderLine('l')">+ ORDER</button></div><div class="order-lines" id="lLines"></div></div>
       </div>
     </div>
   </aside>
 
-  <main class="workspace">
-    <section class="panel plan-panel">
-      <div class="plan-titlebar">
-        <div><h1>LAADPLAN</h1><span>Bovenaanzicht · identiek in app, WhatsApp en PDF</span></div>
-        <div class="plan-actions">
-          <button class="accent" onclick="autoPlan()">✨ AUTO OPTIMAAL</button>
-          <button class="secondary" onclick="rotateSelected()">↻ DRAAI</button>
-          <button class="secondary" onclick="resetManual()">↺ RESET</button>
-        </div>
+  <main class="rightcol">
+    <div class="main-toolbar">
+      <div id="viewModeBar">
+        <button id="viewBtn" class="modebtn active" onclick="setUIMode(false)">BEKIJK LAADPLAN</button>
+        <button id="editBtn" class="modebtn" onclick="setUIMode(true)">BEWERKEN</button>
       </div>
-
-      <div class="trailer-shell">
-        <div class="direction-row"><span>← CABINE</span><span>DEUREN →</span></div>
-        <div class="meter-ruler">
-          <span style="left:0%">0m</span><span style="left:14.7059%">2m</span><span style="left:29.4118%">4m</span>
-          <span style="left:44.1176%">6m</span><span style="left:58.8235%">8m</span><span style="left:73.5294%">10m</span>
-          <span style="left:88.2353%">12m</span><span style="left:100%">13,6m</span>
-        </div>
-        <div class="trailer-scroll" id="trailerScroll"><div id="canvas"></div></div>
+      <div class="quick-actions">
+        <button onclick="autoPlan()">✦ AUTO</button>
+        <button onclick="rotateSelected()">↻ DRAAI</button>
+        <button onclick="resetManual()">↺ RESET</button>
+        <button onclick="zoomOut()">− UITZOOM</button>
+        <button onclick="zoomIn()">＋ INZOOM</button>
+        <button onclick="fitView()">▣ PASSEND</button>
       </div>
+    </div>
 
-      <div class="toolbar2 compact-tools">
-        <button class="secondary" onclick="zoomOut()">− UITZOOM</button>
-        <button class="secondary" onclick="fitView()">▣ PASSEND</button>
-        <button class="secondary" onclick="zoomIn()">＋ INZOOM</button>
+    <section class="loadarea">
+      <div class="direction-row"><span>← CABINE</span><span>DEUREN →</span></div>
+      <div class="meter-ruler">
+        <span style="left:0%">0m</span><span style="left:7.35%">1m</span><span style="left:14.7%">2m</span><span style="left:22.05%">3m</span><span style="left:29.4%">4m</span><span style="left:36.75%">5m</span><span style="left:44.1%">6m</span><span style="left:51.45%">7m</span><span style="left:58.8%">8m</span><span style="left:66.15%">9m</span><span style="left:73.5%">10m</span><span style="left:80.85%">11m</span><span style="left:88.2%">12m</span><span style="left:95.55%">13m</span><span style="left:100%">13,6m</span>
       </div>
-
-      <div id="modeLabel">TETRIS AUTO — elk order krijgt zijn eigen volledige optimalisatieronde</div>
-      <div id="orderWarning" class="warning"></div>
-      <div class="security-note">TETRIS AUTO v10.2: ieder order wordt afzonderlijk volledig geoptimaliseerd. Kleinere orders worden exact doorgerekend op alle zinvolle posities en draairichtingen; grotere orders gebruiken de combinatieplanner.</div>
-      <div id="orderLegend"></div>
+      <div class="trailer-scroll" id="trailerScroll"><div id="canvas"></div></div>
     </section>
 
-    <section class="panel export-panel">
-      <div class="export-copy">
-        <b>LAADPLAN DELEN</b>
-        <span>Dezelfde visuele indeling wordt gebruikt voor WhatsApp en PDF.</span>
+    <section class="status-strip">
+      <div class="okicon">✓</div>
+      <div><b>OPTIMALE INDELING GEVONDEN</b><span>Alle pallets zijn geplaatst. De planner optimaliseert ieder order afzonderlijk.</span></div>
+      <button>▥ DETAILS</button>
+    </section>
+
+    <section class="bottom-grid">
+      <div class="available">
+        <h3>BESCHIKBARE PALLETS</h3>
+        <div class="mini-pallets">
+          <div class="mini e"><b>EURO</b><span>120×80</span><small id="avail-e">0</small></div>
+          <div class="mini b"><b>BLOK</b><span>100×120</span><small id="avail-b">0</small></div>
+          <div class="mini m"><b>MIDDEL</b><span>140×80</span><small id="avail-m">0</small></div>
+          <div class="mini l"><b>LANG</b><span>200×80</span><small id="avail-l">0</small></div>
+        </div>
       </div>
-      <div class="export-actions">
-        <button onclick="send()">WHATSAPP VISUEEL</button>
-        <button class="pdfbtn" onclick="downloadPdf()">DOWNLOAD PDF</button>
-        <button class="secondary" onclick="printPlan()">PDF / PRINT</button>
+      <div class="exports">
+        <button class="wa" onclick="send()">WHATSAPP<br>VISUEEL</button>
+        <button class="pdf" onclick="downloadPdf()">DOWNLOAD<br>PDF</button>
+        <button class="print" onclick="printPlan()">PDF / PRINT</button>
       </div>
     </section>
+
+    <div id="orderWarning" class="warning"></div>
+    <div id="orderLegend"></div>
+    <div id="modeLabel"></div>
   </main>
 </div>
 <script>
@@ -617,7 +534,14 @@ function palletDirection(p){
 
 function autoPlan(){manual=false;selectedId=null;items=buildItems();items=optimizePlan(items);render();document.getElementById('modeLabel').innerText='TETRIS AUTO — elk order krijgt zijn eigen volledige optimalisatieronde'}
 function endCm(arr=items){return arr.reduce((m,p)=>Math.max(m,p.x+p.l),0)}function endMeters(arr=items){return endCm(arr)/100}
-function render(){const can=document.getElementById('canvas');can.innerHTML='';document.getElementById('p-out').innerText=items.length;const end=endCm();document.getElementById('m-out').innerText=(end/100).toFixed(2).replace('.',',');document.getElementById('free-out').innerText=Math.max(0,(TL-end)/100).toFixed(2).replace('.',',');
+function render(){const can=document.getElementById('canvas');can.innerHTML='';document.getElementById('p-out').innerText=items.length;const end=endCm();document.getElementById('m-out').innerText=(end/100).toFixed(2).replace('.',',')+' m';document.getElementById('free-out').innerText=Math.max(0,(TL-end)/100).toFixed(2).replace('.',',')+' m';
+
+ const counts={e:0,b:0,m:0,l:0};items.forEach(p=>counts[p.type]++);
+ const total=items.length;
+ const util=total?Math.round((end/TL)*100):0;
+ const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val};
+ set('p-total-label',total);set('cnt-total',total);set('cnt-e',counts.e);set('cnt-b',counts.b);set('cnt-m',counts.m);set('cnt-l',counts.l);
+ set('avail-e',counts.e);set('avail-b',counts.b);set('avail-m',counts.m);set('avail-l',counts.l);set('util-out',util+'%');
  let seenOrders=new Set(); items.forEach(p=>{const d=document.createElement('div');const isStart=!seenOrders.has(p.order);seenOrders.add(p.order);const pd=palletDirection(p);d.className='v-p '+(pd.lengthwise?'dir-long':'dir-cross')+(p.id===selectedId?' selected':'')+(isStart?' order-start':'');d.dataset.id=p.id;d.style.left=p.x*S+'px';d.style.top=p.y*S+'px';d.style.width=p.l*S+'px';d.style.height=p.w*S+'px';d.style.backgroundColor=p.c;d.style.border=`3px solid ${orderColor(p.order)}`;d.innerHTML=`<span class="pallet-visual">${['b1','b2','b3'].map(b=>`<i class="deck-board ${pd.lengthwise?'long':'cross'} ${b}"></i>`).join('')}</span><span class="pallet-label"><span class="ord">${escapeHtml(p.order==='—'?'GEEN ORDER':'ORD '+p.order)}</span><span class="dims">${p.label} ${p.w}×${p.l}</span></span>`;d.addEventListener('pointerdown',startDrag);d.addEventListener('click',()=>{selectedId=p.id;render()});can.appendChild(d)});window.plan=makeRows();renderOrderLegend()}
 
 function candidateContactPositions(p,others){
@@ -688,54 +612,71 @@ function rotateSelected(){
 }function resetManual(){autoPlan()}
 function makeRows(){const cuts=[...new Set(items.map(p=>p.x))].sort((a,b)=>a-b);return cuts.map(x=>items.filter(p=>p.x===x).sort((a,b)=>a.y-b.y).map(p=>`${p.label}(${p.w}×${p.l})`).join(' + ')).filter(Boolean)}
 function makePlanImage(){
- const used=TL, scale=2, margin=64, top=255, footerH=230;
- // Landscape export: keep a wide trailer composition for WhatsApp and A4 landscape PDF.
- const planW=1360;
- const c=document.createElement('canvas');c.width=planW+margin*2;c.height=TW*scale+top+footerH;const g=c.getContext('2d');
+ const c=document.createElement('canvas');c.width=1600;c.height=900;const g=c.getContext('2d');
  const order=document.getElementById('orderNo').value.trim()||'—';
  const ref=document.getElementById('reference').value.trim()||'—';
  const date=new Date().toLocaleDateString('nl-NL');
- // Professional AWC header
- g.fillStyle='#ffffff';g.fillRect(0,0,c.width,c.height);
- g.fillStyle='#0f172a';g.fillRect(0,0,c.width,150);
- g.fillStyle='#22c55e';g.fillRect(0,150,c.width,7);
- g.strokeStyle='#22c55e';g.lineWidth=5;g.strokeRect(margin,28,92,78);
- g.fillStyle='#ffffff';g.font='900 38px Arial';g.textAlign='center';g.textBaseline='middle';g.fillText('AWC',margin+46,67);
- g.textAlign='left';g.textBaseline='alphabetic';g.font='900 30px Arial';g.fillText('AMSTERDAM WAREHOUSE COMPANY',margin+120,60);
- g.font='bold 22px Arial';g.fillStyle='#cbd5e1';g.fillText('LAADPLAN • BOVENAANZICHT',margin+120,98);
- // Metadata cards
- const metaY=178, gap=18, cardW=(c.width-margin*2-gap)/2;
- function card(x,title,value){g.fillStyle='#f8fafc';g.fillRect(x,metaY,cardW,55);g.strokeStyle='#cbd5e1';g.lineWidth=2;g.strokeRect(x,metaY,cardW,55);g.fillStyle='#64748b';g.font='bold 14px Arial';g.fillText(title,x+14,metaY+20);g.fillStyle='#0f172a';g.font='bold 20px Arial';g.fillText(value,x+14,metaY+45)}
- card(margin,'ORDER / VRACHTNUMMER',order);card(margin+cardW+gap,'REFERENTIE / KLANT',ref);
- const sx=planW/used, sy=(TW*scale)/TW, px=margin,py=top;
- g.fillStyle='#475569';g.font='900 16px Arial';g.textAlign='left';g.fillText('← CABINE',px,py-12);
- g.textAlign='right';g.fillText('DEUREN →',px+planW,py-12);g.textAlign='left';
- g.fillStyle='#111827';g.fillRect(px,py,planW,TW*scale);g.strokeStyle='#0f172a';g.lineWidth=5;g.strokeRect(px,py,planW,TW*scale);g.fillStyle='#475569';g.fillRect(px,py,12,TW*scale);g.fillStyle='#94a3b8';g.fillRect(px+planW-14,py,5,TW*scale);g.fillRect(px+planW-6,py,5,TW*scale);
- for(let m=0;m<=Math.ceil(used/100);m++){const x=px+m*100*sx;if(x>px+planW)break;g.strokeStyle='rgba(255,255,255,.20)';g.lineWidth=1;g.beginPath();g.moveTo(x,py);g.lineTo(x,py+TW*scale);g.stroke();g.fillStyle='#475569';g.font='16px Arial';g.fillText(`${m}m`,x+3,py+TW*scale+24)}
- items.forEach(p=>{const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy;g.fillStyle=p.c;g.fillRect(x,y,w,h);const pd=palletDirection(p);
- // Draw pallet deck boards from top view. Boards follow the pallet's long axis.
- g.save();g.fillStyle='rgba(20,20,20,.26)';g.strokeStyle='rgba(255,255,255,.22)';g.lineWidth=1;
- if(pd.lengthwise){
-   const bh=Math.max(4,h*.12);[.10,.44,.78].forEach(r=>{const yy=y+h*r;g.fillRect(x+w*.05,yy,w*.90,bh);g.strokeRect(x+w*.05,yy,w*.90,bh)});
- }else{
-   const bw=Math.max(4,w*.12);[.10,.44,.78].forEach(r=>{const xx=x+w*r;g.fillRect(xx,y+h*.05,bw,h*.90);g.strokeRect(xx,y+h*.05,bw,h*.90)});
- }
- g.restore();
- g.strokeStyle=orderColor(p.order);g.lineWidth=6;g.strokeRect(x,y,w,h);
- // dark label plate keeps order readable while the pallet remains visually obvious
- const ord=p.order==='—'?'GEEN ORDER':`ORD ${p.order}`;const fs=Math.max(12,Math.min(20,h*.20));
- const plateW=Math.min(w*.86,Math.max(68,g.measureText(ord).width+22)),plateH=Math.min(h*.46,fs*2.2);
- g.fillStyle='rgba(2,6,23,.62)';g.fillRect(x+(w-plateW)/2,y+(h-plateH)/2,plateW,plateH);
- g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';g.font=`900 ${fs}px Arial`;g.fillText(ord,x+w/2,y+h/2-fs*.35,Math.max(30,w-10));
- g.font=`bold ${Math.max(10,fs*.72)}px Arial`;g.fillText(`${p.label} ${p.w}×${p.l}`,x+w/2,y+h/2+fs*.58,Math.max(30,w-10))
-});
+ const end=endCm(), used=(end/100).toFixed(2).replace('.',','), free=Math.max(0,(TL-end)/100).toFixed(2).replace('.',',');
+ const util=Math.round((end/TL)*100);
+ g.fillStyle='#06111f';g.fillRect(0,0,c.width,c.height);
+
+ // top bar
+ g.fillStyle='#071321';g.fillRect(0,0,c.width,78);g.strokeStyle='#203247';g.beginPath();g.moveTo(0,77);g.lineTo(c.width,77);g.stroke();
+ g.fillStyle='#ffffff';g.font='900 28px Arial';g.fillText('WAREHOUSE MASTER',34,48);
+ g.fillStyle='#1677ed';g.fillRect(330,20,122,38);g.fillStyle='#fff';g.font='900 17px Arial';g.fillText('v10.4 PRO',345,46);
+ g.fillStyle='#00c96b';g.font='900 17px Arial';g.textAlign='right';g.fillText('✓ OPGESLAGEN',1560,46);g.textAlign='left';
+
+ // left data panel
+ const lx=20,ly=96,lw=405;
+ function panel(x,y,w,h,title){g.fillStyle='#0a1725';g.fillRect(x,y,w,h);g.strokeStyle='#26384d';g.strokeRect(x,y,w,h);g.fillStyle='#fff';g.font='900 17px Arial';g.fillText(title,x+14,y+25)}
+ panel(lx,ly,lw,255,'LAADGEGEVENS');
+ const boxes=[['ORDER / VRACHTNUMMER',order],['REFERENTIE / KLANT',ref],['DATUM',date],['TRAILER','13,60 × 2,40 m']];
+ boxes.forEach((b,i)=>{const bx=lx+14+(i%2)*190,by=ly+45+Math.floor(i/2)*82;g.fillStyle='#071321';g.fillRect(bx,by,176,62);g.strokeStyle='#34495f';g.strokeRect(bx,by,176,62);g.fillStyle='#a7b4c3';g.font='bold 11px Arial';g.fillText(b[0],bx+8,by+18);g.fillStyle='#fff';g.font='900 18px Arial';g.fillText(b[1],bx+8,by+45)});
+
+ panel(lx,ly+268,lw,178,'LAADRESULTAAT');
+ const rs=[['GEBRUIKTE LENGTE',used+' m','#00d265'],['REST LENGTE',free+' m','#fff'],['BENUTTING',util+'%','#fff']];
+ rs.forEach((r,i)=>{const x=lx+14+i*126,y=ly+315;g.fillStyle='#071321';g.fillRect(x,y,114,86);g.strokeStyle='#273a4e';g.strokeRect(x,y,114,86);g.fillStyle='#d7e0e9';g.font='bold 10px Arial';g.fillText(r[0],x+7,y+22);g.fillStyle=r[2];g.font='900 23px Arial';g.fillText(r[1],x+7,y+58)});
+
+ // main trailer header
+ const px=455,py=160,pw=1100,ph=360;
+ g.fillStyle='#fff';g.font='900 18px Arial';g.fillText('← CABINE',px,128);g.textAlign='right';g.fillText('DEUREN →',px+pw,128);g.textAlign='left';
+ for(let m=0;m<=13;m++){const x=px+(m/13.6)*pw;g.fillStyle='#dbe4ec';g.font='13px Arial';g.fillText(m+'m',x,151)}
+ g.fillText('13,6m',px+pw-35,151);
+
+ // trailer
+ g.fillStyle='#0f1721';g.fillRect(px,py,pw,ph);g.strokeStyle='#d7dde4';g.lineWidth=3;g.strokeRect(px,py,pw,ph);
+ for(let m=1;m<14;m++){const x=px+(m/13.6)*pw;g.strokeStyle='rgba(255,255,255,.12)';g.lineWidth=1;g.beginPath();g.moveTo(x,py);g.lineTo(x,py+ph);g.stroke()}
+ g.fillStyle='#4f5c6a';g.fillRect(px,py,28,ph);g.fillStyle='#9ca8b4';g.fillRect(px+pw-14,py,4,ph);g.fillRect(px+pw-7,py,4,ph);
+
+ const sx=pw/TL, sy=ph/TW;
+ items.forEach(p=>{
+   const x=px+p.x*sx,y=py+p.y*sy,w=p.l*sx,h=p.w*sy;
+   g.fillStyle=p.c;g.fillRect(x,y,w,h);
+   const pd=palletDirection(p);
+   g.save();g.fillStyle='rgba(30,20,10,.20)';g.strokeStyle='rgba(0,0,0,.25)';
+   if(pd.lengthwise){const bh=Math.max(3,h*.10);[.10,.44,.78].forEach(r=>{const yy=y+h*r;g.fillRect(x+w*.05,yy,w*.9,bh);g.strokeRect(x+w*.05,yy,w*.9,bh)})}
+   else{const bw=Math.max(3,w*.10);[.10,.44,.78].forEach(r=>{const xx=x+w*r;g.fillRect(xx,y+h*.05,bw,h*.9);g.strokeRect(xx,y+h*.05,bw,h*.9)})}
+   g.restore();
+   g.strokeStyle=orderColor(p.order);g.lineWidth=5;g.strokeRect(x,y,w,h);
+   g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';
+   const fs=Math.max(11,Math.min(19,h*.18));
+   g.font=`900 ${fs}px Arial`;g.fillText(p.order==='—'?'GEEN ORDER':'ORD '+p.order,x+w/2,y+h/2-fs*.45,Math.max(30,w-8));
+   g.font=`bold ${Math.max(10,fs*.72)}px Arial`;g.fillText(`${p.label} ${p.w}×${p.l}`,x+w/2,y+h/2+fs*.65,Math.max(30,w-8));
+ });
+
+ // status strip
  g.textAlign='left';g.textBaseline='alphabetic';
- const fy=py+TW*scale+48;g.fillStyle='#0f172a';g.font='bold 22px Arial';g.fillText(`Gebruikt: ${(endCm()/100).toFixed(2).replace('.',',')} m`,margin,fy);g.fillText(`Pallets: ${items.length}`,margin+230,fy);g.fillText(`Vrij: ${Math.max(0,(TL-endCm())/100).toFixed(2).replace('.',',')} m`,margin+390,fy);
- g.fillStyle='#64748b';g.font='17px Arial';g.fillText(`Datum: ${date}  •  Trailer: 13,60 × 2,40 m`,margin,fy+36);
- // legend
- let lx=margin, ly=fy+75;g.font='bold 16px Arial';Object.values(TYPES).forEach(t=>{g.fillStyle=t.c;g.fillRect(lx,ly-14,20,20);g.fillStyle='#334155';g.fillText(`${t.name} ${t.w}×${t.l}`,lx+28,ly+2);lx+=185});
- // Order legend: colored border = order, fill color = pallet type
- let ox=margin, oy=ly+38;g.font='bold 15px Arial';orderStats().forEach(([o,n])=>{const label=(o==='—'?'GEEN ORDER':'ORD '+o)+` (${n})`;const tw=g.measureText(label).width+45;if(ox+tw>c.width-margin){ox=margin;oy+=30}g.fillStyle='#fff';g.fillRect(ox,oy-17,22,22);g.strokeStyle=orderColor(o);g.lineWidth=5;g.strokeRect(ox,oy-17,22,22);g.fillStyle='#334155';g.fillText(label,ox+31,oy);ox+=tw});
+ panel(px,548,pw,96,'');
+ g.strokeStyle='#00c96b';g.lineWidth=3;g.beginPath();g.arc(px+36,596,18,0,Math.PI*2);g.stroke();g.fillStyle='#00c96b';g.font='900 21px Arial';g.fillText('✓',px+28,603);
+ g.font='900 18px Arial';g.fillText('OPTIMALE INDELING GEVONDEN',px+72,586);
+ g.fillStyle='#e0e7ef';g.font='15px Arial';g.fillText('Alle pallets zijn geplaatst. Ieder order is afzonderlijk geoptimaliseerd.',px+72,612);
+
+ // bottom legend cards
+ panel(px,660,pw,190,'BESCHIKBARE PALLETS / LEGENDA');
+ const types=[TYPES.e,TYPES.b,TYPES.m,TYPES.l];
+ types.forEach((t,i)=>{const x=px+24+i*145,y=705;g.fillStyle=t.c;g.fillRect(x,y,118,104);g.strokeStyle='#657587';g.strokeRect(x,y,118,104);g.fillStyle='#fff';g.textAlign='center';g.font='900 18px Arial';g.fillText(t.name.toUpperCase(),x+59,y+44);g.font='bold 14px Arial';g.fillText(`${t.l}×${t.w}`,x+59,y+67)});
+ g.textAlign='left';
+
  return c;
 }
 async function send(){
